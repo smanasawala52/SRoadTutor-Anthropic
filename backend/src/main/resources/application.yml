@@ -57,7 +57,16 @@ spring:
   # -------------------------------------------------------------------
   flyway:
     enabled: true
+    # Supabase ships with auth/storage/realtime schemas, which makes the DB
+    # look "non-empty" to Flyway. Without baseline-version=0, Flyway would
+    # silently baseline at whatever it detects as "latest" and SKIP V1.
+    # Setting baseline-version=0 forces Flyway to record the baseline BELOW
+    # V1 so V1 (and every other migration) is actually executed.
     baseline-on-migrate: true
+    baseline-version: 0
+    # Only touch the 'public' schema; leave Supabase's internal schemas alone.
+    schemas: public
+    default-schema: public
     locations: classpath:db/migration
     validate-on-migrate: true
     placeholders:
