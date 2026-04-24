@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  These string resources are overridden per-flavor in
+  android/app/src/<flavor>/res/values/strings.xml.
+  This file is just the fallback used if a flavor forgets to override.
+-->
+<resources>
+    <string name="app_name">SRoadTutor</string>
+    <string name="facebook_app_id">REPLACE_ME_FB_APP_ID</string>
+    <string name="facebook_client_token">REPLACE_ME_FB_CLIENT_TOKEN</string>
+    <string name="fb_login_protocol_scheme">fbREPLACE_ME_FB_APP_ID</string>
+</resources>

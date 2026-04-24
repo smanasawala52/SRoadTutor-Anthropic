@@ -1,0 +1,36 @@
+# Prod overrides. Strict, quiet, no SQL in logs.
+
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        generate_statistics: false
+
+  # Explicit: PROD NEVER runs the dev seed. Belt-and-suspenders on top of
+  # the base default in application.yml.
+  flyway:
+    placeholders:
+      seed-dev: "false"
+
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+
+logging:
+  level:
+    com.sroadtutor: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.web: WARN
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  endpoints:
+    web:
+      exposure:
+        include: health

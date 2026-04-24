@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flavor-specific Facebook IDs. Plug in your DEV Facebook app credentials. -->
+<resources>
+    <string name="facebook_app_id">REPLACE_ME_DEV_FB_APP_ID</string>
+    <string name="facebook_client_token">REPLACE_ME_DEV_FB_CLIENT_TOKEN</string>
+    <string name="fb_login_protocol_scheme">fbREPLACE_ME_DEV_FB_APP_ID</string>
+</resources>

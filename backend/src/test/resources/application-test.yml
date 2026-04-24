@@ -1,0 +1,27 @@
+# Test-scoped copy. Stays beside test sources so it's always on the classpath
+# when running under @ActiveProfiles("test").
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    secret: test-jwt-secret-at-least-64-characters-long-so-HS256-signer-is-happy-xxxxx
+    access-token-expiration-minutes: 15
+    refresh-token-expiration-days: 30
+    issuer: sroadtutor-test
+  oauth:
+    google:
+      client-id: test-google-client-id
+      client-secret: test-google-client-secret
+    facebook:
+      app-id: test-facebook-app-id
+      app-secret: test-facebook-app-secret
+  cors:
+    allowed-origins: "*"

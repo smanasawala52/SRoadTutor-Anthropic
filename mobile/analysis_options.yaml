@@ -1,0 +1,58 @@
+# SRoadTutor — Flutter static analysis rules
+# -----------------------------------------------------------------------------
+# This file tells the Dart analyzer (the tool IntelliJ / flutter_test use to
+# flag issues) what to treat as warnings or errors.
+#
+# We start from Flutter's recommended lints and layer on Riverpod-specific
+# checks via custom_lint. Stricter now = cleaner code later.
+# -----------------------------------------------------------------------------
+
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true        # "Object to String" must be explicit
+    strict-inference: true    # no silent dynamic inference
+    strict-raw-types: true    # force you to specify List<T> not just List
+  errors:
+    # Things that should fail the build, not just warn:
+    missing_required_param: error
+    missing_return: error
+    invalid_assignment: error
+    dead_code: error
+    unused_import: warning
+    unused_local_variable: warning
+    todo: ignore              # we allow TODOs in code
+  exclude:
+    - "**/*.g.dart"           # generated (drift / riverpod)
+    - "**/*.freezed.dart"
+    - "**/generated_plugin_registrant.dart"
+    - "build/**"
+
+linter:
+  rules:
+    # Style
+    always_declare_return_types: true
+    avoid_print: true                 # use `logger` package instead
+    avoid_unnecessary_containers: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    sort_pub_dependencies: false      # we group by purpose, not alphabetically
+    unnecessary_lambdas: true
+    use_key_in_widget_constructors: true
+
+    # Correctness / null-safety
+    avoid_returning_null_for_future: true
+    cancel_subscriptions: true
+    close_sinks: true
+    unawaited_futures: true           # force `await` or `unawaited()` on Futures
+
+    # Readability
+    directives_ordering: true
+    prefer_relative_imports: false    # we prefer `package:` imports always
+
+# custom_lint enables riverpod_lint's extra rules (e.g. missing autoDispose).
+# Run `flutter pub run custom_lint` to see them.

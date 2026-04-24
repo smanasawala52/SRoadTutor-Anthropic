@@ -1,0 +1,101 @@
+# ========================
+# SECRETS — NEVER COMMIT
+# ========================
+# Anything matching .env (any name) except the .example templates.
+.env
+.env.*
+!.env.*.example
+!*.env.example
+secrets/
+*.pem
+*.key
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# ========================
+# Java / Spring Boot / Maven
+# ========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+HELP.md
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+build/
+out/
+.gradle/
+
+# ========================
+# Flutter / Dart
+# ========================
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+mobile/pubspec.lock
+mobile/coverage/
+mobile/.symbols/
+mobile/**/ios/Flutter/.last_build_id
+mobile/ios/Pods/
+mobile/ios/Podfile.lock
+mobile/ios/.symbols/
+mobile/android/.gradle/
+mobile/android/captures/
+mobile/android/local.properties
+mobile/android/**/gradle-wrapper.jar
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+
+# Generated Dart/Flutter files (build_runner output)
+mobile/**/*.g.dart
+mobile/**/*.freezed.dart
+mobile/**/*.mocks.dart
+mobile/**/*.config.dart
+
+# ========================
+# IntelliJ / Android Studio / VSCode
+# ========================
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ========================
+# Test / coverage reports
+# ========================
+coverage/
+.jacoco/
+jacoco.exec
+test-results/
+allure-results/
+playwright-report/
+test-output/
+
+# ========================
+# OS / misc
+# ========================
+*.swp
+*~
+.history/
+tmp/
+logs/
+
+# One-shot git bundle produced by the Cowork sandbox — users delete
+# this file locally after the initial push to GitHub.
+sroadtutor-initial-commit.bundle

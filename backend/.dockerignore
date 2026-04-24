@@ -1,0 +1,12 @@
+target/
+.idea/
+*.iml
+.git/
+.gitignore
+.env
+.env.*
+!.env.*.example
+**/README.md
+test-results/
+coverage/
+.jacoco/

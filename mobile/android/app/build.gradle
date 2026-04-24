@@ -1,0 +1,127 @@
+// -----------------------------------------------------------------------------
+//  SRoadTutor — Android module build script
+// -----------------------------------------------------------------------------
+//  Adds three Android product flavors matching the Flutter flavors: dev / qa /
+//  prod. Each gets its own applicationIdSuffix so they can be installed side-
+//  by-side on one phone (handy for dogfooding QA vs prod simultaneously).
+//
+//  Running:
+//    flutter run --flavor dev  -t lib/main_dev.dart
+//    flutter run --flavor qa   -t lib/main_qa.dart
+//    flutter run --flavor prod -t lib/main_prod.dart
+// -----------------------------------------------------------------------------
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '0.1.0'
+
+// Keystore props are OPTIONAL: if /android/key.properties is missing we fall
+// back to the Android debug key so `flutter run` still works. For an APK that
+// you can distribute to friends (see docs/RAILWAY_DEPLOY.md §5) you'll want a
+// real key.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "com.sroadtutor.app"
+    compileSdk 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    defaultConfig {
+        applicationId "com.sroadtutor.app"
+        minSdk 23          // covers 98%+ of devices in-use (Android 6 and up)
+        targetSdk 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+    }
+
+    // ── Signing ──────────────────────────────────────────────────────────
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
+    // ── Flavors ──────────────────────────────────────────────────────────
+    flavorDimensions "env"
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "app_name", "SRoadTutor Dev"
+        }
+        qa {
+            dimension "env"
+            applicationIdSuffix ".qa"
+            versionNameSuffix "-qa"
+            resValue "string", "app_name", "SRoadTutor QA"
+        }
+        prod {
+            dimension "env"
+            resValue "string", "app_name", "SRoadTutor"
+        }
+    }
+
+    // ── Build types ──────────────────────────────────────────────────────
+    buildTypes {
+        release {
+            signingConfig keystorePropertiesFile.exists()
+                    ? signingConfigs.release
+                    : signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    // Plays nicely with `sqlite3_flutter_libs` on older Android versions.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.1'
+    coreLibraryDesugaring 'com.android.tools.desugar_jdk_libs:desugar_jdk_libs:2.0.4'
+}

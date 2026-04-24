@@ -1,0 +1,19 @@
+# QA overrides. Prod-like, but logs a bit more info for debugging test failures.
+
+spring:
+  jpa:
+    show-sql: false
+
+  # Explicit: QA NEVER runs the dev seed.
+  flyway:
+    placeholders:
+      seed-dev: "false"
+
+logging:
+  level:
+    com.sroadtutor: DEBUG
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized

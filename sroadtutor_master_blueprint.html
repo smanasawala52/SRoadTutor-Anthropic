@@ -1,0 +1,168 @@
+
+<style>
+.w{padding:1rem 0;font-size:14px;color:var(--color-text-primary);line-height:1.6}
+.sec{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary);margin:24px 0 10px}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.card.pu{border-color:#AFA9EC;background:#EEEDFE}.card.pu .ct{color:#26215C}.card.pu .cs{color:#534AB7}
+.card.te{border-color:#5DCAA5;background:#E1F5EE}.card.te .ct{color:#04342C}.card.te .cs{color:#0F6E56}
+.card.am{border-color:#EF9F27;background:#FAEEDA}.card.am .ct{color:#412402}.card.am .cs{color:#633806}
+.card.co{border-color:#F0997B;background:#FAECE7}.card.co .ct{color:#4A1B0C}.card.co .cs{color:#712B13}
+.card.bl{border-color:#85B7EB;background:#E6F1FB}.card.bl .ct{color:#042C53}.card.bl .cs{color:#0C447C}
+.ct{font-size:13px;font-weight:500;margin-bottom:5px}
+.cs{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin:2px 2px 0 0}
+.tag.free{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
+.tag.ph1{background:#EEEDFE;color:#26215C;border:1px solid #AFA9EC}
+.tag.ph2{background:#FAEEDA;color:#412402;border:1px solid #EF9F27}
+.tag.ph3{background:#FAECE7;color:#4A1B0C;border:1px solid #F0997B}
+.tag.db{background:#E6F1FB;color:#042C53;border:1px solid #85B7EB}
+.phase-bar{display:flex;gap:0;border-radius:var(--border-radius-lg);overflow:hidden;border:1px solid var(--color-border-tertiary);margin-bottom:10px}
+.pb{flex:1;padding:10px 12px;text-align:center;font-size:12px;font-weight:500}
+.pb.p1{background:#EEEDFE;color:#26215C}.pb.p2{background:#FAEEDA;color:#412402}.pb.p3{background:#FAECE7;color:#4A1B0C}
+.pb-sub{font-size:11px;font-weight:400;color:var(--color-text-tertiary);display:block;margin-top:2px}
+.table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.table th{text-align:left;padding:7px 10px;background:var(--color-background-tertiary);color:var(--color-text-secondary);font-weight:500;font-size:11px}
+.table td{padding:7px 10px;border-top:1px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:top}
+.table tr:first-child td{border-top:none}
+.pill{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-right:3px}
+.pill.g{background:#E1F5EE;color:#085041}.pill.p{background:#EEEDFE;color:#26215C}.pill.a{background:#FAEEDA;color:#412402}.pill.r{background:#FCEBEB;color:#791F1F}
+hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
+.note{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;border-left:3px solid #534AB7;margin-top:10px;line-height:1.6}
+.num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:500;flex-shrink:0}
+.n-pu{background:#EEEDFE;color:#26215C}.n-te{background:#E1F5EE;color:#04342C}.n-am{background:#FAEEDA;color:#412402}
+.step-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+@media(max-width:520px){.g2,.g3{grid-template-columns:1fr}}
+</style>
+<div class="w">
+
+<div class="sec">3 build phases — aligned to investor document</div>
+<div class="phase-bar">
+  <div class="pb p1">Phase 1 — Core SaaS<span class="pb-sub">Months 1–3 · MVP</span></div>
+  <div class="pb p2">Phase 2 — Marketplace<span class="pb-sub">Months 4–9 · Revenue</span></div>
+  <div class="pb p3">Phase 3 — AI + Data<span class="pb-sub">Year 2 · Unicorn play</span></div>
+</div>
+
+<div class="sec">Phase 1 — every module to build (MVP)</div>
+<div class="grid g3">
+  <div class="card pu"><div class="ct">Auth system</div><div class="cs">Google login, Facebook login, email/password. OTP SMS via Twilio. Passwordless for non-tech users. Role assigned at signup.</div><span class="tag ph1">Phase 1</span><span class="tag free">Supabase Auth</span></div>
+  <div class="card pu"><div class="ct">Role-based access</div><div class="cs">4 roles: Owner, Instructor, Student, Parent. Each sees only their own screens. Spring Boot enforces this on every API call.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card pu"><div class="ct">Instructor onboarding</div><div class="cs">Self-signup OR owner invites. School name, license number, SGI certification, vehicle info, working hours.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card te"><div class="ct">Student management</div><div class="cs">Add by instructor or owner. Name, contact, parent link, package purchased, lessons remaining, status.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card te"><div class="ct">Parent portal</div><div class="cs">Linked to student. Read-only: schedule, progress, payments. Gets WhatsApp alerts. No edit permissions.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card te"><div class="ct">Scheduling engine</div><div class="cs">Calendar view. Instructor sets availability. Student/owner/instructor can book, edit, cancel. Conflict detection auto-blocks double bookings.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card am"><div class="ct">WhatsApp reminders</div><div class="cs">One-tap sends pre-filled message to student + parent via WhatsApp link. Twilio SMS fallback. Auto-fires 24h before lesson.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card am"><div class="ct">Digital payment ledger</div><div class="cs">Track what's owed per session. Mark paid/unpaid. Cash + e-transfer support first. Stripe online payments later.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card am"><div class="ct">SGI evaluation engine</div><div class="cs">Pre-loaded SGI mistake categories. Big colour-coded buttons for in-car use. Auto-generates Road Test Readiness score.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card bl"><div class="ct">Progress reports</div><div class="cs">Per-student PDF report card. Mistake history, improvement over time, readiness percentage. Shareable via WhatsApp.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card bl"><div class="ct">Owner dashboard</div><div class="cs">Total revenue, unpaid sessions, active students, instructor workloads, monthly MRR summary.</div><span class="tag ph1">Phase 1</span></div>
+  <div class="card bl"><div class="ct">Subscription billing</div><div class="cs">Free / $29 / $69 / $149 plans. Stripe billing. Plan limits enforced by Spring Boot. Upgrade prompts in-app.</div><span class="tag ph1">Phase 1</span></div>
+</div>
+
+<div class="sec">Phase 2 — marketplace modules</div>
+<div class="grid g3">
+  <div class="card am"><div class="ct">First Car Matchmaker</div><div class="cs">Parent portal widget. Collects vehicle preferences + financing readiness. Pre-qualifies parents before student passes test.</div><span class="tag ph2">Phase 2</span></div>
+  <div class="card am"><div class="ct">Graduation trigger</div><div class="cs">When instructor marks "Passed Road Test" → auto-routes lead to partnered dealership CRM via API. $200–$500 bounty per conversion.</div><span class="tag ph2">Phase 2</span></div>
+  <div class="card am"><div class="ct">Instructor affiliate</div><div class="cs">Instructor earns $100 automated kickback when their student buys a car via SRoadTutor marketplace.</div><span class="tag ph2">Phase 2</span></div>
+  <div class="card am"><div class="ct">Dealership CRM API</div><div class="cs">REST API integration with dealership CRMs (DealerSocket, CDK). Lead payload: name, budget, location, timeline.</div><span class="tag ph2">Phase 2</span></div>
+  <div class="card am"><div class="ct">Tax prep integration</div><div class="cs">Export instructor earnings, session logs, payment records to CSV/API for accounting firms. CRA-ready format.</div><span class="tag ph2">Phase 2</span></div>
+  <div class="card am"><div class="ct">Insurance lead module</div><div class="cs">After passing, route student to partnered insurance brokers. Referral bounty per policy quote started.</div><span class="tag ph2">Phase 2</span></div>
+</div>
+
+<div class="sec">Phase 3 — AI + data pipeline</div>
+<div class="grid g2">
+  <div class="card co"><div class="ct">New Driver Risk Score</div><div class="cs">Aggregate anonymized mistake logs across all students. Generate proprietary risk scores. License to auto insurers via B2B API. PIPEDA compliant.</div><span class="tag ph3">Phase 3</span></div>
+  <div class="card co"><div class="ct">AV edge-case telemetry</div><div class="cs">Sync timestamped mistake logs with Tesla/OEM vehicle telemetry (camera, steering angle). Sell labelled datasets to AV research firms.</div><span class="tag ph3">Phase 3</span></div>
+</div>
+
+<hr>
+
+<div class="sec">Complete database schema — 16 tables</div>
+<table class="table">
+  <tr><th>Table</th><th>Key columns</th><th>Phase</th></tr>
+  <tr><td><strong>schools</strong></td><td>id, name, owner_id, plan_tier, stripe_customer_id, province, created_at</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>users</strong></td><td>id, school_id, role (owner/instructor/student/parent), email, phone, auth_provider, language_pref, created_at</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>instructors</strong></td><td>id, user_id, school_id, license_no, sgi_cert, vehicle_make, vehicle_model, vehicle_year, working_hours_json</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>students</strong></td><td>id, user_id, school_id, instructor_id, package_total_lessons, lessons_remaining, status (active/passed/dropped), road_test_date</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>parent_student</strong></td><td>id, parent_user_id, student_id (many parents → one student)</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>sessions</strong></td><td>id, school_id, instructor_id, student_id, scheduled_at, duration_mins, status (scheduled/completed/cancelled/no_show), location, notes</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>payments</strong></td><td>id, school_id, student_id, session_id, amount, method (cash/etransfer/stripe), status (paid/unpaid/partial), paid_at, stripe_payment_id</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>mistake_categories</strong></td><td>id, jurisdiction (SGI/ICBC/MTO/DMV), category_name, severity (minor/major/fail), display_order</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>session_mistakes</strong></td><td>id, session_id, student_id, mistake_category_id, count, instructor_notes, logged_at</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>road_test_results</strong></td><td>id, student_id, test_date, result (pass/fail), examiner_notes, attempt_number, readiness_score_at_test</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>reminders</strong></td><td>id, session_id, recipient_user_id, channel (whatsapp/sms/push), status (sent/failed/pending), sent_at</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>subscriptions</strong></td><td>id, school_id, plan (free/pro/growth/enterprise), stripe_sub_id, current_period_end, instructor_limit, student_limit</td><td><span class="pill g">P1</span></td></tr>
+  <tr><td><strong>dealership_leads</strong></td><td>id, student_id, parent_user_id, vehicle_pref_json, budget, financing_ready, dealership_id, status, bounty_amount, converted_at</td><td><span class="pill a">P2</span></td></tr>
+  <tr><td><strong>dealerships</strong></td><td>id, name, city, province, crm_type, crm_api_key_encrypted, bounty_per_lead, active</td><td><span class="pill a">P2</span></td></tr>
+  <tr><td><strong>instructor_payouts</strong></td><td>id, instructor_id, lead_id, payout_amount, status (pending/paid), e_transfer_ref, paid_at</td><td><span class="pill a">P2</span></td></tr>
+  <tr><td><strong>risk_scores</strong></td><td>id, student_id (anonymized_hash), mistake_profile_json, risk_tier, generated_at, licensed_to_insurer</td><td><span class="pill r">P3</span></td></tr>
+</table>
+
+<hr>
+
+<div class="sec">Spring Boot API — every endpoint group</div>
+<div class="grid g2">
+  <div class="card pu"><div class="ct">/auth</div><div class="cs">POST /signup (email+pass), /login, /google, /facebook, /otp/send, /otp/verify, /logout, /refresh-token</div></div>
+  <div class="card pu"><div class="ct">/schools</div><div class="cs">POST /create, GET /mine, PUT /update, GET /{id}/dashboard-stats, GET /{id}/instructors, GET /{id}/students</div></div>
+  <div class="card te"><div class="ct">/instructors</div><div class="cs">POST /invite, POST /self-register, GET /my-schedule, PUT /availability, GET /my-students, GET /my-earnings</div></div>
+  <div class="card te"><div class="ct">/students</div><div class="cs">POST /add, GET /{id}/profile, GET /{id}/progress, GET /{id}/sessions, GET /{id}/payments, GET /{id}/report-card</div></div>
+  <div class="card te"><div class="ct">/sessions</div><div class="cs">POST /book, PUT /{id}/update, DELETE /{id}/cancel, GET /calendar, POST /{id}/complete, POST /{id}/no-show</div></div>
+  <div class="card am"><div class="ct">/mistakes</div><div class="cs">GET /categories/{jurisdiction}, POST /session/{id}/log, GET /student/{id}/history, GET /student/{id}/readiness-score</div></div>
+  <div class="card am"><div class="ct">/payments</div><div class="cs">POST /record, PUT /{id}/mark-paid, GET /student/{id}/ledger, GET /school/{id}/outstanding, POST /stripe/checkout</div></div>
+  <div class="card am"><div class="ct">/reminders</div><div class="cs">POST /send-whatsapp, POST /send-sms, POST /schedule-auto, GET /session/{id}/reminder-status</div></div>
+  <div class="card bl"><div class="ct">/reports</div><div class="cs">GET /student/{id}/pdf-report, GET /school/{id}/monthly, GET /instructor/{id}/summary, GET /school/{id}/revenue-chart</div></div>
+  <div class="card bl"><div class="ct">/subscriptions</div><div class="cs">GET /my-plan, POST /upgrade, POST /stripe/webhook, GET /usage-limits, POST /cancel</div></div>
+  <div class="card am"><div class="ct">/marketplace (P2)</div><div class="cs">POST /leads/submit, POST /graduation-trigger, GET /dealerships/nearby, POST /instructor/payout-request</div></div>
+  <div class="card co"><div class="ct">/ai-data (P3)</div><div class="cs">POST /risk-score/generate, GET /risk-score/{hash}, POST /telemetry/sync, GET /aggregate/jurisdiction/{id}</div></div>
+</div>
+
+<hr>
+
+<div class="sec">Flutter app — screens per role</div>
+<div class="grid g2">
+  <div class="card pu">
+    <div class="ct">Owner screens (8)</div>
+    <div class="cs">Dashboard · Instructor list · Student list · Revenue chart · Outstanding payments · Subscription management · School settings · Reports</div>
+  </div>
+  <div class="card te">
+    <div class="ct">Instructor screens (7)</div>
+    <div class="cs">My schedule (calendar) · Today's lessons · Student profile · In-car mistake logger · Payment recorder · WhatsApp reminder · My earnings</div>
+  </div>
+  <div class="card pu">
+    <div class="ct">Student screens (5)</div>
+    <div class="cs">My upcoming lessons · Book/request lesson · My progress + mistakes · Payment status · Road test readiness score</div>
+  </div>
+  <div class="card te">
+    <div class="ct">Parent screens (4)</div>
+    <div class="cs">Child's schedule · Child's progress report · Payment summary · First Car Matchmaker (P2)</div>
+  </div>
+  <div class="card bl">
+    <div class="ct">Shared screens (4)</div>
+    <div class="cs">Login (Google / Facebook / Email / OTP SMS) · Profile settings · Notifications · Language selector</div>
+  </div>
+  <div class="card am">
+    <div class="ct">In-car mistake logger (critical UX)</div>
+    <div class="cs">BIG colour-coded buttons. Minor = amber. Major = orange. Fail = red. One tap logs. Works offline, syncs when connected.</div>
+  </div>
+</div>
+
+<hr>
+
+<div class="sec">Third-party services — all free tiers to start</div>
+<table class="table">
+  <tr><th>Service</th><th>What it does</th><th>Free tier</th><th>Paid when</th></tr>
+  <tr><td>Supabase</td><td>Postgres DB + Auth + Storage</td><td>500 MB, 50k users</td><td>$25/mo at scale</td></tr>
+  <tr><td>Railway</td><td>Spring Boot hosting</td><td>$5 credit/mo</td><td>$5/mo always-on</td></tr>
+  <tr><td>Twilio</td><td>SMS OTP + WhatsApp</td><td>$15 trial credit</td><td>~$0.01/SMS</td></tr>
+  <tr><td>Stripe</td><td>Subscription billing + payouts</td><td>Free until revenue</td><td>2.9% + 30¢/txn</td></tr>
+  <tr><td>Google OAuth</td><td>Google login</td><td>Free forever</td><td>Never</td></tr>
+  <tr><td>Facebook OAuth</td><td>Facebook login</td><td>Free forever</td><td>Never</td></tr>
+  <tr><td>iTextSharp/JasperReports</td><td>PDF report generation</td><td>Free open source</td><td>Never</td></tr>
+  <tr><td>Firebase FCM</td><td>Push notifications (app)</td><td>Free forever</td><td>Never</td></tr>
+  <tr><td>Vercel</td><td>Web frontend hosting</td><td>Free forever</td><td>$20/mo at scale</td></tr>
+</table>
+
+<div class="note">Build order: Auth → Schools → Instructors → Students → Sessions → Mistakes → Payments → Reports → Reminders → Subscriptions. This order means you always have a working app at every step — nothing is half-built waiting for something else.</div>
+
+</div>

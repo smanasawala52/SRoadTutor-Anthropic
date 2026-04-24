@@ -1,0 +1,105 @@
+# =============================================================================
+#  SRoadTutor — Backend CI
+# =============================================================================
+#  Runs on every push / PR that touches the /backend folder.
+#
+#  Stages:
+#    1. Checkout
+#    2. Set up JDK 21 + Maven cache
+#    3. Boot a Postgres 16 service container (for Flyway validation, not the
+#       integration tests — those spin up their own Testcontainers Postgres)
+#    4. `mvn -B verify` → compiles, runs Surefire (unit) AND Failsafe
+#       (integration) tests, runs JaCoCo, then enforces the 80%/70% gate.
+#    5. Upload JaCoCo report as a build artifact.
+#    6. Upload the JAR so downstream workflows (e.g. Railway deploy) can fetch
+#       it without re-building.
+#    7. Run SonarCloud analysis (skipped for forks — org secrets aren't
+#       available there).
+# =============================================================================
+
+name: Backend CI
+
+on:
+  push:
+    branches: [main, qa, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main, qa, develop]
+    paths:
+      - 'backend/**'
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-coverage:
+    name: Test + JaCoCo gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      # Docker-in-Docker is already there on GitHub runners — this just gives
+      # Testcontainers a DOCKER_HOST it can reach.
+      docker:
+        image: docker:24-dind
+        options: --privileged
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # SonarCloud needs full history for blame
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Cache SonarCloud scanner
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Maven verify (unit + integration + JaCoCo gate)
+        working-directory: backend
+        env:
+          # A dummy JWT secret for test profile. Real secrets never touch CI.
+          JWT_SECRET: test-secret-at-least-32-bytes-long-aaaaaaaaaaaaaaa
+          TESTCONTAINERS_REUSE_ENABLE: 'true'
+        run: ./mvnw -B -ntp clean verify
+
+      - name: Upload JaCoCo HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/target/site/jacoco
+          retention-days: 14
+
+      - name: Upload runnable JAR
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: backend/target/*.jar
+          retention-days: 14
+
+      - name: SonarCloud scan
+        # Skip on forked PRs — they can't read org secrets.
+        if: ${{ env.SONAR_TOKEN != '' && github.event.pull_request.head.repo.fork != true }}
+        working-directory: backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./mvnw -B -ntp sonar:sonar \
+            -Dsonar.projectKey=sroadtutor-backend \
+            -Dsonar.organization=sroadtutor \
+            -Dsonar.host.url=https://sonarcloud.io

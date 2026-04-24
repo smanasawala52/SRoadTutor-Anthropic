@@ -1,0 +1,24 @@
+# Dev-only overrides. Chatty logs, hot data, developer-friendly.
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Turn ON the dev seed migration (V4__seed_dev_data.sql).
+  flyway:
+    placeholders:
+      seed-dev: "true"
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+# Make Swagger UI slightly more discoverable in dev.
+springdoc:
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
