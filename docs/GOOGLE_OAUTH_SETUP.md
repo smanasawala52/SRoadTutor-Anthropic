@@ -76,11 +76,45 @@ Do this:
 1. `+ Create Credentials` → `OAuth client ID`.
 2. Application type: **Android**.
 3. Package name: the applicationId above (e.g. `com.sroadtutor.app.dev`).
-4. SHA-1 signing certificate: run this in `mobile/android/`:
-   ```bash
-   ./gradlew signingReport
+4. SHA-1 signing certificate: the **debug keystore** on your laptop signs
+   every debug APK. Get its SHA-1 fingerprint — you have two options:
+
+   **Option A — `keytool` (recommended; works with just the JDK you already
+   have installed, no Gradle / Flutter / Android Studio needed):**
+
+   Windows PowerShell:
+   ```powershell
+   keytool -list -v `
+     -keystore "$env:USERPROFILE\.android\debug.keystore" `
+     -alias androiddebugkey -storepass android -keypass android
    ```
-   Copy the `SHA1` of the `debug` variant. (For release builds later, you'll generate your own keystore — see `docs/RAILWAY_DEPLOY.md`.)
+   macOS / Linux:
+   ```bash
+   keytool -list -v \
+     -keystore "$HOME/.android/debug.keystore" \
+     -alias androiddebugkey -storepass android -keypass android
+   ```
+   Look for the `SHA1:` line in the output. That's your fingerprint.
+
+   > First time? The debug keystore is created the first time you run any
+   > Android build (e.g. `flutter run` or opening the `android/` folder in
+   > Android Studio once). If the command above errors with
+   > `Keystore file does not exist`, start Android Studio once, or run
+   > `flutter create . --platforms=android --project-name=sroadtutor --org=com.sroadtutor`
+   > in `mobile/` — that generates it.
+
+   **Option B — `./gradlew signingReport` (only works once the Gradle wrapper
+   is in place; see `docs/ANDROID_GRADLE_BOOTSTRAP.md`):**
+
+   ```bash
+   cd mobile/android
+   ./gradlew signingReport        # macOS / Linux
+   .\gradlew.bat signingReport    # Windows
+   ```
+   Copy the `SHA1` line printed under **Variant: debug**.
+
+   (For release builds later, you'll generate your own keystore — see
+   `docs/RAILWAY_DEPLOY.md`.)
 5. Create.
 
 **You don't need a client secret for Android/iOS clients** — Google doesn't issue them. The mobile app uses just the client ID to request a token.
@@ -124,6 +158,6 @@ GOOGLE_WEB_CLIENT_ID=<the-web-client-id-from-step-3a>
 ## Troubleshooting
 
 - **`Access blocked: This app's request is invalid`**: usually a missing SHA-1 or wrong package name in the Android client. Re-check step 3b.
-- **`ApiException: 10` in google_sign_in**: SHA-1 mismatch. Run `./gradlew signingReport` again and update the Google Console.
+- **`ApiException: 10` in google_sign_in**: SHA-1 mismatch. Re-run the `keytool -list -v ...` command from step 3b/4 and update the SHA-1 on the matching Android client ID in the Google Console.
 - **Backend returns `Invalid Google ID token`**: the Web client ID in `.env` doesn't match the one the mobile app is using. Make sure `GOOGLE_WEB_CLIENT_ID` (mobile) and `GOOGLE_OAUTH_CLIENT_ID` (backend) are **the same Web client ID**.
 - **"This app isn't verified"** screen on first login: expected during development. Click "Advanced" → "Go to SRoadTutor (unsafe)". For prod, submit the app for Google verification (takes a few days).

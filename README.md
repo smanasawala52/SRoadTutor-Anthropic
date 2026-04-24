@@ -30,6 +30,8 @@ Read these docs in order. Each one is written assuming zero prior knowledge.
 7. **[docs/RAILWAY_DEPLOY.md](docs/RAILWAY_DEPLOY.md)** — deploy the backend to Railway
 8. **[docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** — how to run all the tests
 9. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — how the pieces fit together
+10. **[docs/ANDROID_GRADLE_BOOTSTRAP.md](docs/ANDROID_GRADLE_BOOTSTRAP.md)** — one-time `flutter create .` that materialises the binary Android files
+11. **[docs/LOCAL_VERIFICATION_RUNBOOK.md](docs/LOCAL_VERIFICATION_RUNBOOK.md)** — end-to-end build / test / deploy walkthrough
 
 Then open `backend/README.md` and `mobile/README.md` for module-specific steps.
 

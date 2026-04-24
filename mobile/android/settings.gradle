@@ -1,0 +1,42 @@
+// ============================================================================
+//  SRoadTutor — Android settings.gradle
+// ============================================================================
+//  This is the standard Flutter settings.gradle — it:
+//    1) Pins the Android Gradle Plugin (AGP) and Kotlin versions.
+//    2) Wires in Flutter's own Gradle plugin so `flutter build` / `flutter run`
+//       can drive Gradle under the hood.
+//    3) Declares the one Gradle sub-module we have (`:app`).
+//
+//  If you ever see "Plugin [id: 'dev.flutter.flutter-gradle-plugin'] was not
+//  found", it means the `includeBuild` below can't resolve — run
+//  `flutter pub get` in the mobile/ folder to repopulate
+//  `mobile/android/local.properties` with the correct flutter.sdk path.
+// ============================================================================
+
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties — run `flutter pub get` in mobile/"
+        return flutterSdkPath
+    }()
+
+    includeBuild("${flutterSdkPath}/packages/flutter_tools/gradle")
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    // Keep these versions in sync with the Flutter SDK you're running.
+    // Flutter 3.24 → AGP 8.1.x, Kotlin 1.9.x.
+    id "com.android.application"          version "8.1.4"  apply false
+    id "org.jetbrains.kotlin.android"     version "1.9.22" apply false
+}
+
+include ":app"

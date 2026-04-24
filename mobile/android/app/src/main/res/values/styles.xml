@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    SRoadTutor — Android light-mode themes.
+
+    LaunchTheme is shown for the ~0.5s between tapping the app icon and Flutter
+    finishing its cold start. NormalTheme is what takes over once Flutter is
+    ready (the system bar stays transparent / black).
+
+    The default Flutter scaffolding uses the exact same two themes — we mirror
+    it so the app behaves identically to a fresh `flutter create` project.
+-->
+<resources>
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- Show the launch_background drawable during the first frame(s). -->
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+</resources>

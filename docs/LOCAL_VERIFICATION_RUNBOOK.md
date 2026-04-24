@@ -165,6 +165,13 @@ Successfully applied 4 migrations
 
 ## Section 4 — Mobile tests (run twice, per your spec)
 
+> **First time only:** before the very first `flutter test` or `flutter run`,
+> follow **`docs/ANDROID_GRADLE_BOOTSTRAP.md`** to generate the binary files
+> (`gradlew`, `gradle-wrapper.jar`, `ic_launcher.png`, iOS scaffolding) that
+> the Cowork sandbox couldn't write. One command — `flutter create .` with a
+> few flags — fills everything in and does **not** overwrite our custom files.
+> Skip this step on subsequent runs.
+
 ```powershell
 cd C:\path\to\SRoadTutor\mobile
 flutter pub get
