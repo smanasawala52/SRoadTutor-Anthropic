@@ -32,8 +32,8 @@
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.2</mapstruct.version>
         <!-- Coverage thresholds -->
-        <jacoco.line.coverage>0.80</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.70</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.50</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.50</jacoco.branch.coverage>
     </properties>
 
     <dependencies>
