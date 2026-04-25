@@ -10,6 +10,7 @@ import com.sroadtutor.config.AppProperties;
 import com.sroadtutor.exception.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
@@ -32,11 +33,18 @@ public class FacebookOAuthService {
     private final AppProperties props;
     private final Function<String, FacebookClient> clientFactory;
 
+    /**
+     * Production constructor — used by Spring at runtime.
+     * {@code @Autowired} is required because this class exposes a second
+     * (test-only) constructor; without an annotation Spring can't decide
+     * which one to use and falls back to a no-arg ctor that doesn't exist.
+     */
+    @Autowired
     public FacebookOAuthService(AppProperties props) {
         this(props, token -> new DefaultFacebookClient(token, Version.LATEST));
     }
 
-    /** Package-private ctor used by tests to inject a mock client factory. */
+    /** Package-private ctor used by tests to inject a mock client factory. Do NOT annotate. */
     FacebookOAuthService(AppProperties props, Function<String, FacebookClient> clientFactory) {
         this.props = props;
         this.clientFactory = clientFactory;

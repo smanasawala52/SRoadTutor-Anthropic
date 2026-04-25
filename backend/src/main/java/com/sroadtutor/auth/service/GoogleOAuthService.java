@@ -8,6 +8,7 @@ import com.sroadtutor.config.AppProperties;
 import com.sroadtutor.exception.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,13 +27,24 @@ public class GoogleOAuthService {
 
     private final GoogleIdTokenVerifier verifier;
 
+    /**
+     * Production constructor — used by Spring at runtime.
+     *
+     * Marked {@code @Autowired} explicitly because this class has TWO
+     * constructors (prod + test).  Spring only auto-picks a constructor
+     * when there's exactly one; with multiple constructors and none
+     * annotated, it silently falls back to a no-arg constructor, which
+     * we don't provide, so context startup fails with
+     * {@code NoSuchMethodException: GoogleOAuthService.<init>()}.
+     */
+    @Autowired
     public GoogleOAuthService(AppProperties props) {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(props.oauth().google().clientId()))
                 .build();
     }
 
-    /** Package-private ctor for unit tests — inject a mock verifier. */
+    /** Package-private ctor for unit tests — inject a mock verifier. Do NOT annotate. */
     GoogleOAuthService(GoogleIdTokenVerifier verifier) {
         this.verifier = verifier;
     }
