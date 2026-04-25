@@ -8,17 +8,26 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update   # dev safe (no data loss)
+      # Flyway is the single source of truth for schema in EVERY profile,
+      # including dev. `validate` lets Hibernate fail-fast at boot if a
+      # JPA entity drifts from the migration-built schema, instead of
+      # silently mutating dev DBs (which then mask V-migration bugs).
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
 
-  # Turn ON the dev seed migration (V4__seed_dev_data.sql).
+  # Turn ON BOTH seed migrations in dev:
+  #   - V4__seed_dev_data.sql       (synthetic test fixtures)
+  #   - V7__seed_customer_data.sql  (Drivers Student Manager.xlsx import)
+  # Every other profile keeps these "false" so QA / prod / test never
+  # accidentally insert seed data.
   flyway:
     enabled: true
     placeholders:
       seed-dev: "true"
+      seed-customer: "true"
 server:
   port: ${SERVER_PORT:8080}
 

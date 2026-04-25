@@ -49,11 +49,12 @@ spring:
   # -------------------------------------------------------------------
   # Flyway — database migrations.
   #
-  # placeholders.seed-dev gates V4__seed_dev_data.sql. The migration body
-  # checks this at runtime and no-ops unless the value is the literal
-  # string "true". Base default is "false" so QA / prod / test never
-  # accidentally insert fake users. Overridden to "true" in
-  # application-dev.yml only.
+  # placeholders.seed-dev gates V4__seed_dev_data.sql.
+  # placeholders.seed-customer gates V7__seed_customer_data.sql.
+  # Each migration body checks its placeholder at runtime and no-ops
+  # unless the value is the literal string "true". Base defaults are
+  # "false" so QA / prod / test never accidentally insert seed data.
+  # Both are flipped to "true" in application-dev.yml only.
   # -------------------------------------------------------------------
   flyway:
     enabled: true
@@ -71,6 +72,7 @@ spring:
     validate-on-migrate: true
     placeholders:
       seed-dev: "false"
+      seed-customer: "false"
 
   # -------------------------------------------------------------------
   # JSON / Jackson

@@ -1,11 +1,14 @@
 package com.sroadtutor.auth.filter;
 
 import com.sroadtutor.auth.service.JwtService;
+import com.sroadtutor.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +31,8 @@ import java.util.List;
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private static final String HEADER = "Authorization";
     private static final String PREFIX = "Bearer ";
@@ -57,11 +62,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            } catch (Exception ignored) {
-                // Invalid token → leave context empty. The 401 (if needed) is
-                // emitted by SecurityConfig's filter chain, not here.
+            } catch (UnauthorizedException ex) {
+                // Expected path for an invalid / expired / tampered JWT.
+                // Clear the context and let SecurityConfig's filter chain
+                // emit the 401 if the endpoint required auth. We log at
+                // DEBUG only — every unauth request would otherwise spam
+                // the logs.
+                log.debug("Rejected JWT from {}: [{}] {}",
+                        request.getRemoteAddr(), ex.getCode(), ex.getMessage());
                 SecurityContextHolder.clearContext();
             }
+            // Anything else (NPE, IllegalStateException, …) is a real bug
+            // and MUST propagate so the global error handler can log it
+            // with a stack trace and return 500. Swallowing it here would
+            // mask the real defect under a generic 401.
         }
         filterChain.doFilter(request, response);
     }

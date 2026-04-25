@@ -8,11 +8,15 @@ spring:
         format_sql: false
         generate_statistics: false
 
-  # Explicit: PROD NEVER runs the dev seed. Belt-and-suspenders on top of
-  # the base default in application.yml.
+  # Explicit: PROD NEVER runs either seed migration. Belt-and-suspenders
+  # on top of the base default in application.yml. The synthetic dev seed
+  # AND the Drivers Student Manager.xlsx customer seed are both pinned
+  # off — production data must come through real signup / invitation
+  # flows only.
   flyway:
     placeholders:
       seed-dev: "false"
+      seed-customer: "false"
 
 server:
   error:

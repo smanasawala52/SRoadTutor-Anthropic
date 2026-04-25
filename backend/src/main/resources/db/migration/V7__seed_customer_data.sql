@@ -12,12 +12,24 @@
 --  Login: every seeded user has password 'Password1' (BCrypt strength 12).
 --  Emails are synthesised because the source sheet has phone-only data.
 --
---  NOT gated — runs in dev / qa / prod per user decision (2026-04-24).
---  Idempotent via "skip if school already exists".
+--  Gated by Flyway placeholder `${seed-customer}` (mirrors the
+--  `${seed-dev}` pattern used by V4). Only `application-dev.yml` sets it
+--  to "true"; every other profile (qa / prod / test, plus the base
+--  default in application.yml) keeps it "false". The Flyway version
+--  history still advances either way — that means switching the gate
+--  off later cannot accidentally re-trigger insertion.
+--
+--  Idempotent via "skip if school already exists" — keeps the gate
+--  belt-and-suspenders against manual re-runs in dev.
 -- =====================================================================
 
 DO $body$
 BEGIN
+    IF '${seed-customer}' <> 'true' THEN
+        RAISE NOTICE 'V7 customer seed disabled (seed-customer=${seed-customer}) — skipping.';
+        RETURN;
+    END IF;
+
     IF EXISTS (SELECT 1 FROM schools WHERE id = 'c3d9a79c-3ad8-5e22-8462-124ed13c5382'::uuid) THEN
         RAISE NOTICE 'V7 customer data already loaded — skipping.';
         RETURN;

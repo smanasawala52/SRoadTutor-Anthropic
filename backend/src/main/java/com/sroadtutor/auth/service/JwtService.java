@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,16 +54,23 @@ public class JwtService {
 
     public String generateAccessToken(User user) {
         Instant now = Instant.now();
+        // Build claims defensively — only include schoolId when the user
+        // actually belongs to a school. Emitting an empty-string claim is
+        // a footgun: downstream code would have to special-case "" alongside
+        // null, and the JWT itself becomes ambiguous (does "" mean "no
+        // school" or "schoolId is the empty string"?).
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(CLAIM_ROLE, user.getRole().name());
+        claims.put(CLAIM_EMAIL, user.getEmail());
+        if (user.getSchoolId() != null) {
+            claims.put(CLAIM_SCHOOL_ID, user.getSchoolId().toString());
+        }
         return Jwts.builder()
                 .issuer(issuer)
                 .subject(user.getId().toString())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(accessTokenTtl)))
-                .claims(Map.of(
-                        CLAIM_ROLE, user.getRole().name(),
-                        CLAIM_SCHOOL_ID, user.getSchoolId() == null ? "" : user.getSchoolId().toString(),
-                        CLAIM_EMAIL, user.getEmail()
-                ))
+                .claims(claims)
                 .signWith(signingKey, Jwts.SIG.HS256)
                 .compact();
     }

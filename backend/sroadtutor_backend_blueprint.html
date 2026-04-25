@@ -1,0 +1,229 @@
+<style>
+.w{padding:1rem 0;font-size:14px;color:var(--color-text-primary);line-height:1.6}
+.sec{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary);margin:24px 0 10px}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.card.pu{border-color:#AFA9EC;background:#EEEDFE}.card.pu .ct{color:#26215C}.card.pu .cs{color:#534AB7}
+.card.te{border-color:#5DCAA5;background:#E1F5EE}.card.te .ct{color:#04342C}.card.te .cs{color:#0F6E56}
+.card.am{border-color:#EF9F27;background:#FAEEDA}.card.am .ct{color:#412402}.card.am .cs{color:#633806}
+.card.co{border-color:#F0997B;background:#FAECE7}.card.co .ct{color:#4A1B0C}.card.co .cs{color:#712B13}
+.card.bl{border-color:#85B7EB;background:#E6F1FB}.card.bl .ct{color:#042C53}.card.bl .cs{color:#0C447C}
+.ct{font-size:13px;font-weight:500;margin-bottom:5px}
+.cs{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin:2px 2px 0 0}
+.tag.done{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
+.tag.next{background:#FAEEDA;color:#412402;border:1px solid #EF9F27}
+.tag.later{background:#FAECE7;color:#4A1B0C;border:1px solid #F0997B}
+.tag.fix{background:#FCEBEB;color:#791F1F;border:1px solid #C73838}
+.tag.db{background:#E6F1FB;color:#042C53;border:1px solid #85B7EB}
+.phase-bar{display:flex;gap:0;border-radius:var(--border-radius-lg);overflow:hidden;border:1px solid var(--color-border-tertiary);margin-bottom:10px}
+.pb{flex:1;padding:10px 12px;text-align:center;font-size:12px;font-weight:500}
+.pb.p1{background:#E1F5EE;color:#085041}.pb.p2{background:#FAEEDA;color:#412402}.pb.p3{background:#FAECE7;color:#4A1B0C}
+.pb-sub{font-size:11px;font-weight:400;color:var(--color-text-tertiary);display:block;margin-top:2px}
+.table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.table th{text-align:left;padding:7px 10px;background:var(--color-background-tertiary);color:var(--color-text-secondary);font-weight:500;font-size:11px}
+.table td{padding:7px 10px;border-top:1px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:top}
+.table tr:first-child td{border-top:none}
+.pill{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-right:3px}
+.pill.g{background:#E1F5EE;color:#085041}.pill.p{background:#EEEDFE;color:#26215C}.pill.a{background:#FAEEDA;color:#412402}.pill.r{background:#FCEBEB;color:#791F1F}
+hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
+.note{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;border-left:3px solid #534AB7;margin-top:10px;line-height:1.6}
+.note.warn{border-left-color:#EF9F27;background:#FFF8E8}
+@media(max-width:520px){.g2,.g3{grid-template-columns:1fr}}
+</style>
+<div class="w">
+
+<div class="sec">Backend status — where we are right now</div>
+<div class="phase-bar">
+  <div class="pb p1">PR1–PR4 — Done<span class="pb-sub">Auth · Phone · WhatsApp · 124 tests</span></div>
+  <div class="pb p2">PR5–PR9 — Next<span class="pb-sub">Schools · Sessions · Payments · Billing</span></div>
+  <div class="pb p3">PR10+ — Later<span class="pb-sub">Marketplace · AI · Reports</span></div>
+</div>
+
+<div class="note warn"><strong>One thing to fix before we ship:</strong> a small bug from the last session puts the error code into the JSON response twice. The fix is small (one file revert + 5 test lines). Tracked in the workflow doc.</div>
+
+<div class="sec">What's actually built — backend modules done</div>
+<div class="grid g3">
+  <div class="card te"><div class="ct">Auth — signup &amp; login</div><div class="cs">Email + password signup. Google login. Roles: Owner / Instructor / Student / Parent. Picks role at signup.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">JWT access tokens</div><div class="cs">15-minute access tokens. Sent in the <code>Authorization: Bearer</code> header. Stateless — no server session.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Refresh tokens</div><div class="cs">30-day refresh tokens. Rotated on every use. If a stolen one is replayed, all the user's tokens get nuked.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Password security</div><div class="cs">BCrypt strength 12 (~250ms per hash). Slow on purpose so brute force is expensive.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Phone numbers (1..N)</div><div class="cs">Any user / school / instructor / student can have up to 5 phones. One is "primary". E.164 format.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Phone scope rules</div><div class="cs">Owner sees own school. Instructor sees own. Student sees own. Parent sees linked student. Enforced on every call.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">WhatsApp link generator</div><div class="cs">Generates <code>wa.me</code> click-to-chat links. Pick a template OR write free-text. Logs every link for audit.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Phone verification (click-confirm)</div><div class="cs">First time you click your own wa.me link, your phone is marked verified. No SMS OTP cost.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">WhatsApp templates</div><div class="cs">Reusable message bodies with <code>{{name}}</code> / <code>{{lesson_time}}</code> placeholders. Platform defaults + per-school overrides.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Standard error envelope</div><div class="cs">Every error returns <code>{ code, message, status, timestamp }</code>. Stable codes for the SPA to handle.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Database migrations</div><div class="cs">8 Flyway migrations. Every schema change is a versioned SQL file. Never run "auto-DDL" in real environments.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Swagger / OpenAPI docs</div><div class="cs">Live API docs at <code>/swagger-ui.html</code>. Bearer-JWT auth built in — paste a token, hit endpoints from the browser.</div><span class="tag done">Done</span></div>
+</div>
+
+<div class="sec">Up next — modules to build</div>
+<div class="grid g3">
+  <div class="card am"><div class="ct">Schools</div><div class="cs">Create / update schools. Tenant isolation. Tax IDs (GST/PST/HST). Plan tier lives here. Schema exists; needs Java entity + endpoints.</div><span class="tag next">PR5</span></div>
+  <div class="card am"><div class="ct">Instructor profiles</div><div class="cs">Vehicle info, working hours, SGI cert, hourly rate. Schema exists; needs entity + endpoints.</div><span class="tag next">PR5/6</span></div>
+  <div class="card am"><div class="ct">Student management</div><div class="cs">Add by instructor or owner. Package purchased, lessons remaining, status. Parent linkage.</div><span class="tag next">PR6</span></div>
+  <div class="card am"><div class="ct">Email verification flow</div><div class="cs">Send verification email, click-link to confirm. Tokens table exists; just needs the endpoints.</div><span class="tag next">PR5</span></div>
+  <div class="card am"><div class="ct">Owner invites</div><div class="cs">Owner invites instructor / student / parent by email. Token link OR <code>test123</code> dummy password. Schema exists.</div><span class="tag next">PR5</span></div>
+  <div class="card am"><div class="ct">Scheduling engine</div><div class="cs">Calendar. Instructor sets availability. Book / edit / cancel. Conflict detection blocks double bookings.</div><span class="tag next">PR6</span></div>
+  <div class="card am"><div class="ct">Lesson reminders</div><div class="cs">Auto-fires 24h before lesson. Generates wa.me link, sender clicks, recipient gets the message.</div><span class="tag next">PR6/7</span></div>
+  <div class="card am"><div class="ct">Payment ledger</div><div class="cs">Track owed-per-session. Mark paid / unpaid. Cash + e-transfer first. Stripe online later.</div><span class="tag next">PR7</span></div>
+  <div class="card am"><div class="ct">Subscription billing</div><div class="cs">Free / $29 / $69 / $149 plans. Stripe billing. Plan limits enforced in code (replaces hardcoded 5-phone cap).</div><span class="tag next">PR9</span></div>
+</div>
+
+<div class="sec">Later — Phase 2 / Phase 3 modules</div>
+<div class="grid g3">
+  <div class="card co"><div class="ct">SGI mistake logger</div><div class="cs">Pre-loaded SGI mistake categories. Big colour-coded buttons for in-car use. Auto-generates Road Test Readiness score.</div><span class="tag later">Phase 1+</span></div>
+  <div class="card co"><div class="ct">PDF report cards</div><div class="cs">Per-student PDF. Mistake history, improvement over time, readiness %. Shareable via WhatsApp.</div><span class="tag later">Phase 1+</span></div>
+  <div class="card co"><div class="ct">Owner dashboard</div><div class="cs">Total revenue, unpaid sessions, active students, instructor workloads, monthly MRR.</div><span class="tag later">Phase 1+</span></div>
+  <div class="card co"><div class="ct">First Car Matchmaker</div><div class="cs">Parent portal widget. Vehicle preferences + financing readiness. Pre-qualifies before student passes test.</div><span class="tag later">Phase 2</span></div>
+  <div class="card co"><div class="ct">Dealership lead routing</div><div class="cs">When student passes road test, auto-route lead to partnered dealership. $200–$500 bounty.</div><span class="tag later">Phase 2</span></div>
+  <div class="card co"><div class="ct">Insurance lead module</div><div class="cs">Route new drivers to partnered insurance brokers. Bounty per quote started.</div><span class="tag later">Phase 2</span></div>
+  <div class="card co"><div class="ct">Risk Score data product</div><div class="cs">Anonymized mistake logs → proprietary risk scores. Sell to auto insurers. PIPEDA compliant.</div><span class="tag later">Phase 3</span></div>
+  <div class="card co"><div class="ct">AV telemetry sync</div><div class="cs">Sync mistake logs with Tesla / OEM vehicle telemetry. Sell labelled datasets to AV research firms.</div><span class="tag later">Phase 3</span></div>
+</div>
+
+<hr>
+
+<div class="sec">Database — what's actually in the database right now</div>
+<table class="table">
+  <tr><th>Table</th><th>What it stores</th><th>Status</th></tr>
+  <tr><td><strong>users</strong></td><td>Everyone who can log in. Email, username, password hash, role, auth provider, language.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>refresh_tokens</strong></td><td>Server-side refresh tokens. Stores SHA-256 hash, not the raw token.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>email_verification_tokens</strong></td><td>One-shot tokens for "click to verify your email". Schema ready, endpoints not yet.</td><td><span class="pill a">Schema only</span></td></tr>
+  <tr><td><strong>schools</strong></td><td>Driving school tenants. Tax IDs, plan tier, business reg #.</td><td><span class="pill a">Schema only</span></td></tr>
+  <tr><td><strong>instructors</strong></td><td>Instructor profile rows. Vehicle, plate, bio.</td><td><span class="pill a">Schema only</span></td></tr>
+  <tr><td><strong>instructor_schools</strong></td><td>An instructor can be at multiple schools. Joined / left dates.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>students</strong></td><td>Student profile rows. Package, lessons remaining, status.</td><td><span class="pill a">Schema only</span></td></tr>
+  <tr><td><strong>parent_student</strong></td><td>Many-parents-per-student link table.</td><td><span class="pill a">Schema only</span></td></tr>
+  <tr><td><strong>phone_numbers</strong></td><td>1..N phones for any user / school / instructor / student. E.164 format.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>invitations</strong></td><td>Owner-issued invites. Token link or dummy-password mode.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>whatsapp_templates</strong></td><td>Reusable message bodies with placeholders.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>whatsapp_message_log</strong></td><td>Audit row for every wa.me link generated. Click timestamp.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td>sessions</td><td>Booked lessons. Scheduled-at, duration, status.</td><td><span class="pill r">Not yet</span></td></tr>
+  <tr><td>payments</td><td>Cash / e-transfer / Stripe transactions per session.</td><td><span class="pill r">Not yet</span></td></tr>
+  <tr><td>mistake_categories + session_mistakes</td><td>SGI / ICBC mistake catalog + per-session log.</td><td><span class="pill r">Not yet</span></td></tr>
+  <tr><td>subscriptions</td><td>Plan tier + Stripe subscription id per school.</td><td><span class="pill r">Not yet</span></td></tr>
+</table>
+
+<hr>
+
+<div class="sec">REST endpoints — what's live right now</div>
+<div class="grid g2">
+  <div class="card pu"><div class="ct">/auth (5 endpoints)</div><div class="cs">POST /signup · POST /login · POST /google · POST /refresh · POST /logout</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/phone-numbers (7 endpoints)</div><div class="cs">POST · GET (list) · GET /{id} · PUT /{id} · DELETE /{id} · POST /{id}/primary · POST /{id}/whatsapp-optin</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/whatsapp/links (2 endpoints)</div><div class="cs">POST (generate wa.me link + audit log) · POST /{logId}/click-confirm (verifies the recipient phone)</div><span class="tag done">Done</span></div>
+  <div class="card bl"><div class="ct">/actuator/health · /swagger-ui.html</div><div class="cs">Health probe for Railway. Swagger docs page (paste a JWT, hit endpoints from the browser).</div><span class="tag done">Done</span></div>
+  <div class="card am"><div class="ct">/api/schools (planned)</div><div class="cs">POST /create · GET /mine · PUT /update · GET /{id}/dashboard-stats</div><span class="tag next">PR5</span></div>
+  <div class="card am"><div class="ct">/api/instructors (planned)</div><div class="cs">POST /invite · POST /self-register · GET /my-schedule · PUT /availability</div><span class="tag next">PR5/6</span></div>
+  <div class="card am"><div class="ct">/api/students (planned)</div><div class="cs">POST /add · GET /{id}/profile · GET /{id}/sessions · GET /{id}/payments</div><span class="tag next">PR6</span></div>
+  <div class="card am"><div class="ct">/api/sessions (planned)</div><div class="cs">POST /book · PUT /{id} · DELETE /{id} · GET /calendar · POST /{id}/complete</div><span class="tag next">PR6</span></div>
+  <div class="card am"><div class="ct">/api/payments (planned)</div><div class="cs">POST /record · PUT /{id}/mark-paid · GET /student/{id}/ledger · POST /stripe/checkout</div><span class="tag next">PR7</span></div>
+  <div class="card am"><div class="ct">/api/subscriptions (planned)</div><div class="cs">GET /my-plan · POST /upgrade · POST /stripe/webhook · GET /usage-limits</div><span class="tag next">PR9</span></div>
+</div>
+
+<hr>
+
+<div class="sec">Who can do what — the rules</div>
+<table class="table">
+  <tr><th>Role</th><th>Their own user phone</th><th>School phones</th><th>Instructor phones</th><th>Student phones</th></tr>
+  <tr><td><strong>Owner</strong></td><td>Yes (in own school)</td><td>Yes (own school only)</td><td>Yes (instructors at own school)</td><td>Yes (students at own school)</td></tr>
+  <tr><td><strong>Instructor</strong></td><td>Yes (self only)</td><td>No</td><td>Yes (own instructor row)</td><td>No</td></tr>
+  <tr><td><strong>Student</strong></td><td>Yes (self only)</td><td>No</td><td>No</td><td>Yes (own student row)</td></tr>
+  <tr><td><strong>Parent</strong></td><td>Yes (self only)</td><td>No</td><td>No</td><td>Yes (their linked student)</td></tr>
+</table>
+
+<div class="note">If you can see a phone, you can edit it (V1). The split between "read" and "write" is in the code already so we can tighten it later if some screen needs view-only access.</div>
+
+<hr>
+
+<div class="sec">Error codes the SPA can rely on</div>
+<table class="table">
+  <tr><th>Code</th><th>HTTP</th><th>When it happens</th></tr>
+  <tr><td>EMAIL_ALREADY_EXISTS</td><td>400</td><td>Signup with an email already in use</td></tr>
+  <tr><td>EMAIL_USED_WITH_DIFFERENT_PROVIDER</td><td>400</td><td>Google login with an email that's a local account (or vice versa)</td></tr>
+  <tr><td>ROLE_REQUIRED</td><td>400</td><td>First-time Google signup without picking a role</td></tr>
+  <tr><td>INVALID_PHONE_NUMBER</td><td>400</td><td>Bad country code or national number format</td></tr>
+  <tr><td>PHONE_LIMIT_EXCEEDED</td><td>400</td><td>Trying to add a 6th phone for an owner</td></tr>
+  <tr><td>PHONE_ALREADY_EXISTS</td><td>400</td><td>Same phone added twice for the same owner</td></tr>
+  <tr><td>WHATSAPP_DISABLED</td><td>400</td><td>Tried to send a wa.me link to a number that's opted out</td></tr>
+  <tr><td>TEMPLATE_INACTIVE</td><td>400</td><td>Selected template was deactivated</td></tr>
+  <tr><td>MISSING_BODY_OR_TEMPLATE</td><td>400</td><td>Wa.me request with no template AND no body</td></tr>
+  <tr><td>PLACEHOLDER_MISSING</td><td>400</td><td>Template uses <code>{{name}}</code> but caller didn't supply it</td></tr>
+  <tr><td>INVALID_CREDENTIALS</td><td>401</td><td>Wrong email or password (deliberately doesn't say which)</td></tr>
+  <tr><td>USE_OAUTH_LOGIN</td><td>401</td><td>Tried password login on a Google account</td></tr>
+  <tr><td>ACCOUNT_DISABLED</td><td>401</td><td>Account is set inactive</td></tr>
+  <tr><td>INVALID_TOKEN</td><td>401</td><td>JWT is bad / expired / tampered</td></tr>
+  <tr><td>INVALID_REFRESH_TOKEN</td><td>401</td><td>Refresh token doesn't exist on the server</td></tr>
+  <tr><td>REFRESH_TOKEN_REVOKED</td><td>401</td><td>Old refresh token replayed → all the user's tokens get nuked</td></tr>
+  <tr><td>FORBIDDEN</td><td>403</td><td>Authenticated, but you don't have access to this resource</td></tr>
+  <tr><td>NOT_FOUND</td><td>404</td><td>Looked up something by id that doesn't exist</td></tr>
+  <tr><td>VALIDATION_ERROR</td><td>400</td><td>Request body failed validation (returns per-field errors)</td></tr>
+  <tr><td>CONFLICT</td><td>409</td><td>Database integrity constraint hit (rare; usually a race)</td></tr>
+  <tr><td>INTERNAL_ERROR</td><td>500</td><td>Something unexpected. Stack trace is logged server-side, never sent.</td></tr>
+</table>
+
+<hr>
+
+<div class="sec">Tech stack — what's actually wired up</div>
+<table class="table">
+  <tr><th>Service</th><th>What it does</th><th>Status</th></tr>
+  <tr><td>Spring Boot 3.3</td><td>The backend itself. Java 21.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>PostgreSQL</td><td>The database. Hosted on Supabase (or any Postgres).</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>Flyway</td><td>Schema migrations. 8 versioned SQL files.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>Hikari</td><td>DB connection pool. 2..10 connections.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>JJWT</td><td>JWT mint + verify (HS256).</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>BCrypt</td><td>Password hashing (strength 12).</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>Google OAuth client</td><td>Verify Google ID tokens via Google's verifier.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>wa.me</td><td>Click-to-chat WhatsApp links. No API key needed.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>Springdoc OpenAPI</td><td>Auto-generated Swagger docs.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>JaCoCo</td><td>Test coverage gate on every <code>mvn verify</code>.</td><td><span class="pill g">In use</span></td></tr>
+  <tr><td>Stripe</td><td>Subscription billing.</td><td><span class="pill a">Wires in PR9</span></td></tr>
+  <tr><td>WhatsApp Cloud API</td><td>Native push (instead of click-to-chat).</td><td><span class="pill r">V2 — not yet</span></td></tr>
+  <tr><td>Twilio SMS</td><td>OTP fallback if WhatsApp unavailable.</td><td><span class="pill r">V2 — not yet</span></td></tr>
+  <tr><td>JasperReports</td><td>PDF report card generation.</td><td><span class="pill r">PR8 — not yet</span></td></tr>
+</table>
+
+<hr>
+
+<div class="sec">Numbers that matter</div>
+<table class="table">
+  <tr><th>What</th><th>Number</th></tr>
+  <tr><td>Java source files (production)</td><td>60</td></tr>
+  <tr><td>Production classes</td><td>41</td></tr>
+  <tr><td>Test classes</td><td>11</td></tr>
+  <tr><td>Unit tests passing today</td><td>119 / 124 (5 fail because of the bug above)</td></tr>
+  <tr><td>REST endpoints live</td><td>14</td></tr>
+  <tr><td>Database tables (live)</td><td>12</td></tr>
+  <tr><td>Database tables planned next</td><td>4 (sessions, payments, mistakes, subscriptions)</td></tr>
+  <tr><td>Flyway migrations</td><td>8</td></tr>
+  <tr><td>Error codes in active use</td><td>22</td></tr>
+  <tr><td>Phone owner types supported</td><td>4 (USER · SCHOOL · INSTRUCTOR · STUDENT)</td></tr>
+  <tr><td>User roles</td><td>4 (OWNER · INSTRUCTOR · STUDENT · PARENT)</td></tr>
+  <tr><td>Phones per owner cap</td><td>5 (will become plan-tier-aware in PR9)</td></tr>
+</table>
+
+<hr>
+
+<div class="sec">Build order — what to ship next, in this order</div>
+<table class="table">
+  <tr><th>#</th><th>What</th><th>Why this order</th></tr>
+  <tr><td>0</td><td>Fix the [CODE] bug + 4 small pre-launch items</td><td>Production gates. Nothing else ships until these clear.</td></tr>
+  <tr><td>1</td><td>Schools — entity + endpoints</td><td>Phone schema already has school_id; closes the loop. Email-verify endpoints land here too.</td></tr>
+  <tr><td>2</td><td>Instructor profiles — entity + endpoints</td><td>Vehicle, hours, SGI cert. Phone owner already supports INSTRUCTOR.</td></tr>
+  <tr><td>3</td><td>Students + Parent links</td><td>Parent screens depend on this graph.</td></tr>
+  <tr><td>4</td><td>Sessions — scheduling engine</td><td>Pulls phone.primary for reminders — proves wa.me works end-to-end.</td></tr>
+  <tr><td>5</td><td>Reminders — auto-fire 24h before lesson</td><td>Glues sessions to the wa.me link generator we already built.</td></tr>
+  <tr><td>6</td><td>Payments — ledger</td><td>Independent of scheduling. Could land in parallel with #4–5.</td></tr>
+  <tr><td>7</td><td>Subscriptions + plan limits</td><td>Replaces the hardcoded 5-phone cap. Adds instructor + student caps.</td></tr>
+  <tr><td>8</td><td>SGI mistake logger + readiness score</td><td>The in-car UX. Big colour-coded buttons.</td></tr>
+  <tr><td>9</td><td>PDF report cards</td><td>Shareable via WhatsApp once #8 has data.</td></tr>
+  <tr><td>10</td><td>Owner dashboard</td><td>Pulls everything above into one place.</td></tr>
+</table>
+
+<div class="note">Rule we hold to: every PR keeps the build green. <code>mvn -B verify</code> must pass with all tests + coverage gate. No "fix the tests later" commits. The 5 currently-failing tests are from the small bug above and will land green again as soon as that fix goes in.</div>
+
+<div class="note warn">For the deep version of this — every request flow step-by-step, every code-review finding with file/line citations, every ADR — see <code>sroadtutor_backend_workflow.html</code> in this same folder.</div>
+
+</div>

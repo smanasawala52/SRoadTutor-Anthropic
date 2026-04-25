@@ -4,10 +4,13 @@ spring:
   jpa:
     show-sql: false
 
-  # Explicit: QA NEVER runs the dev seed.
+  # Explicit: QA NEVER runs either seed migration. Belt-and-suspenders on
+  # top of the base default in application.yml — if a future profile yml
+  # accidentally inherits a "true" we still pin them off here.
   flyway:
     placeholders:
       seed-dev: "false"
+      seed-customer: "false"
 
 logging:
   level:

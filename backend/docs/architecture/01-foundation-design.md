@@ -392,15 +392,23 @@ If unsure, I default to Option B and we revisit when signup volume justifies the
 | TD-08 | Empty packages `com/sroadtutor/{school,user}/{controller,dto,model,repository,service}` in main code. Misleading. | Low | Cleanup | PR6 |
 | TD-09 | `CorsConfig` splits on raw comma — fragile if env vars accidentally have spaces. | Low | Config | Future |
 | TD-10 | `FlywayDevConfig` runs `repair()` before every dev migrate. Fine for local dev but document loudly so no one ports it to QA. | Info | Config | Documented here |
+| TD-11 | `instructors.working_hours_json` deprecated by Module 4; column dropped in V10. | Medium | Scheduling | V10 |
+| TD-12 | Instructor availability rules are advisory in V1 (booking outside is logged, not rejected). | Medium | Scheduling | V2 |
+| TD-13 | Student double-booking not enforced (only instructor-side EXCLUDE in V9). | Low | Scheduling | V2 |
+| TD-14 | Vehicle / car resource not modelled — multi-instructor sharing one car not detectable. | Low | Scheduling | V2 |
+| TD-15 | Cancellation window hard-coded to 24h instead of `schools.cancellation_window_hours`. | Low | Scheduling | V2 |
+| TD-16 | `lesson_credits` decrement runs only on `COMPLETED`; orphan SCHEDULED bookings leak credits indefinitely. Need NO_SHOW auto-flip job. | Medium | Scheduling | V2 |
+| TD-17 | Parent alerts delivered as email + wa.me link, not native WhatsApp push (Option B carryover). | High if customer expects push | WhatsApp | Cloud API integration (V2+) |
 
 ---
 
 ## 13. What this design explicitly does NOT cover
 
-- Calendar / availability / booking (Phase 2)
-- Lesson session lifecycle, mistake categorization runtime, road-test results capture (Phase 2)
+- ~~Calendar / availability / booking (Phase 2)~~ → moved into Module 4 / PR9 — see `02-students-parents-scheduling.md`
+- ~~Lesson session lifecycle~~ → status state machine + cancel audit added in V9 (PR9)
+- Mistake categorization runtime, road-test results capture (Phase 2)
 - Payments + Stripe (Phase 3)
-- Reminders engine + cron (Phase 3)
+- Reminders engine + cron (Phase 3) — manual triggers via PR4 wa.me + PR5 email cover Module 3 alerts
 - Subscriptions / billing (Phase 3)
 - Dealership leads + risk scoring (Phase 4)
 - WhatsApp inbound / two-way conversation (out of scope per D15)

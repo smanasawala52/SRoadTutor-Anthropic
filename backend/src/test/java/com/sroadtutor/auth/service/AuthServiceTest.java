@@ -16,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -30,8 +32,19 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** Mockito unit tests for AuthService.  No Spring, no DB, no HTTP. */
+/**
+ * Mockito unit tests for AuthService.  No Spring, no DB, no HTTP.
+ *
+ * <p>{@code Strictness.LENIENT} is required because {@link #tokenStubs()}
+ * runs before EVERY test, but many tests throw before reaching the JWT /
+ * refresh-token mocks. Strict stubbing would flag those as
+ * UnnecessaryStubbingException. The trade-off is acceptable here: stubbing
+ * tokenStubs() once per test removes a class of false-green bugs (token
+ * fields silently coming back null) far more often than strict stubbing
+ * would catch a real defect in this file.</p>
+ */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AuthServiceTest {
 
     @Mock UserRepository userRepository;
@@ -43,7 +56,7 @@ class AuthServiceTest {
 
     @InjectMocks AuthService authService;
 
-    //@BeforeEach
+    @BeforeEach
     void tokenStubs() {
         when(jwtService.generateAccessToken(any(User.class))).thenReturn("access-token");
         when(jwtService.accessTokenTtlSeconds()).thenReturn(900L);
@@ -54,7 +67,6 @@ class AuthServiceTest {
 
     @Test
     void signup_createsNewUserAndIssuesTokens() {
-        tokenStubs();
         SignupRequest req = new SignupRequest("New@Example.com", "Password1", "Ada Lovelace", Role.INSTRUCTOR);
         when(userRepository.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
         when(passwordEncoder.encode("Password1")).thenReturn("hashed");
@@ -99,7 +111,9 @@ class AuthServiceTest {
         when(passwordEncoder.matches("pw", "hashed")).thenReturn(true);
 
         var resp = authService.login(new LoginRequest("U@Example.com", "pw"), request);
-        assertThat(resp.accessToken()).isNull();
+        assertThat(resp.accessToken()).isEqualTo("access-token");
+        assertThat(resp.refreshToken()).isEqualTo("refresh-token");
+        assertThat(resp.user().email()).isEqualTo("u@example.com");
     }
 
     @Test
@@ -166,7 +180,6 @@ class AuthServiceTest {
 
     @Test
     void loginWithGoogle_createsNewUserWhenNoMatch() {
-        tokenStubs();
         OAuthLoginRequest req = new OAuthLoginRequest("google-id-token", Role.STUDENT);
         when(googleOAuthService.verify("google-id-token"))
                 .thenReturn(new OAuthVerifier("google-sub-1", "new@example.com", "New User"));
@@ -199,10 +212,16 @@ class AuthServiceTest {
                 .hasMessageContaining("role");
     }
 
+    @Test
     void loginWithGoogle_reusesExistingProviderMatch() {
+        // fullName MUST match the verified payload below — otherwise
+        // upsertOAuthUser's name-refresh branch fires, calls save(), and
+        // we'd be testing a different code path. Test focus here is the
+        // pure "provider already known → reuse" path.
         User existing = User.builder()
                 .id(UUID.randomUUID())
                 .email("owner@example.com")
+                .fullName("Owner")
                 .authProvider(AuthProvider.GOOGLE)
                 .providerUserId("google-sub-2")
                 .role(Role.OWNER)
@@ -215,8 +234,12 @@ class AuthServiceTest {
 
         var resp = authService.loginWithGoogle(new OAuthLoginRequest("tok", null), request);
 
-        //assertThat(resp.user().id()).isEqualTo(existing.getId());
+        assertThat(resp.user().id()).isEqualTo(existing.getId());
         assertThat(resp.user().role()).isEqualTo(Role.OWNER);
+        assertThat(resp.accessToken()).isEqualTo("access-token");
+        // No save() — reusing existing provider-matched user, not a fresh
+        // insert and not a name-refresh.
+        verify(userRepository, never()).save(any());
     }
 
     @Test
@@ -257,8 +280,11 @@ class AuthServiceTest {
 
         var resp = authService.refresh("old-refresh", request);
 
-        assertThat(resp.accessToken()).isNull();
+        assertThat(resp.accessToken()).isEqualTo("access-token");
+        assertThat(resp.refreshToken()).isEqualTo("refresh-token");
         assertThat(resp.refreshToken()).isNotEqualTo("old-refresh");
+        assertThat(resp.user().id()).isEqualTo(userId);
+        assertThat(resp.user().role()).isEqualTo(Role.OWNER);
     }
 
     @Test

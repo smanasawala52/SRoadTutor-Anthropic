@@ -1,0 +1,371 @@
+<style>
+.w{padding:1rem 0;font-size:14px;color:var(--color-text-primary);line-height:1.6}
+.sec{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary);margin:24px 0 10px}
+h1{font-size:20px;font-weight:600;margin:8px 0 4px}
+h2{font-size:16px;font-weight:600;margin:18px 0 6px}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.card.pu{border-color:#AFA9EC;background:#EEEDFE}.card.pu .ct{color:#26215C}.card.pu .cs{color:#534AB7}
+.card.te{border-color:#5DCAA5;background:#E1F5EE}.card.te .ct{color:#04342C}.card.te .cs{color:#0F6E56}
+.card.am{border-color:#EF9F27;background:#FAEEDA}.card.am .ct{color:#412402}.card.am .cs{color:#633806}
+.card.co{border-color:#F0997B;background:#FAECE7}.card.co .ct{color:#4A1B0C}.card.co .cs{color:#712B13}
+.card.bl{border-color:#85B7EB;background:#E6F1FB}.card.bl .ct{color:#042C53}.card.bl .cs{color:#0C447C}
+.card.rd{border-color:#E89A9A;background:#FCEBEB}.card.rd .ct{color:#791F1F}.card.rd .cs{color:#9A2828}
+.ct{font-size:13px;font-weight:500;margin-bottom:5px}
+.cs{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin:2px 2px 0 0}
+.tag.p0{background:#FCEBEB;color:#791F1F;border:1px solid #C73838}
+.tag.p1{background:#FAEEDA;color:#412402;border:1px solid #EF9F27}
+.tag.p2{background:#FAECE7;color:#4A1B0C;border:1px solid #F0997B}
+.tag.ok{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
+.tag.note{background:#EEEDFE;color:#26215C;border:1px solid #AFA9EC}
+.table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.table th{text-align:left;padding:7px 10px;background:var(--color-background-tertiary);color:var(--color-text-secondary);font-weight:500;font-size:11px}
+.table td{padding:7px 10px;border-top:1px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:top}
+.table tr:first-child td{border-top:none}
+.pill{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-right:3px}
+.pill.g{background:#E1F5EE;color:#085041}.pill.p{background:#EEEDFE;color:#26215C}.pill.a{background:#FAEEDA;color:#412402}.pill.r{background:#FCEBEB;color:#791F1F}
+.pill.b{background:#E6F1FB;color:#042C53}
+hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
+.note{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;border-left:3px solid #534AB7;margin-top:10px;line-height:1.6}
+.note.warn{border-left-color:#EF9F27;background:#FFF8E8}
+.note.crit{border-left-color:#C73838;background:#FCEBEB;color:#791F1F}
+code{font-family:var(--font-family-monospace,monospace);font-size:11px;background:var(--color-background-tertiary);padding:1px 5px;border-radius:4px}
+pre{font-family:var(--font-family-monospace,monospace);font-size:11px;background:var(--color-background-tertiary);padding:10px 12px;border-radius:6px;overflow-x:auto;line-height:1.5}
+.flow{counter-reset:step;list-style:none;padding:0;margin:6px 0}
+.flow li{counter-increment:step;position:relative;padding:6px 0 6px 28px}
+.flow li::before{content:counter(step);position:absolute;left:0;top:8px;width:20px;height:20px;border-radius:50%;background:#EEEDFE;color:#26215C;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.kpi{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.kpi-box{flex:1;min-width:120px;background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:10px 14px}
+.kpi-num{font-size:20px;font-weight:600}
+.kpi-lbl{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+@media(max-width:520px){.g2,.g3{grid-template-columns:1fr}}
+</style>
+<div class="w">
+
+<h1>SRoadTutor backend — in-depth workflow document</h1>
+<div class="cs">Generated from a full read of <code>src/main/java/**</code> (60 source files), <code>src/main/resources/db/migration/V*.sql</code> (8 migrations), and the test corpus (124 unit tests, 11 test classes). Every claim below is grounded in a specific file and line; nothing assumed.</div>
+
+<div class="kpi">
+  <div class="kpi-box"><div class="kpi-num">60</div><div class="kpi-lbl">Java source files</div></div>
+  <div class="kpi-box"><div class="kpi-num">41</div><div class="kpi-lbl">Production classes</div></div>
+  <div class="kpi-box"><div class="kpi-num">11</div><div class="kpi-lbl">Test classes</div></div>
+  <div class="kpi-box"><div class="kpi-num">124</div><div class="kpi-lbl">Unit tests</div></div>
+  <div class="kpi-box"><div class="kpi-num">8</div><div class="kpi-lbl">Flyway migrations</div></div>
+  <div class="kpi-box"><div class="kpi-num">21</div><div class="kpi-lbl">REST endpoints</div></div>
+</div>
+
+<div class="note crit"><strong>P0 OPEN — must fix before tagging "production-ready":</strong>
+The <code>BadRequestException</code> change applied earlier in this session prefixes <code>[CODE]</code> onto <code>super(message)</code>. <code>GlobalExceptionHandler</code> (lines 38–41) emits <strong>both</strong> <code>ex.getCode()</code> and <code>ex.getMessage()</code> into the <code>ErrorResponse</code>, so the JSON now contains the code twice — once in the <code>code</code> field and again embedded in the <code>message</code> field. <code>UnauthorizedException</code> does NOT prefix, so 401 envelopes are clean and 400 envelopes are polluted. <strong>Recommended fix:</strong> revert the prefix and update the 5 affected test assertions (PhoneNumberServiceTest L185, L334; WaMeServiceTest L229, L246, L267) to use <code>.extracting("code").isEqualTo("…")</code> instead of <code>.hasMessageContaining("…")</code>. Awaiting your call on which approach to take.</div>
+
+<hr>
+
+<h2>1. Boot &amp; configuration topology</h2>
+
+<table class="table">
+  <tr><th>File</th><th>Responsibility</th><th>Notes</th></tr>
+  <tr><td><code>SRoadTutorApplication</code></td><td>Spring Boot entry. <code>@SpringBootApplication</code> + <code>@EnableConfigurationProperties(AppProperties.class)</code>.</td><td>Active profile from <code>SPRING_PROFILES_ACTIVE</code> env (defaults to <code>dev</code>).</td></tr>
+  <tr><td><code>AppProperties</code></td><td><code>@Validated @ConfigurationProperties(prefix="app")</code>. JWT secret/issuer/TTLs, Google client id/secret, CORS origins/methods/headers/credentials/maxAge.</td><td>Missing <code>@NotBlank</code> field = startup failure. Loud, early.</td></tr>
+  <tr><td><code>SecurityConfig</code></td><td>Stateless filter chain; whitelist <code>/auth/**</code>, <code>/actuator/health*</code>, <code>/v3/api-docs/**</code>, <code>/swagger-ui*</code>, <code>/error</code>; everything else requires JWT. <code>@EnableMethodSecurity</code> for <code>@PreAuthorize</code>. CSRF disabled (stateless API). BCrypt strength 12.</td><td>JWT filter is wired <em>before</em> <code>UsernamePasswordAuthenticationFilter</code>.</td></tr>
+  <tr><td><code>CorsConfig</code></td><td><code>setAllowedOriginPatterns</code> (not <code>setAllowedOrigins</code>) so wildcards <em>and</em> <code>allowCredentials</code> can coexist.</td><td>Driven by <code>app.cors.*</code> in YAML — dev allows <code>http://localhost:*</code>.</td></tr>
+  <tr><td><code>FlywayDevConfig</code></td><td><code>@Profile("dev")</code> only. Replaces default migration strategy with <code>repair() then migrate()</code> so checksum drift on edited migrations is auto-healed locally.</td><td>QA/prod retain default validation behaviour.</td></tr>
+  <tr><td><code>OpenApiConfig</code></td><td>Swagger UI at <code>/swagger-ui.html</code>; Bearer-JWT security scheme so the docs page can call protected endpoints.</td><td></td></tr>
+  <tr><td><code>application.yml</code></td><td>Datasource via <code>SPRING_DATASOURCE_URL/USERNAME/PASSWORD</code>. <strong><code>jpa.hibernate.ddl-auto=validate</code></strong> — schema mismatch = startup failure. Hikari pool 2..10 connections. Jackson UTC, ISO timestamps, non-null inclusion. Flyway <code>baseline-version=0</code> so Supabase's pre-existing schemas don't trick it into skipping V1. Actuator exposes <code>health,info</code> only.</td><td>Two Flyway placeholders gate dev/customer seed data: <code>seed-dev</code>, <code>seed-customer</code> — only flipped to <code>"true"</code> in <code>application-dev.yml</code>.</td></tr>
+</table>
+
+<hr>
+
+<h2>2. Authentication module — request flows</h2>
+
+<h3 class="sec">2.1 Local signup — <code>POST /auth/signup</code></h3>
+<ol class="flow">
+  <li><strong>AuthController</strong> validates <code>SignupRequest</code> (<code>@Valid</code>), passes to <code>AuthService.signup</code>.</li>
+  <li>Email lowercased + trimmed via <code>normaliseEmail</code>. <code>userRepository.existsByEmailIgnoreCase</code> → if true, throw <code>BadRequestException("EMAIL_ALREADY_EXISTS")</code>.</li>
+  <li>Initial username generated server-side: <code>SUBSTRING(local-part, 1, 50) + "_" + first-8-of-fresh-uuid</code>, all lowercased. Backed by unique index <code>ux_users_username_lower</code> on <code>LOWER(username)</code>.</li>
+  <li>Password BCrypt-hashed (strength 12 ≈ 250ms). User saved with <code>authProvider=LOCAL</code>, <code>active=true</code>, <code>mustChangePassword=false</code>, <code>emailVerifiedAt=null</code>.</li>
+  <li><code>JwtService.generateAccessToken</code> mints HS256 JWT with claims <code>sub=userId</code>, <code>role</code>, <code>email</code>, conditionally <code>schoolId</code>. TTL from <code>app.jwt.access-token-expiration-minutes</code> (default 15 min).</li>
+  <li><code>RefreshTokenService.issueFor</code> generates 48 random bytes (SecureRandom) → URL-safe Base64 → SHA-256 hex hash stored. Plaintext is returned to client only. UA + client IP (X-Forwarded-For honoured) recorded for forensics.</li>
+  <li>Response <code>201 CREATED</code>, <code>ApiResponse&lt;AuthResponse&gt;</code> with both tokens + a <code>UserDto</code> projection. <code>mustChangePassword</code> drives SPA redirect to rotation flow when an owner pre-created the row with <code>test123</code>.</li>
+</ol>
+
+<h3 class="sec">2.2 Local login — <code>POST /auth/login</code></h3>
+<ol class="flow">
+  <li>Email normalised, user looked up via <code>findByEmailIgnoreCase</code>. Missing → <code>UnauthorizedException("INVALID_CREDENTIALS")</code> (deliberately the same code as wrong-password to avoid email enumeration).</li>
+  <li>If <code>authProvider != LOCAL</code> or <code>passwordHash == null</code> → <code>UnauthorizedException("USE_OAUTH_LOGIN")</code> with the actual provider name in the human message.</li>
+  <li><code>passwordEncoder.matches(raw, hash)</code>. Mismatch → <code>INVALID_CREDENTIALS</code>.</li>
+  <li><code>active=false</code> → <code>ACCOUNT_DISABLED</code>.</li>
+  <li>Issue tokens (same path as signup, step 5–7).</li>
+</ol>
+
+<h3 class="sec">2.3 Google OAuth — <code>POST /auth/google</code></h3>
+<ol class="flow">
+  <li><code>GoogleOAuthService.verify(idToken)</code> calls Google's verifier (audience = our client id). Failure throws <code>UnauthorizedException("INVALID_GOOGLE_TOKEN")</code>. Verifier returns <code>OAuthVerifier(providerUserId, email, fullName)</code>.</li>
+  <li><strong>Upsert priority 1</strong>: <code>findByAuthProviderAndProviderUserId(GOOGLE, sub)</code> — if found, return that user. Refresh fullName if it changed at the provider. Reject if <code>!active</code>.</li>
+  <li><strong>Priority 2</strong>: same email exists but different provider → <code>BadRequestException("EMAIL_USED_WITH_DIFFERENT_PROVIDER")</code>. Same provider but missing <code>providerUserId</code> → backfill it.</li>
+  <li><strong>Priority 3</strong>: brand-new user. Requires <code>signupRole</code> in the request — missing throws <code>BadRequestException("ROLE_REQUIRED")</code>. Email pre-verified (<code>emailVerifiedAt = Instant.now()</code>) because Google asserts ownership.</li>
+  <li>Issue tokens.</li>
+</ol>
+
+<h3 class="sec">2.4 Refresh — <code>POST /auth/refresh</code> (rotation)</h3>
+<ol class="flow">
+  <li><code>RefreshTokenService.consumeAndRotate(rawToken)</code>: SHA-256 hash, lookup, fail with <code>INVALID_REFRESH_TOKEN</code> on miss.</li>
+  <li><code>isActive(now)</code>: not revoked AND not expired. <strong>Reuse detection</strong> — if revoked-but-presented, revoke ALL active tokens for that user (<code>repository.revokeAllForUser</code>) and throw <code>REFRESH_TOKEN_REVOKED</code>. Defends against replay after theft.</li>
+  <li>Mark used token <code>revokedAt=now</code>, return its <code>userId</code>. Caller (<code>AuthService.refresh</code>) re-loads the user, re-checks <code>active</code>, issues a fresh access+refresh pair.</li>
+</ol>
+
+<h3 class="sec">2.5 Logout — <code>POST /auth/logout</code></h3>
+<div class="cs">Look up by hash, set <code>revokedAt</code> if not already revoked. Idempotent — unknown tokens are silently 204'd (no info leak about which tokens existed).</div>
+
+<h3 class="sec">2.6 JWT request flow</h3>
+<ol class="flow">
+  <li><code>JwtAuthenticationFilter</code> (<code>OncePerRequestFilter</code>) reads <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+  <li><code>JwtService.parseAndValidate</code>: signature (HS256, secret ≥ 32 bytes enforced at <code>JwtService</code> construction), <code>requireIssuer("sroadtutor")</code>, exp. <code>JwtException</code>/<code>IllegalArgumentException</code> → <code>UnauthorizedException("INVALID_TOKEN")</code>.</li>
+  <li>Build <code>UsernamePasswordAuthenticationToken(userId, null, [ROLE_&lt;role&gt;])</code> and set on <code>SecurityContextHolder</code>. <strong>Critical:</strong> only <code>UnauthorizedException</code> is caught and swallowed — any other exception (NPE, IllegalState) propagates, so real bugs aren't masked as 401s.</li>
+  <li><code>SecurityUtil.currentUserId() / currentRole()</code> are the controller-side accessors. Both throw <code>UnauthorizedException("NOT_AUTHENTICATED" / "MISSING_ROLE" / "INVALID_PRINCIPAL")</code> rather than returning null.</li>
+</ol>
+
+<hr>
+
+<h2>3. Phone-number module — request flows</h2>
+
+<h3 class="sec">3.1 Owner polymorphism — the central design choice</h3>
+<div class="cs"><code>phone_numbers</code> has four nullable owner FKs (<code>user_id</code>, <code>school_id</code>, <code>instructor_id</code>, <code>student_id</code>) plus a CHECK <code>phone_owner_exactly_one</code> that enforces "exactly one is non-null". Java side: <code>PhoneOwnerType</code> enum (USER/SCHOOL/INSTRUCTOR/STUDENT) is the wire format, never persisted as a column. <strong>Q1a</strong>: there is no PARENT owner — parents are users with <code>role=PARENT</code>, so their phones use <code>USER</code>. The four <code>findByXxxId</code> repository methods + four <code>findByXxxIdAndPrimaryTrue</code> match this shape one-to-one.</div>
+
+<h3 class="sec">3.2 Create — <code>POST /api/phone-numbers</code></h3>
+<ol class="flow">
+  <li>Controller pulls <code>(role, currentUserId)</code> from <code>SecurityUtil</code>; Bean Validation enforces non-blank country code, 4-char max; non-blank national, 20-char max; label ≤ 40.</li>
+  <li><strong>Scope check</strong>: <code>PhoneScopeChecker.requireWriteScope(role, currentUserId, ownerType, ownerId)</code>. The 4 × 4 matrix is implemented with explicit per-role private methods. OWNER scope queries <code>users.school_id</code> for the owner-user and confirms target shares it. INSTRUCTOR/STUDENT/PARENT scopes resolve via <code>PhoneOwnershipLookup</code> (raw SQL on <code>instructors</code>, <code>instructor_schools</code>, <code>students</code>, <code>parent_student</code>).</li>
+  <li><strong>5-cap enforcement</strong>: <code>ownerPhones(type, id).size() &gt;= 5</code> → <code>BadRequestException("PHONE_LIMIT_EXCEEDED")</code>. Constant <code>MAX_PHONES_PER_OWNER=5</code> is in the service file, deliberately visible.</li>
+  <li><strong>E.164 normalisation</strong>: <code>E164Normalizer.normalize(cc, nn)</code>. Regex <code>^[1-9][0-9]{0,2}$</code> for country (no leading zero), <code>^[0-9]{4,14}$</code> for national, total ≤ 15 digits. Returns <code>(cc, nn, "+ccnn")</code>. All failures throw <code>INVALID_PHONE_NUMBER</code>.</li>
+  <li><strong>Same-owner duplicate check</strong>: stream existing phones, fail with <code>PHONE_ALREADY_EXISTS</code> on match. Race-safe authority is the partial unique index <code>ux_phone_&lt;owner&gt;_e164</code>; this check just gives a friendly error pre-DB.</li>
+  <li>Build entity (<code>whatsapp</code>=true, <code>whatsappOptIn</code>=true by default, <code>primary=false</code>, <code>verifiedAt=null</code>), set the correct owner FK via <code>applyOwner</code>, save.</li>
+  <li><strong>Primary promotion</strong>: <code>shouldBePrimary = makePrimary || existing==0</code>. If true, <code>promoteToPrimaryInternal</code> demotes any existing primary on the same owner (using the owner-specific <code>findByXxxIdAndPrimaryTrue</code>), then promotes the new row. Both saves run in the same <code>@Transactional</code> so the partial unique index never sees two primaries simultaneously.</li>
+  <li>Response <code>201 CREATED</code> with <code>PhoneNumberResponse</code> projection — <code>ownerType</code> derived from whichever FK is non-null.</li>
+</ol>
+
+<h3 class="sec">3.3 List — <code>GET /api/phone-numbers?ownerType=&amp;ownerId=</code></h3>
+<div class="cs">Both query params optional. Default = caller's own user phones (<code>USER</code> + <code>currentUserId</code>) — the dominant SPA call. Scope-checked the same way as create. Read scope == write scope at V1 (<code>PhoneScopeChecker.requireReadScope</code> just delegates to <code>requireWriteScope</code>).</div>
+
+<h3 class="sec">3.4 Get one — <code>GET /api/phone-numbers/{id}</code></h3>
+<div class="cs">Repository <code>findById</code>; missing → <code>ResourceNotFoundException</code> (404). Scope check derives owner from the entity (<code>requireReadScope(role, userId, phone)</code> overload).</div>
+
+<h3 class="sec">3.5 Update — <code>PUT /api/phone-numbers/{id}</code></h3>
+<ol class="flow">
+  <li>Load + scope check.</li>
+  <li><strong>Atomic CC/NN rule</strong>: <code>countryCode</code> and <code>nationalNumber</code> must travel together. Sending one without the other → <code>BadRequestException("INVALID_PHONE_NUMBER", "countryCode and nationalNumber must be updated together")</code>. Stops a partial update from leaving a corrupted e164.</li>
+  <li>If both supplied AND new e164 != current → re-check same-owner uniqueness, set the three columns, <strong>null out <code>verifiedAt</code></strong> (number changed → previous verification is stale).</li>
+  <li>Apply nullable label/whatsapp/optIn deltas. Save.</li>
+</ol>
+
+<h3 class="sec">3.6 Promote-primary — <code>POST /api/phone-numbers/{id}/primary</code></h3>
+<div class="cs">Idempotent (already-primary → return as-is). Otherwise the demote-then-promote dance from §3.2 step 7.</div>
+
+<h3 class="sec">3.7 WhatsApp opt-in toggle — <code>POST /api/phone-numbers/{id}/whatsapp-optin</code></h3>
+<div class="cs">Pure setter on <code>whatsappOptIn</code>. Useful for the SPA's "Stop WhatsApp" toggle without re-entering the number.</div>
+
+<h3 class="sec">3.8 Delete — <code>DELETE /api/phone-numbers/{id}</code></h3>
+<div class="cs">Hard delete. <code>ON DELETE CASCADE</code> on <code>whatsapp_message_log.recipient_phone_id</code> wipes audit rows for the deleted phone — see §6 tech-debt for why this matters.</div>
+
+<hr>
+
+<h2>4. WhatsApp module — request flows</h2>
+
+<h3 class="sec">4.1 Generate link — <code>POST /api/whatsapp/links</code></h3>
+<ol class="flow">
+  <li>Load recipient phone (<code>findById</code>, 404 on miss). <code>requireReadScope(senderRole, senderUserId, phone)</code> — same gate as phone CRUD.</li>
+  <li><code>!whatsapp || !whatsappOptIn</code> → <code>WHATSAPP_DISABLED</code>.</li>
+  <li><strong>Body resolution</strong>: <code>templateId</code> wins. If supplied but row missing → 404. If row exists but <code>!active</code> → <code>TEMPLATE_INACTIVE</code>. Otherwise <code>renderPlaceholders(body, placeholders)</code> substitutes <code>{{key}}</code> tokens via regex <code>\{\{\s*([a-zA-Z0-9_.-]+)\s*}}</code>; missing key → <code>PLACEHOLDER_MISSING</code>. <code>Matcher.quoteReplacement</code> escapes <code>$</code>/<code>\</code> in values.</li>
+  <li>If no <code>templateId</code> but <code>body</code> non-blank → trim and use as-is.</li>
+  <li>If neither supplied (or body is blank/whitespace) → <code>MISSING_BODY_OR_TEMPLATE</code>.</li>
+  <li>Pull sender's <code>schoolId</code> from <code>users</code> (may be null — column is nullable).</li>
+  <li>Persist a <code>WhatsappMessageLog</code> row: <code>senderUserId</code>, <code>recipientPhoneId</code>, <code>templateId</code> (nullable), <code>renderedBody</code> (verbatim, audit-grade), <code>schoolId</code>, <code>correlationId</code>. <code>linkGeneratedAt</code> defaults to now via <code>@PrePersist</code>.</li>
+  <li>Build URL: <code>https://wa.me/&lt;cc+nn&gt;?text=&lt;URLEncoder.encode(body, UTF_8)&gt;</code>. The "+" is intentionally stripped (wa.me spec).</li>
+  <li>Response <code>201 CREATED</code> with <code>WaMeLinkResponse(logId, url, generatedAt, …)</code>.</li>
+</ol>
+
+<h3 class="sec">4.2 Click confirm — <code>POST /api/whatsapp/links/{logId}/click-confirm</code></h3>
+<ol class="flow">
+  <li>Load log row (<code>findById</code>, 404 on miss).</li>
+  <li><strong>Sender == clicker auth model</strong>: if <code>logRow.senderUserId != currentUserId</code> → <code>AccessDeniedException</code> (403 via GlobalExceptionHandler) with message <code>"Only the link generator can confirm the click"</code>. This is the verification model — D14: "trust the typist + WhatsApp click-confirm". <em>Trade-off:</em> cross-device verification (instructor generates, student clicks) doesn't fly. Tracked as TD.</li>
+  <li>Idempotent click time: if <code>linkClickedAt</code> already set, reuse it; else set to <code>Instant.now()</code> and save.</li>
+  <li>Reload phone (defensive — could have been deleted between generation and confirm). If <code>phone.verifiedAt == null</code> → set to <code>clickAt</code>, save, mark <code>verifiedNow=true</code>. Subsequent confirms are no-ops on the verification flag.</li>
+  <li>Response: <code>ClickConfirmResponse(logId, phoneId, clickAt, verifiedNow, phone.verifiedAt)</code>.</li>
+</ol>
+
+<hr>
+
+<h2>5. Error envelope &amp; exception handling</h2>
+
+<h3 class="sec">5.1 Standard envelopes</h3>
+<table class="table">
+  <tr><th>Type</th><th>Shape</th></tr>
+  <tr><td>Success</td><td><code>ApiResponse&lt;T&gt; { data: T, timestamp }</code> — <code>@JsonInclude(NON_NULL)</code>.</td></tr>
+  <tr><td>Error</td><td><code>ErrorResponse { code, message, status, fieldErrors?, timestamp }</code> — fieldErrors only on <code>VALIDATION_ERROR</code>.</td></tr>
+</table>
+
+<h3 class="sec">5.2 Mapping table — every exception → HTTP code</h3>
+<table class="table">
+  <tr><th>Exception</th><th>HTTP</th><th>Code</th><th>Notes</th></tr>
+  <tr><td><code>ResourceNotFoundException</code></td><td>404</td><td><code>NOT_FOUND</code></td><td>Single-string ctor; no <code>code</code> field.</td></tr>
+  <tr><td><code>BadRequestException</code></td><td>400</td><td>caller-supplied</td><td>10 codes in active use (table below). <strong>P0 regression flagged at top.</strong></td></tr>
+  <tr><td><code>UnauthorizedException</code></td><td>401</td><td>caller-supplied</td><td>9 codes in active use. Clean message (no prefix).</td></tr>
+  <tr><td><code>BadCredentialsException</code> / <code>AuthenticationException</code></td><td>401</td><td><code>INVALID_CREDENTIALS</code></td><td>Generic. Doesn't leak which factor failed.</td></tr>
+  <tr><td><code>AccessDeniedException</code> (Spring)</td><td>403</td><td><code>FORBIDDEN</code></td><td>Used by <code>PhoneScopeChecker</code> + <code>WaMeService.confirmClick</code>.</td></tr>
+  <tr><td><code>MethodArgumentNotValidException</code></td><td>400</td><td><code>VALIDATION_ERROR</code></td><td>Populates <code>fieldErrors</code> from Bean Validation.</td></tr>
+  <tr><td><code>ConstraintViolationException</code></td><td>400</td><td><code>VALIDATION_ERROR</code></td><td>For <code>@Validated</code> on path/query params.</td></tr>
+  <tr><td><code>DataIntegrityViolationException</code></td><td>409</td><td><code>CONFLICT</code></td><td>Catches DB unique-index violations the service layer didn't pre-check (race-safe).</td></tr>
+  <tr><td>any other <code>Exception</code></td><td>500</td><td><code>INTERNAL_ERROR</code></td><td>Stack trace logged server-side at ERROR level only.</td></tr>
+</table>
+
+<h3 class="sec">5.3 Active error-code inventory</h3>
+<table class="table">
+  <tr><th>Code</th><th>HTTP</th><th>Source</th><th>Trigger</th></tr>
+  <tr><td><code>INVALID_PHONE_NUMBER</code></td><td>400</td><td>E164Normalizer + PhoneNumberService.update</td><td>Null/format/length/digit-cap; partial CC/NN update</td></tr>
+  <tr><td><code>PHONE_LIMIT_EXCEEDED</code></td><td>400</td><td>PhoneNumberService.create</td><td>≥5 phones for owner</td></tr>
+  <tr><td><code>PHONE_ALREADY_EXISTS</code></td><td>400</td><td>PhoneNumberService.create + .update</td><td>Same e164 already on this owner</td></tr>
+  <tr><td><code>INVALID_OWNER</code></td><td>400</td><td>PhoneScopeChecker</td><td>Null ownerType or ownerId</td></tr>
+  <tr><td><code>WHATSAPP_DISABLED</code></td><td>400</td><td>WaMeService.generateLink</td><td><code>!whatsapp</code> or <code>!whatsappOptIn</code></td></tr>
+  <tr><td><code>TEMPLATE_INACTIVE</code></td><td>400</td><td>WaMeService.generateLink</td><td>Template found but <code>active=false</code></td></tr>
+  <tr><td><code>MISSING_BODY_OR_TEMPLATE</code></td><td>400</td><td>WaMeService.generateLink</td><td>Neither <code>templateId</code> nor non-blank <code>body</code></td></tr>
+  <tr><td><code>PLACEHOLDER_MISSING</code></td><td>400</td><td>WaMeService.renderPlaceholders</td><td>Template references unsupplied <code>{{key}}</code></td></tr>
+  <tr><td><code>EMAIL_ALREADY_EXISTS</code></td><td>400</td><td>AuthService.signup</td><td>Local-account email collision</td></tr>
+  <tr><td><code>EMAIL_USED_WITH_DIFFERENT_PROVIDER</code></td><td>400</td><td>AuthService.upsertOAuthUser</td><td>OAuth login email already a LOCAL account</td></tr>
+  <tr><td><code>ROLE_REQUIRED</code></td><td>400</td><td>AuthService.upsertOAuthUser</td><td>First-time OAuth signup with no role</td></tr>
+  <tr><td><code>INVALID_CREDENTIALS</code></td><td>401</td><td>AuthService.login</td><td>Email missing or password mismatch (single code by design)</td></tr>
+  <tr><td><code>USE_OAUTH_LOGIN</code></td><td>401</td><td>AuthService.login</td><td>Account is OAuth-managed; password login refused</td></tr>
+  <tr><td><code>ACCOUNT_DISABLED</code></td><td>401</td><td>AuthService.login + .refresh + OAuth</td><td><code>active=false</code></td></tr>
+  <tr><td><code>USER_NOT_FOUND</code></td><td>401</td><td>AuthService.refresh</td><td>Refresh token's user no longer exists</td></tr>
+  <tr><td><code>INVALID_REFRESH_TOKEN</code></td><td>401</td><td>RefreshTokenService.consumeAndRotate</td><td>Hash not found</td></tr>
+  <tr><td><code>REFRESH_TOKEN_REVOKED</code></td><td>401</td><td>RefreshTokenService.consumeAndRotate</td><td>Token reuse — also nukes all this user's other tokens</td></tr>
+  <tr><td><code>INVALID_TOKEN</code></td><td>401</td><td>JwtService.parseAndValidate</td><td>Signature/expiry/issuer fail</td></tr>
+  <tr><td><code>INVALID_GOOGLE_TOKEN</code></td><td>401</td><td>GoogleOAuthService.verify</td><td>Google verifier returned null or threw</td></tr>
+  <tr><td><code>NOT_AUTHENTICATED</code></td><td>401</td><td>SecurityUtil</td><td>SecurityContext empty</td></tr>
+  <tr><td><code>MISSING_ROLE</code></td><td>401</td><td>SecurityUtil</td><td>No <code>ROLE_*</code> authority on principal</td></tr>
+  <tr><td><code>INVALID_PRINCIPAL</code></td><td>401</td><td>SecurityUtil</td><td>Principal not parseable as UUID</td></tr>
+</table>
+
+<hr>
+
+<h2>6. Database schema — what's actually in V1..V8</h2>
+<table class="table">
+  <tr><th>Table</th><th>Purpose</th><th>Key columns / constraints</th></tr>
+  <tr><td><code>users</code></td><td>One row per login-capable actor</td><td>id, schoolId?, email (unique), username (case-insensitive unique), passwordHash?, mustChangePassword, fullName, role, authProvider, providerUserId?, languagePref='en', emailVerifiedAt?, phoneVerifiedAt?, active, created/updated</td></tr>
+  <tr><td><code>schools</code></td><td>Driving school tenants (D12)</td><td>id, name, owner, plan, gst/pst/hst, businessRegistrationNumber, metadata jsonb, isSynthetic</td></tr>
+  <tr><td><code>instructors</code></td><td>Instructor profile rows</td><td>id, userId, schoolId? (nullable since V8/D5), vehicle*, bio</td></tr>
+  <tr><td><code>instructor_schools</code></td><td>M:N join (D5) — an instructor can be at multiple schools</td><td>(instructorId, schoolId) PK; roleAtSchool, joinedAt, leftAt (soft-delete)</td></tr>
+  <tr><td><code>students</code></td><td>Student profile rows</td><td>id, userId, schoolId, package_*, status, road_test_date</td></tr>
+  <tr><td><code>parent_student</code></td><td>Many-parents-per-student M:N</td><td>(parentUserId, studentId)</td></tr>
+  <tr><td><code>phone_numbers</code></td><td>1..N phones per owner (D13–D16)</td><td>4 nullable owner FKs + <code>phone_owner_exactly_one</code> CHECK; e164 + cc + nn; isPrimary; isWhatsapp; whatsappOptIn; verifiedAt?; partial unique indexes for primary-per-owner and (owner,e164)</td></tr>
+  <tr><td><code>invitations</code></td><td>Owner→user invites (D6)</td><td>schoolId, email, username, role, deliveryMode (TOKEN/DUMMY_PWD), tokenHash?, status, metadata jsonb; <code>chk_invitation_token_or_dummy</code> CHECK</td></tr>
+  <tr><td><code>whatsapp_templates</code></td><td>Reusable bodies with <code>{{placeholders}}</code></td><td>schoolId? (null = platform default), code, label, language, body text, placeholders jsonb, active. Two partial unique indexes for school-override / platform-default uniqueness</td></tr>
+  <tr><td><code>whatsapp_message_log</code></td><td>Audit row per generated link (D17)</td><td>senderUserId, recipientPhoneId, templateId?, renderedBody (verbatim), schoolId?, correlationId, linkGeneratedAt, linkClickedAt?</td></tr>
+  <tr><td><code>email_verification_tokens</code></td><td>One-shot signup verification</td><td>userId, tokenHash unique, issuedAt, expiresAt, consumedAt?</td></tr>
+  <tr><td><code>refresh_tokens</code></td><td>Server-side refresh-token store</td><td>userId, tokenHash unique, issued/expires/revoked, userAgent, ipAddress</td></tr>
+</table>
+
+<div class="note">
+<strong>JPA entities exist for:</strong> <code>User</code>, <code>RefreshToken</code>, <code>EmailVerificationToken</code>, <code>PhoneNumber</code>, <code>InstructorSchool</code> (composite PK), <code>Invitation</code>, <code>WhatsappTemplate</code>, <code>WhatsappMessageLog</code>.
+<br><strong>NOT yet entities:</strong> <code>schools</code>, <code>instructors</code>, <code>students</code>, <code>parent_student</code>. They're queried only via raw SQL in <code>PhoneOwnershipLookup</code>. Future PRs will add JPA entities + services for these.
+</div>
+
+<hr>
+
+<h2>7. Authorization matrix — phone resource</h2>
+<table class="table">
+  <tr><th>Caller role</th><th>USER target</th><th>SCHOOL target</th><th>INSTRUCTOR target</th><th>STUDENT target</th></tr>
+  <tr><td>OWNER</td><td>same school</td><td>own school only</td><td>instructor at own school</td><td>student at own school</td></tr>
+  <tr><td>INSTRUCTOR</td><td>self only</td><td>denied (400 INVALID + 403 FORBIDDEN)</td><td>own instructor row only</td><td>denied</td></tr>
+  <tr><td>STUDENT</td><td>self only</td><td>denied</td><td>denied</td><td>own student row only</td></tr>
+  <tr><td>PARENT</td><td>self only</td><td>denied</td><td>denied</td><td>linked-student via <code>parent_student</code></td></tr>
+</table>
+<div class="cs">Source: <code>PhoneScopeChecker</code> + 37 unit tests covering every cell. Read scope == write scope at V1; the read/write split is reserved for future "audit-only viewer" if needed.</div>
+
+<hr>
+
+<h2>8. Code-review findings — by severity</h2>
+
+<div class="grid g2">
+  <div class="card rd"><div class="ct">P0 · BadRequestException prefix duplicates code in API response</div><div class="cs"><code>BadRequestException</code> (line 16): <code>super("[" + code + "] " + message)</code>. <code>GlobalExceptionHandler.handleBadRequest</code> (lines 38–41) sends both <code>code</code> and <code>message</code> into <code>ErrorResponse</code>. Result: client sees the code in two fields, and the human message has a noisy bracket prefix. <code>UnauthorizedException</code> (line 8) does NOT prefix — so the API is now inconsistent across status codes. <strong>Fix:</strong> revert <code>super("[" + code + "] " + message)</code> to <code>super(message)</code>; update test assertions in <code>PhoneNumberServiceTest</code> (L185, L334) and <code>WaMeServiceTest</code> (L229, L246, L267) from <code>.hasMessageContaining(CODE)</code> to either <code>.extracting("code").isEqualTo(CODE)</code> or a custom <code>BadRequestException::getCode</code> assertion.</div><span class="tag p0">P0 · Blocks production</span></div>
+
+  <div class="card am"><div class="ct">P1 · WaMeService URL has no body-length cap</div><div class="cs"><code>buildWaMeUrl</code> URL-encodes <code>renderedBody</code> with no length guard. WhatsApp's wa.me silently truncates somewhere around 2 KB; long template bodies (or large placeholder values) will produce links that truncate mid-message. <strong>Fix:</strong> validate <code>renderedBody.length() &lt; 2000</code> after rendering; throw <code>BODY_TOO_LONG</code>.</div><span class="tag p1">P1 · Pre-launch</span></div>
+
+  <div class="card am"><div class="ct">P1 · WaMeController.confirmClick has no scope check</div><div class="cs">By design — sender == clicker check is the auth model. But: if a sender's account is later disabled (<code>active=false</code>), they can still call <code>confirmClick</code> and verify a phone (no <code>active</code> re-check). Low-impact (account disable is rare) but worth a guard. <strong>Fix:</strong> in <code>confirmClick</code>, also load the sender user and reject if <code>!active</code>.</div><span class="tag p1">P1</span></div>
+
+  <div class="card am"><div class="ct">P1 · whatsapp_message_log cascade-deletes on phone delete</div><div class="cs"><code>recipient_phone_id UUID NOT NULL REFERENCES phone_numbers(id) ON DELETE CASCADE</code>. Hard-deleting a phone wipes its entire reminder history — bad for tax/audit (D17 says "every wa.me link"). <strong>Fix options:</strong> (a) soft-delete phones (add <code>deleted_at</code>, change <code>findById</code> to filter); (b) change FK to <code>ON DELETE RESTRICT</code> + force soft-delete; (c) drop the FK to nullable <code>SET NULL</code>. Option (a) is the most invasive but the most correct — the audit log keeps the data forever.</div><span class="tag p1">P1</span></div>
+
+  <div class="card am"><div class="ct">P1 · whatsapp_message_log records absolute body, no PII redaction</div><div class="cs"><code>renderedBody</code> stores the substituted body verbatim — including <code>{{name}}</code>, <code>{{phone}}</code>, etc. Once school count grows, this column will hold meaningful PII at rest. <strong>Fix:</strong> column-level encryption or a configurable retention policy (auto-purge log rows &gt; N days). Mention to legal/PIPEDA before launch.</div><span class="tag p1">P1 · PIPEDA</span></div>
+
+  <div class="card am"><div class="ct">P2 · Hand-rolled E.164 vs libphonenumber</div><div class="cs"><code>E164Normalizer</code> regex passes any digits that fit the shape. <code>+1 0000000000</code> is accepted (no NA-NPA validation). Acceptable for V1 (controlled SPA inputs); becomes a problem when we open a webhook ingest path or expand to a market with national-trunk-code rules (Italy, Argentina). <strong>Fix:</strong> swap <code>E164Normalizer</code> internals for libphonenumber. The seam is clean — one class, no caller changes.</div><span class="tag p2">P2 · Tracked</span></div>
+
+  <div class="card am"><div class="ct">P2 · 5-cap is a Java constant, not plan-tier-aware</div><div class="cs"><code>MAX_PHONES_PER_OWNER=5</code>. Free/Pro/Growth/Enterprise plans will want different caps. <strong>Fix:</strong> when subscriptions module lands, replace with a <code>SubscriptionService.phoneLimitFor(schoolId)</code> lookup.</div><span class="tag p2">P2</span></div>
+
+  <div class="card am"><div class="ct">P2 · Email enumeration via <code>USE_OAUTH_LOGIN</code></div><div class="cs"><code>AuthService.login</code> distinguishes "wrong password" (<code>INVALID_CREDENTIALS</code>) from "this email exists but is OAuth-managed" (<code>USE_OAUTH_LOGIN</code>). An attacker can probe whether a given email is registered at all, and which provider. Mitigated by rate-limiting at the gateway, but the codes themselves are still informative. <strong>Fix options:</strong> (a) collapse both to <code>INVALID_CREDENTIALS</code>; (b) leave but document. We've kept the discriminating code for usability — confirms with you before we change.</div><span class="tag p2">P2 · Decision pending</span></div>
+
+  <div class="card am"><div class="ct">P2 · No cleanup job for expired refresh tokens</div><div class="cs"><code>RefreshTokenRepository.deleteExpiredBefore</code> exists but no scheduled task calls it. Table grows monotonically. <strong>Fix:</strong> <code>@Scheduled(cron="0 0 3 * * *")</code> cleanup bean, or a Postgres pg_cron job.</div><span class="tag p2">P2</span></div>
+
+  <div class="card am"><div class="ct">P2 · No rate-limit on /auth/login or /auth/google</div><div class="cs">Brute-force protection is currently relying on BCrypt cost (250 ms/hash). Sufficient for Phase 1 traffic; not for any post-launch threat model. <strong>Fix:</strong> bucket4j or Spring Cloud Gateway rate-limit at the edge. Track per-IP + per-email.</div><span class="tag p2">P2</span></div>
+
+  <div class="card bl"><div class="ct">OK · Two saves in <code>promoteToPrimaryInternal</code> are atomic</div><div class="cs">Caller (<code>create</code>, <code>promoteToPrimary</code>) is <code>@Transactional</code>; the demote-then-promote pair runs inside a single tx, so the partial unique index <code>ux_phone_primary_*</code> never sees two primaries simultaneously even on concurrent calls. Verified.</div><span class="tag ok">Verified</span></div>
+
+  <div class="card bl"><div class="ct">OK · JWT claim hygiene</div><div class="cs"><code>schoolId</code> claim only emitted when non-null (avoids ambiguity between "" and null). HS256 secret length validated at construction (<code>≥ 32 bytes</code>). Issuer required on parse. Defensive.</div><span class="tag ok">Verified</span></div>
+
+  <div class="card bl"><div class="ct">OK · Refresh-token reuse detection</div><div class="cs">Presenting an already-revoked token wipes ALL the user's active tokens (<code>revokeAllForUser</code>), not just the presented one. This is the right play — assume theft and force a clean re-login.</div><span class="tag ok">Verified</span></div>
+
+  <div class="card bl"><div class="ct">OK · ddl-auto=validate on all profiles</div><div class="cs">No <code>create</code> or <code>update</code> auto-DDL anywhere. Flyway is the only schema author. Mismatch between <code>@Entity</code> and DB → app refuses to boot. This is the right strictness.</div><span class="tag ok">Verified</span></div>
+
+  <div class="card bl"><div class="ct">OK · No PII in INFO logs</div><div class="cs">All service-layer info logs use UUIDs, role names, owner-types — never raw email or phone. Critical for PIPEDA when audit retention lands.</div><span class="tag ok">Verified</span></div>
+
+  <div class="card bl"><div class="ct">OK · OAuth ID-token verification is canonical</div><div class="cs"><code>GoogleOAuthService</code> uses Google's official <code>GoogleIdTokenVerifier</code> with the configured client id as audience. No JWT-decoding shortcuts.</div><span class="tag ok">Verified</span></div>
+</div>
+
+<hr>
+
+<h2>9. Tech-debt register</h2>
+<table class="table">
+  <tr><th>ID</th><th>Item</th><th>Trigger to address</th></tr>
+  <tr><td>TD-01</td><td>libphonenumber migration (E164Normalizer seam)</td><td>First non-NA market or first inbound webhook (whichever is first)</td></tr>
+  <tr><td>TD-02</td><td>Cross-device wa.me verification (Cloud API webhook)</td><td>Free-tier users start complaining about "send to student, student clicks" not verifying</td></tr>
+  <tr><td>TD-03</td><td>Per-tenant phone cap (subscription-aware)</td><td>Subscription module lands</td></tr>
+  <tr><td>TD-04</td><td>WhatsappTemplate version history</td><td>Owners get template-edit UI</td></tr>
+  <tr><td>TD-05</td><td>Soft-delete on phone_numbers + audit retention</td><td>First reminder-history compliance request</td></tr>
+  <tr><td>TD-06</td><td>Refresh-token cleanup scheduled job</td><td>Now — set a 1h ticket; trivial</td></tr>
+  <tr><td>TD-07</td><td>Login rate-limiting</td><td>Pre-launch</td></tr>
+  <tr><td>TD-08</td><td>WaMe URL body-length validation</td><td>Pre-launch (P1 above)</td></tr>
+  <tr><td>TD-09</td><td>WhatsappMessageLog PII at rest</td><td>Before first non-test school onboards</td></tr>
+  <tr><td>TD-10</td><td>OWNER schools/instructors/students/parent_student JPA entities (currently raw SQL)</td><td>PR5/6/7 — when their controllers and services land</td></tr>
+  <tr><td>TD-11</td><td>Username chooser endpoint (D7)</td><td>SPA stops being a backend-only milestone</td></tr>
+  <tr><td>TD-12</td><td>Email verification flow (token issue + consume endpoints)</td><td>Pre-launch — table exists, the API doesn't yet</td></tr>
+</table>
+
+<hr>
+
+<h2>10. Build &amp; test pipeline</h2>
+<table class="table">
+  <tr><th>Phase</th><th>Plugin</th><th>What runs</th><th>Result on last clean run</th></tr>
+  <tr><td>compile</td><td>maven-compiler 3.13.0</td><td>60 source files → target/classes (Java 21)</td><td>OK</td></tr>
+  <tr><td>test</td><td>surefire 3.2.5 + jacoco prepare-agent</td><td>124 unit tests across 11 test classes</td><td>119 pass / 5 fail (the P0)</td></tr>
+  <tr><td>package</td><td>spring-boot 3.3.4 repackage</td><td>Fat jar at <code>target/sroadtutor-backend.jar</code></td><td>OK</td></tr>
+  <tr><td>integration-test</td><td>failsafe 3.2.5 + jacoco prepare-agent-integration</td><td>Currently no IT classes registered (PhoneNumberControllerIntegrationTest is in tree but not executed)</td><td>OK · 0 ITs</td></tr>
+  <tr><td>verify</td><td>jacoco report + check</td><td>Coverage gate</td><td>Met when tests pass</td></tr>
+</table>
+
+<div class="note warn">
+<strong>Verification needed:</strong> Confirm whether <code>PhoneNumberControllerIntegrationTest</code> should run under failsafe or surefire. The filename suggests IT (failsafe), but failsafe only picks <code>**/*IT.java</code> by default. If it's intended as an IT, rename to <code>PhoneNumberControllerIT</code>; if it's intended as a fast unit-style controller test, leave as-is and let surefire run it — but it'll need <code>@WebMvcTest</code> or the relevant slice annotation.
+</div>
+
+<hr>
+
+<h2>11. Open questions / decisions needed before "production-ready"</h2>
+<ol>
+  <li>Confirm fix approach for the P0 (revert prefix + update 5 tests vs. strip prefix in handler vs. third option).</li>
+  <li>Does <code>USE_OAUTH_LOGIN</code> stay distinct from <code>INVALID_CREDENTIALS</code>, or collapse for security? (P2 above.)</li>
+  <li>Phone cap policy — keep Java constant for V1, or wire to Subscription now (P2)?</li>
+  <li>Is <code>PhoneNumberControllerIntegrationTest</code> meant to run? Rename to <code>*IT</code> if yes, or move/wire if no.</li>
+  <li>Soft-delete strategy for phones (P1 above) — agree on approach before any reminder traffic ships.</li>
+  <li>WhatsappMessageLog retention/redaction (P1 PIPEDA) — set policy before first paying tenant.</li>
+</ol>
+
+<div class="note">Workflow doc complete. See companion <code>sroadtutor_backend_blueprint.html</code> for the strategic / phase-aligned view.</div>
+
+</div>
