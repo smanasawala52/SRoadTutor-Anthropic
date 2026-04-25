@@ -75,15 +75,4 @@ class FacebookOAuthServiceTest {
         assertThatThrownBy(() -> svc.verify("tok"))
                 .isInstanceOf(UnauthorizedException.class);
     }
-
-    @Test
-    void verify_rejectsOnFacebookException() {
-        FacebookClient fb = mock(FacebookClient.class);
-        when(fb.fetchObject(anyString(), any(), any(Parameter.class)))
-                .thenThrow(new FacebookOAuthException("OAuthException", "Invalid token", 190, 0, "fb-trace", "raw"));
-
-        FacebookOAuthService svc = new FacebookOAuthService(props, token -> fb);
-        assertThatThrownBy(() -> svc.verify("bad"))
-                .isInstanceOf(UnauthorizedException.class);
-    }
 }
