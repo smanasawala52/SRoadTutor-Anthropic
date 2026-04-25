@@ -25,8 +25,5 @@ app:
     google:
       client-id: test-google-client-id
       client-secret: test-google-client-secret
-    facebook:
-      app-id: test-facebook-app-id
-      app-secret: test-facebook-app-secret
   cors:
     allowed-origins: "*"

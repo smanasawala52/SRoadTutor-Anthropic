@@ -104,9 +104,6 @@ app:
     google:
       client-id: ${GOOGLE_OAUTH_CLIENT_ID}
       client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
-    facebook:
-      app-id: ${FACEBOOK_OAUTH_APP_ID}
-      app-secret: ${FACEBOOK_OAUTH_APP_SECRET}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:*}
     allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS

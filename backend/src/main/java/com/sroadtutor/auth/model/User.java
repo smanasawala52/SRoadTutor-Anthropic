@@ -61,7 +61,7 @@ public class User {
     @Column(name = "auth_provider", nullable = false, length = 32)
     private AuthProvider authProvider;
 
-    /** Provider-specific id, e.g. Google sub or Facebook user id.  Null for LOCAL. */
+    /** Provider-specific id, e.g. Google sub.  Null for LOCAL. */
     @Column(name = "provider_user_id", length = 128)
     private String providerUserId;
 

@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 /**
- * Orchestrates the 4 entry points of auth: signup, login, OAuth (Google/Facebook),
+ * Orchestrates the 4 entry points of auth: signup, login, OAuth (Google),
  * refresh.  All heavy work (BCrypt, JWT, DB) is delegated to the dedicated services;
  * this class is the place to look for the business rules.
  */
@@ -34,20 +34,17 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final GoogleOAuthService googleOAuthService;
-    private final FacebookOAuthService facebookOAuthService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService,
                        RefreshTokenService refreshTokenService,
-                       GoogleOAuthService googleOAuthService,
-                       FacebookOAuthService facebookOAuthService) {
+                       GoogleOAuthService googleOAuthService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.googleOAuthService = googleOAuthService;
-        this.facebookOAuthService = facebookOAuthService;
     }
 
     // ===========================================================
@@ -106,13 +103,6 @@ public class AuthService {
     public AuthResponse loginWithGoogle(OAuthLoginRequest request, HttpServletRequest http) {
         OAuthVerifier verified = googleOAuthService.verify(request.token());
         User user = upsertOAuthUser(AuthProvider.GOOGLE, verified, request.role());
-        return issueTokens(user, http);
-    }
-
-    @Transactional
-    public AuthResponse loginWithFacebook(OAuthLoginRequest request, HttpServletRequest http) {
-        OAuthVerifier verified = facebookOAuthService.verify(request.token());
-        User user = upsertOAuthUser(AuthProvider.FACEBOOK, verified, request.role());
         return issueTokens(user, http);
     }
 

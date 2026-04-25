@@ -62,15 +62,6 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.of(authService.loginWithGoogle(request, http)));
     }
 
-    @PostMapping("/facebook")
-    @Operation(summary = "Sign in / up with a Facebook access token")
-    public ResponseEntity<ApiResponse<AuthResponse>> facebook(
-            @Valid @RequestBody OAuthLoginRequest request,
-            HttpServletRequest http
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(authService.loginWithFacebook(request, http)));
-    }
-
     @PostMapping("/refresh")
     @Operation(summary = "Exchange a refresh token for a new access + refresh token pair")
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(

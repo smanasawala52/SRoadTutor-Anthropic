@@ -28,15 +28,10 @@ public record AppProperties(
             @NotBlank String issuer
     ) {}
 
-    public record OAuth(Google google, Facebook facebook) {
+    public record OAuth(Google google) {
         public record Google(
                 @NotBlank(message = "app.oauth.google.client-id must be set (env: GOOGLE_OAUTH_CLIENT_ID)") String clientId,
                 @NotBlank(message = "app.oauth.google.client-secret must be set (env: GOOGLE_OAUTH_CLIENT_SECRET)") String clientSecret
-        ) {}
-
-        public record Facebook(
-                @NotBlank(message = "app.oauth.facebook.app-id must be set (env: FACEBOOK_OAUTH_APP_ID)") String appId,
-                @NotBlank(message = "app.oauth.facebook.app-secret must be set (env: FACEBOOK_OAUTH_APP_SECRET)") String appSecret
         ) {}
     }
 

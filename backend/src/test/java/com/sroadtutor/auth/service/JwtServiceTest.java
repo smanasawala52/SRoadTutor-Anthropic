@@ -32,8 +32,7 @@ class JwtServiceTest {
         AppProperties props = new AppProperties(
                 new AppProperties.Jwt(SECRET, 15, 30, "sroadtutor-test"),
                 new AppProperties.OAuth(
-                        new AppProperties.OAuth.Google("cid", "csecret"),
-                        new AppProperties.OAuth.Facebook("fbid", "fbsecret")),
+                        new AppProperties.OAuth.Google("cid", "csecret")),
                 new AppProperties.Cors(java.util.List.of("*"), "GET,POST", "Authorization", true, 3600L)
         );
         jwtService = new JwtService(props);
@@ -103,8 +102,7 @@ class JwtServiceTest {
         AppProperties bad = new AppProperties(
                 new AppProperties.Jwt("short", 15, 30, "iss"),
                 new AppProperties.OAuth(
-                        new AppProperties.OAuth.Google("cid", "csec"),
-                        new AppProperties.OAuth.Facebook("fid", "fsec")),
+                        new AppProperties.OAuth.Google("cid", "csec")),
                 new AppProperties.Cors(java.util.List.of("*"), "GET", "*", true, 3600)
         );
         assertThatThrownBy(() -> new JwtService(bad))

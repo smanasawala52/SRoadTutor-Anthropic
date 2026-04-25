@@ -39,7 +39,6 @@ class AuthServiceTest {
     @Mock JwtService jwtService;
     @Mock RefreshTokenService refreshTokenService;
     @Mock GoogleOAuthService googleOAuthService;
-    @Mock FacebookOAuthService facebookOAuthService;
     @Mock HttpServletRequest request;
 
     @InjectMocks AuthService authService;
@@ -239,28 +238,6 @@ class AuthServiceTest {
                 authService.loginWithGoogle(new OAuthLoginRequest("tok", Role.STUDENT), request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("LOCAL");
-    }
-
-    // ------------------------- Facebook OAuth -------------------------
-
-    @Test
-    void loginWithFacebook_createsNewUser() {
-        tokenStubs();
-        when(facebookOAuthService.verify("fb-tok"))
-                .thenReturn(new OAuthVerifier("fb-id-1", "fb@example.com", "Facebook User"));
-        when(userRepository.findByAuthProviderAndProviderUserId(AuthProvider.FACEBOOK, "fb-id-1"))
-                .thenReturn(Optional.empty());
-        when(userRepository.findByEmailIgnoreCase("fb@example.com")).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            u.setId(UUID.randomUUID());
-            return u;
-        });
-
-        var resp = authService.loginWithFacebook(new OAuthLoginRequest("fb-tok", Role.PARENT), request);
-
-        assertThat(resp.user().authProvider()).isEqualTo(AuthProvider.FACEBOOK);
-        assertThat(resp.user().role()).isEqualTo(Role.PARENT);
     }
 
     // ------------------------- refresh / logout -------------------------
