@@ -1,7 +1,14 @@
 # Dev-only overrides. Chatty logs, hot data, developer-friendly.
 
 spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
+    hibernate:
+      ddl-auto: update   # dev safe (no data loss)
     show-sql: true
     properties:
       hibernate:
@@ -9,8 +16,18 @@ spring:
 
   # Turn ON the dev seed migration (V4__seed_dev_data.sql).
   flyway:
+    enabled: true
     placeholders:
       seed-dev: "true"
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:15}
+    refresh-token-expiration-days: ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:30}
+    issuer: sroadtutor-dev
 
 logging:
   level:
