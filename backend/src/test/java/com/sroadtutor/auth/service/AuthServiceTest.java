@@ -55,7 +55,7 @@ class AuthServiceTest {
     @Test
     void signup_createsNewUserAndIssuesTokens() {
         tokenStubs();
-        SignupRequest req = new SignupRequest("New@Example.com", "Password1", "Ada Lovelace", "+1-555-0100", Role.INSTRUCTOR);
+        SignupRequest req = new SignupRequest("New@Example.com", "Password1", "Ada Lovelace", Role.INSTRUCTOR);
         when(userRepository.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
         when(passwordEncoder.encode("Password1")).thenReturn("hashed");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> {
@@ -74,7 +74,7 @@ class AuthServiceTest {
 
     @Test
     void signup_rejectsDuplicateEmail() {
-        SignupRequest req = new SignupRequest("dup@example.com", "Password1", "Dupe", null, Role.STUDENT);
+        SignupRequest req = new SignupRequest("dup@example.com", "Password1", "Dupe", Role.STUDENT);
         when(userRepository.existsByEmailIgnoreCase("dup@example.com")).thenReturn(true);
 
         assertThatThrownBy(() -> authService.signup(req, request))

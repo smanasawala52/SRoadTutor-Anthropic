@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -58,14 +59,17 @@ public class AuthService {
             throw new BadRequestException("EMAIL_ALREADY_EXISTS", "An account already exists for this email");
         }
 
+        // username is auto-generated server-side until D7 surfaces a chooser; keep it
+        // deterministic-but-unique by combining the email's local-part with a short
+        // UUID suffix. Service layer always lowercases (uniqueness is on LOWER(username)).
+        String username = generateInitialUsername(email);
         User user = User.builder()
                 .email(email)
+                .username(username)
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .fullName(request.fullName())
-                .phone(request.phone())
                 .role(request.role())
                 .authProvider(AuthProvider.LOCAL)
-                .emailVerified(false)
                 .active(true)
                 .build();
         user = userRepository.save(user);
@@ -140,13 +144,15 @@ public class AuthService {
             throw new BadRequestException("ROLE_REQUIRED",
                     "First-time OAuth signup requires a role (OWNER / INSTRUCTOR / STUDENT / PARENT)");
         }
+        String email = normaliseEmail(verified.email());
         User created = User.builder()
-                .email(normaliseEmail(verified.email()))
+                .email(email)
+                .username(generateInitialUsername(email))
                 .fullName(verified.fullName())
                 .role(signupRole)
                 .authProvider(provider)
                 .providerUserId(verified.providerUserId())
-                .emailVerified(true) // trusted from provider
+                .emailVerifiedAt(Instant.now()) // trusted from provider
                 .active(true)
                 .build();
         created = userRepository.save(created);
@@ -189,17 +195,38 @@ public class AuthService {
                         user.getId(),
                         user.getSchoolId(),
                         user.getEmail(),
+                        user.getUsername(),
                         user.getFullName(),
-                        user.getPhone(),
                         user.getRole(),
                         user.getAuthProvider(),
                         user.getLanguagePref(),
-                        user.isEmailVerified()
+                        user.isEmailVerified(),
+                        user.isPhoneVerified(),
+                        user.isMustChangePassword()
                 )
         );
     }
 
     private static String normaliseEmail(String email) {
         return email == null ? null : email.trim().toLowerCase();
+    }
+
+    /**
+     * Generate the user's initial username by combining the email's local-part
+     * (truncated to 50 chars to leave room for the suffix) with a short hex slice
+     * of a fresh UUID. Always lowercased so the unique index on
+     * {@code LOWER(username)} sees a normalised value.
+     *
+     * <p>This is a stop-gap until D7's username chooser ships in PR3+. Collisions
+     * are vanishingly unlikely (8 hex chars = 32 bits of entropy per email
+     * local-part).</p>
+     */
+    private static String generateInitialUsername(String email) {
+        String localPart = email == null ? "user" : email.split("@", 2)[0];
+        if (localPart.length() > 50) {
+            localPart = localPart.substring(0, 50);
+        }
+        String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        return (localPart + "_" + suffix).toLowerCase();
     }
 }

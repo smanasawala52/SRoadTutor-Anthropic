@@ -34,6 +34,9 @@ This is the canonical reference for the Phase-1 foundation. Every code change in
 | D19 | V7 customer seed is gated behind `seed-customer` placeholder. DEV/QA load it; PROD starts empty. | User Q-H |
 | D20 | Secret rotation deferred until higher environments. | User Q-G |
 | D21 | DEV profile points at the QA Supabase project `yemojzjcxdbdwlmuvqhm` (intentional). The unused `pnakuzxvbcbxzcfubaev` project stays untouched. | User Q-I |
+| D22 | `phone_numbers.parent_id` is intentionally not modeled. PARENT is a role on `users`, so a parent's phones reuse `phone_numbers.user_id`. Schools / instructors / students keep their own FK columns because they are independent entities. | User Q1a (PR2 kickoff) |
+| D23 | `users.email_verified BOOLEAN` is dropped in V8. Replaced by `email_verified_at TIMESTAMPTZ` (null = unverified). Existing `email_verified=TRUE` rows get `email_verified_at` backfilled from `updated_at` (or `created_at`). Java derives `isEmailVerified()` from `emailVerifiedAt != null`. | User Q2a (PR2 kickoff) |
+| D24 | `users.phone` column dropped in V8. Canonical NA phones (matching `^\+1[0-9]{10}$` or `^[0-9]{10}$`) are backfilled into `phone_numbers` as the user's primary, `is_whatsapp=TRUE`, `whatsapp_opt_in=TRUE`, `verified_at=NULL`. Free-form values are not parsed; PR4's phone CRUD is the canonical entry point going forward. | User Q3a (PR2 kickoff) |
 
 ---
 
@@ -86,11 +89,14 @@ CREATE TABLE phone_numbers (
     id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- ownership: exactly ONE of these FK columns is non-null (CHECK constraint)
+    -- NOTE D22 (Q1a): there is intentionally no parent_id column. PARENT is a
+    -- role on users; a parent's phones use user_id like every other login-capable
+    -- actor. Schools / instructors / students keep their own FK because they ARE
+    -- separate entities.
     user_id            UUID REFERENCES users(id)        ON DELETE CASCADE,
     school_id          UUID REFERENCES schools(id)      ON DELETE CASCADE,
     instructor_id      UUID REFERENCES instructors(id)  ON DELETE CASCADE,
     student_id         UUID REFERENCES students(id)     ON DELETE CASCADE,
-    parent_id          UUID REFERENCES parents(id)      ON DELETE CASCADE,
 
     -- E.164 storage
     country_code       VARCHAR(4)  NOT NULL,            -- "1", "91", "44"
@@ -109,13 +115,12 @@ CREATE TABLE phone_numbers (
     created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    -- exactly-one-owner enforcement
+    -- exactly-one-owner enforcement (D22: parent_id intentionally omitted)
     CONSTRAINT phone_owner_exactly_one CHECK (
         (CASE WHEN user_id       IS NULL THEN 0 ELSE 1 END) +
         (CASE WHEN school_id     IS NULL THEN 0 ELSE 1 END) +
         (CASE WHEN instructor_id IS NULL THEN 0 ELSE 1 END) +
-        (CASE WHEN student_id    IS NULL THEN 0 ELSE 1 END) +
-        (CASE WHEN parent_id     IS NULL THEN 0 ELSE 1 END) = 1
+        (CASE WHEN student_id    IS NULL THEN 0 ELSE 1 END) = 1
     ),
     CONSTRAINT phone_e164_format CHECK (e164 ~ '^\+[1-9][0-9]{6,18}$')
 );
@@ -129,13 +134,11 @@ CREATE UNIQUE INDEX ux_phone_primary_instructor
     ON phone_numbers(instructor_id) WHERE is_primary AND instructor_id IS NOT NULL;
 CREATE UNIQUE INDEX ux_phone_primary_student
     ON phone_numbers(student_id)    WHERE is_primary AND student_id    IS NOT NULL;
-CREATE UNIQUE INDEX ux_phone_primary_parent
-    ON phone_numbers(parent_id)     WHERE is_primary AND parent_id     IS NOT NULL;
 
 -- a number cannot appear twice on the SAME owner (still allowed across owners per D14)
 CREATE UNIQUE INDEX ux_phone_no_dupe_per_user
     ON phone_numbers(user_id, e164) WHERE user_id IS NOT NULL;
--- (mirror for school/instructor/student/parent)
+-- (mirror for school/instructor/student)
 
 CREATE INDEX ix_phone_e164          ON phone_numbers(e164);
 CREATE INDEX ix_phone_whatsapp_lookup ON phone_numbers(e164) WHERE is_whatsapp AND whatsapp_opt_in;
@@ -309,7 +312,7 @@ Order inside V8:
 10. Backfill: for every existing `users` row, set `username = email`-prefix-`+ id-suffix` to satisfy NOT NULL UNIQUE. Document this in the migration header.
 11. Backfill: for every existing instructor with non-null `school_id`, insert an `instructor_schools` row with `role_at_school='REGULAR'`.
 12. Defensive: `DELETE FROM users WHERE auth_provider='FACEBOOK'` — should be 0 rows in QA but executes anyway.
-13. `ALTER TYPE auth_provider DROP VALUE 'FACEBOOK'` — Postgres requires a workaround; we'll use `CHECK` constraint instead of native enum (already the pattern).
+13. ~~`ALTER TYPE auth_provider DROP VALUE 'FACEBOOK'`~~ — **N/A.** V1 stored `auth_provider` as `VARCHAR(32)`, not a Postgres native enum, so there is no enum value to drop. Step 12's defensive `DELETE` is the only Facebook DB cleanup needed.
 
 Idempotency: every `CREATE TABLE` is bare `CREATE TABLE` (Flyway tracks
 applied state). No `IF NOT EXISTS` — we want the migration to fail loudly
@@ -321,8 +324,8 @@ if state drifts.
 
 | PR | Scope | Blocking? |
 |---|---|---|
-| **PR1** | Remove Facebook everywhere (code, deps, env, tests, README, V8 defensive cleanup row). | No deps |
-| **PR2** | V8 migration + JPA entities for new tables. No business logic yet, just schema + repos + entity tests. | Needs Q6 answer |
+| **PR1** | Remove Facebook everywhere (code, deps, env, tests, README, V8 defensive cleanup row). | **DONE 2026-04-25** |
+| **PR2** | V8 migration + JPA entities for new tables. No business logic yet, just schema + repos + entity tests. | **DONE 2026-04-25** (Q6 answered as Option B; D22/D23/D24 locked) |
 | **PR3** | Auth hardening (test fixes, ddl-auto: validate, JwtFilter exception tightening, gate V7). | Independent of PR2 |
 | **PR4** | Phone-number CRUD + verification flow + WhatsApp template + wa.me URL service + audit log endpoints. | Needs PR2 |
 | **PR5** | Email verification (Spring Mail SMTP), invitation flow, multi-school join logic. | Needs PR2 |
@@ -332,7 +335,11 @@ Each PR ends with `./mvnw verify` green and JaCoCo gate (50%/50%) holding.
 
 ---
 
-## 11. OPEN QUESTION — WhatsApp verification mechanism (Q6)
+## 11. ~~OPEN QUESTION~~ RESOLVED — WhatsApp verification mechanism (Q6 → Option B)
+
+**Resolution (2026-04-24):** ship **Option B** in PR4 — email-only verification at signup, WhatsApp self-attest with admin confirmation. Architecture exposes `PhoneVerificationService` so we can drop in `MetaCloudApiPhoneVerifier` (Option A) later without touching callers. Original analysis preserved below for context.
+
+### 11.1 Original analysis
 
 D9 says "WhatsApp must be verified at signup". D15 says "backend never sends
 WhatsApp messages — wa.me click-to-chat from the sender's phone only". These
