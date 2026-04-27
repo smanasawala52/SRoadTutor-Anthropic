@@ -5,6 +5,8 @@ import com.sroadtutor.exception.BadRequestException;
 import com.sroadtutor.instructor.model.Instructor;
 import com.sroadtutor.instructor.model.WorkingHours;
 import com.sroadtutor.instructor.repository.InstructorRepository;
+import com.sroadtutor.payment.service.PaymentService;
+import com.sroadtutor.reminder.service.ReminderService;
 import com.sroadtutor.school.model.School;
 import com.sroadtutor.school.repository.SchoolRepository;
 import com.sroadtutor.session.dto.BookSessionRequest;
@@ -51,6 +53,8 @@ class SessionServiceTest {
     @Mock InstructorRepository    instructorRepo;
     @Mock StudentRepository       studentRepo;
     @Mock ParentStudentRepository parentLinkRepo;
+    @Mock ReminderService         reminderService;
+    @Mock PaymentService          paymentService;
 
     @InjectMocks SessionService service;
 

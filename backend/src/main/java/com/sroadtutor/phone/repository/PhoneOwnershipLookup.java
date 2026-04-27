@@ -149,6 +149,33 @@ public class PhoneOwnershipLookup {
         );
     }
 
+    /**
+     * {@code instructors.school_id} for the given instructor row. Null when
+     * the row is unaffiliated (V8 made the column nullable). Used by the
+     * plan-limits service to resolve "which school does this owner belong
+     * to" for an INSTRUCTOR-owned phone.
+     */
+    public Optional<UUID> instructorSchoolId(UUID instructorId) {
+        List<UUID> rows = jdbc.queryForList(
+                "SELECT school_id FROM instructors WHERE id = :id",
+                new MapSqlParameterSource("id", instructorId),
+                UUID.class
+        );
+        if (rows.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(rows.get(0));
+    }
+
+    /** {@code students.school_id} for the given student row. Required (NOT NULL) per V1. */
+    public Optional<UUID> studentSchoolId(UUID studentId) {
+        List<UUID> rows = jdbc.queryForList(
+                "SELECT school_id FROM students WHERE id = :id",
+                new MapSqlParameterSource("id", studentId),
+                UUID.class
+        );
+        if (rows.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(rows.get(0));
+    }
+
     // ------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------

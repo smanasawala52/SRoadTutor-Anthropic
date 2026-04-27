@@ -30,6 +30,11 @@ public class SecurityConfig {
             // invitee clicking the email link before they have credentials.
             "/api/invitations/*/accept",
             "/api/invitations/lookup/**",
+            // PR12 — plans catalog drives the public pricing page; the
+            // Stripe webhook scaffold is signature-verified (in PR12.5)
+            // rather than JWT-protected.
+            "/api/subscriptions/plans",
+            "/api/stripe/webhook",
             "/actuator/health",
             "/actuator/health/**",
             "/actuator/info",

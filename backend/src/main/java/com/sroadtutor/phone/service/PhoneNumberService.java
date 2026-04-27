@@ -8,6 +8,8 @@ import com.sroadtutor.phone.dto.PhoneNumberUpdateRequest;
 import com.sroadtutor.phone.model.PhoneNumber;
 import com.sroadtutor.phone.model.PhoneOwnerType;
 import com.sroadtutor.phone.repository.PhoneNumberRepository;
+import com.sroadtutor.phone.repository.PhoneOwnershipLookup;
+import com.sroadtutor.subscription.service.PlanLimitsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,19 +41,30 @@ public class PhoneNumberService {
 
     private static final Logger log = LoggerFactory.getLogger(PhoneNumberService.class);
 
-    /** Hard cap per owner. Locked to 5 by PR4 kickoff Q3a. */
-    static final int MAX_PHONES_PER_OWNER = 5;
+    /**
+     * Floor cap, used as a fallback when the owner can't be resolved to a
+     * tenant (e.g. a USER with {@code school_id = null}). PR12 introduced
+     * plan-tier-aware limits via {@link PlanLimitsService} — they win when
+     * the owner resolves to a school.
+     */
+    static final int MAX_PHONES_PER_OWNER_NO_TENANT = 2;
 
     private final PhoneNumberRepository phoneRepo;
     private final PhoneScopeChecker scopeChecker;
     private final E164Normalizer normalizer;
+    private final PhoneOwnershipLookup ownershipLookup;
+    private final PlanLimitsService planLimits;
 
     public PhoneNumberService(PhoneNumberRepository phoneRepo,
                               PhoneScopeChecker scopeChecker,
-                              E164Normalizer normalizer) {
+                              E164Normalizer normalizer,
+                              PhoneOwnershipLookup ownershipLookup,
+                              PlanLimitsService planLimits) {
         this.phoneRepo = phoneRepo;
         this.scopeChecker = scopeChecker;
         this.normalizer = normalizer;
+        this.ownershipLookup = ownershipLookup;
+        this.planLimits = planLimits;
     }
 
     // ============================================================
@@ -82,14 +95,21 @@ public class PhoneNumberService {
     public PhoneNumber create(Role role, UUID currentUserId, PhoneNumberRequest req) {
         scopeChecker.requireWriteScope(role, currentUserId, req.ownerType(), req.ownerId());
 
-        // 5-cap. Service-layer enforcement keeps the rule visible in code; we
-        // could lean on a CHECK trigger but the limit is product-tier-likely
-        // and "5" being a constant in Java is the obvious place to revisit.
+        // PR12 — plan-tier-aware cap. Resolves the owner's school first and
+        // delegates to PlanLimitsService; falls back to the no-tenant floor
+        // (2 phones) when the owner is unaffiliated. The legacy
+        // PHONE_LIMIT_EXCEEDED code is preserved for owners with no tenant
+        // pointer, while plan-bound owners get the more informative
+        // PLAN_LIMIT_EXCEEDED code.
         int existing = ownerPhones(req.ownerType(), req.ownerId()).size();
-        if (existing >= MAX_PHONES_PER_OWNER) {
+        Optional<UUID> ownerSchool = resolveOwnerSchoolId(req.ownerType(), req.ownerId());
+        if (ownerSchool.isPresent()) {
+            planLimits.requirePhoneCapacity(ownerSchool.get(), existing);
+        } else if (existing >= MAX_PHONES_PER_OWNER_NO_TENANT) {
             throw new BadRequestException(
                     "PHONE_LIMIT_EXCEEDED",
-                    "An owner cannot have more than " + MAX_PHONES_PER_OWNER + " phone numbers");
+                    "An unaffiliated owner cannot have more than "
+                            + MAX_PHONES_PER_OWNER_NO_TENANT + " phone numbers");
         }
 
         E164Normalizer.Normalized n = normalizer.normalize(req.countryCode(), req.nationalNumber());
@@ -271,5 +291,19 @@ public class PhoneNumberService {
             case INSTRUCTOR -> phone.setInstructorId(ownerId);
             case STUDENT    -> phone.setStudentId(ownerId);
         }
+    }
+
+    /**
+     * Resolves the school that "owns" this phone via its owner pointer. The
+     * SCHOOL case is trivial (the school is the owner). USER/INSTRUCTOR/STUDENT
+     * cases delegate to {@link PhoneOwnershipLookup}.
+     */
+    private Optional<UUID> resolveOwnerSchoolId(PhoneOwnerType type, UUID ownerId) {
+        return switch (type) {
+            case SCHOOL     -> Optional.of(ownerId);
+            case USER       -> ownershipLookup.userSchoolId(ownerId);
+            case INSTRUCTOR -> ownershipLookup.instructorSchoolId(ownerId);
+            case STUDENT    -> ownershipLookup.studentSchoolId(ownerId);
+        };
     }
 }

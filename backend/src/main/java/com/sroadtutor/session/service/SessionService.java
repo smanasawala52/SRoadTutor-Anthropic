@@ -6,6 +6,8 @@ import com.sroadtutor.exception.ResourceNotFoundException;
 import com.sroadtutor.instructor.model.Instructor;
 import com.sroadtutor.instructor.model.WorkingHours;
 import com.sroadtutor.instructor.repository.InstructorRepository;
+import com.sroadtutor.payment.service.PaymentService;
+import com.sroadtutor.reminder.service.ReminderService;
 import com.sroadtutor.school.model.School;
 import com.sroadtutor.school.repository.SchoolRepository;
 import com.sroadtutor.session.dto.BookSessionRequest;
@@ -17,6 +19,7 @@ import com.sroadtutor.student.repository.ParentStudentRepository;
 import com.sroadtutor.student.repository.StudentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,16 +82,29 @@ public class SessionService {
     private final StudentRepository       studentRepo;
     private final ParentStudentRepository parentLinkRepo;
 
+    /**
+     * {@code @Lazy} breaks the SessionService → ReminderService → SessionService
+     * dependency cycle: ReminderService injects SessionService for the cron's
+     * scan, and SessionService injects ReminderService here for cancel-cascade.
+     * Only one needs to be lazy — the cycle resolves on first call.
+     */
+    private final ReminderService reminderService;
+    private final PaymentService paymentService;
+
     public SessionService(LessonSessionRepository sessionRepo,
                           SchoolRepository schoolRepo,
                           InstructorRepository instructorRepo,
                           StudentRepository studentRepo,
-                          ParentStudentRepository parentLinkRepo) {
+                          ParentStudentRepository parentLinkRepo,
+                          @Lazy ReminderService reminderService,
+                          PaymentService paymentService) {
         this.sessionRepo = sessionRepo;
         this.schoolRepo = schoolRepo;
         this.instructorRepo = instructorRepo;
         this.studentRepo = studentRepo;
         this.parentLinkRepo = parentLinkRepo;
+        this.reminderService = reminderService;
+        this.paymentService = paymentService;
     }
 
     // ============================================================
@@ -204,12 +220,14 @@ public class SessionService {
         if (!instructor.isActive()) {
             throw new BadRequestException("INSTRUCTOR_INACTIVE", "Instructor is deactivated");
         }
+        UUID studentId = session.getStudentId();
+        UUID schoolId = session.getSchoolId();
         Student student = studentRepo.findById(session.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Student not found: " + session.getStudentId()));
+                        "Student not found: " + studentId));
         School school = schoolRepo.findById(session.getSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "School not found: " + session.getSchoolId()));
+                        "School not found: " + schoolId));
         if (!school.isActive()) {
             throw new BadRequestException("SCHOOL_INACTIVE", "Cannot reschedule at a deactivated school");
         }
@@ -234,16 +252,29 @@ public class SessionService {
         }
         requireNoConflicts(instructor.getId(), student.getId(), session.getId(), targetScheduledAt, endAt);
 
+        boolean timeChanged = !targetScheduledAt.equals(session.getScheduledAt())
+                || targetDuration != session.getDurationMins()
+                || !instructor.getId().equals(session.getInstructorId());
+
         session.setInstructorId(instructor.getId());
         session.setScheduledAt(targetScheduledAt);
         session.setDurationMins(targetDuration);
         if (req.location() != null) session.setLocation(nullIfBlank(req.location()));
         if (req.notes() != null)    session.setNotes(nullIfBlank(req.notes()));
 
+        session = sessionRepo.save(session);
+
+        // PR10 — when the time/instructor changes, the existing PENDING
+        // reminders are stale; cancel them. The next cron sweep will
+        // recreate fresh PENDING rows for the new scheduledAt.
+        if (timeChanged) {
+            reminderService.cancelForSession(session.getId());
+        }
+
         log.info("Session {} rescheduled by {}={} to {} ({} min) instructor={}",
                 session.getId(), role, currentUserId, targetScheduledAt, targetDuration, instructor.getId());
 
-        return sessionRepo.save(session);
+        return session;
     }
 
     // ============================================================
@@ -268,9 +299,13 @@ public class SessionService {
         session.setStatus(LessonSession.STATUS_CANCELLED);
         session.setCancelledAt(now);
         session.setCancelledByUserId(currentUserId);
+        session = sessionRepo.save(session);
+
+        // PR10 — cascade: PENDING reminders for this session flip to CANCELLED.
+        reminderService.cancelForSession(session.getId());
 
         log.info("Session {} cancelled by {}={}", sessionId, role, currentUserId);
-        return sessionRepo.save(session);
+        return session;
     }
 
     // ============================================================
@@ -288,9 +323,10 @@ public class SessionService {
         }
         requireOwnerOrAssignedInstructor(role, currentUserId, session);
 
+        UUID studentId = session.getStudentId();
         Student student = studentRepo.findById(session.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Student not found: " + session.getStudentId()));
+                        "Student not found: " + studentId));
         if (student.getLessonsRemaining() <= 0) {
             throw new BadRequestException(
                     "NO_LESSONS_REMAINING",
@@ -300,9 +336,14 @@ public class SessionService {
         studentRepo.save(student);
 
         session.setStatus(LessonSession.STATUS_COMPLETED);
+        session = sessionRepo.save(session);
+
+        // PR11 — auto-create UNPAID Payment row at COMPLETE.
+        paymentService.createForCompletedSession(session);
+
         log.info("Session {} completed by {}={} (student lessons left = {})",
                 sessionId, role, currentUserId, student.getLessonsRemaining());
-        return sessionRepo.save(session);
+        return session;
     }
 
     // ============================================================

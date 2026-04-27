@@ -8,6 +8,8 @@ import com.sroadtutor.phone.dto.PhoneNumberUpdateRequest;
 import com.sroadtutor.phone.model.PhoneNumber;
 import com.sroadtutor.phone.model.PhoneOwnerType;
 import com.sroadtutor.phone.repository.PhoneNumberRepository;
+import com.sroadtutor.phone.repository.PhoneOwnershipLookup;
+import com.sroadtutor.subscription.service.PlanLimitsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -46,6 +48,8 @@ class PhoneNumberServiceTest {
     @Mock PhoneNumberRepository phoneRepo;
     @Mock PhoneScopeChecker scopeChecker;
     @Mock E164Normalizer normalizer;
+    @Mock PhoneOwnershipLookup ownershipLookup;
+    @Mock PlanLimitsService planLimits;
 
     @InjectMocks PhoneNumberService service;
 
@@ -142,24 +146,28 @@ class PhoneNumberServiceTest {
     }
 
     @Test
-    void create_rejectsOverFiveCap() {
+    void create_rejectsOverCapForUnaffiliatedOwner() {
+        // No tenant pointer (ownerType=USER + user.school_id=null) → falls back
+        // to the no-tenant floor (PHONE_LIMIT_EXCEEDED, NOT plan-bound).
         UUID callerId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         var req = new PhoneNumberRequest(
                 PhoneOwnerType.USER, userId,
                 "1", "3065551234", null, null, null, false);
-        // Owner already has 5 phones — over-cap.
-        List<PhoneNumber> five = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            five.add(PhoneNumber.builder().id(UUID.randomUUID()).userId(userId)
+        // Owner already has 2 phones — over the no-tenant floor.
+        List<PhoneNumber> existing = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            existing.add(PhoneNumber.builder().id(UUID.randomUUID()).userId(userId)
                     .countryCode("1").nationalNumber("000000000" + i)
                     .e164("+1000000000" + i).build());
         }
-        when(phoneRepo.findByUserId(userId)).thenReturn(five);
+        when(phoneRepo.findByUserId(userId)).thenReturn(existing);
+        when(ownershipLookup.userSchoolId(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.create(Role.STUDENT, callerId, req))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("more than 5");
+                .satisfies(ex -> assertThat(((BadRequestException) ex).getCode())
+                        .isEqualTo("PHONE_LIMIT_EXCEEDED"));
         verify(phoneRepo, never()).save(any());
         // Normalizer should NOT have been invoked — we short-circuit before E.164.
         verify(normalizer, never()).normalize(any(), any());
