@@ -113,6 +113,21 @@ app:
     allow-credentials: true
     max-age: 3600
 
+  # ---------------------------------------------------------------------
+  # Stripe billing — PR12.5. Leaving secret-key blank disables Stripe
+  # entirely (admin-mode upgrade still works) so dev environments without
+  # Stripe credentials boot cleanly.
+  # ---------------------------------------------------------------------
+  stripe:
+    secret-key:     ${STRIPE_SECRET_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    success-url:    ${STRIPE_SUCCESS_URL:http://localhost:5173/billing/success?session_id={CHECKOUT_SESSION_ID}}
+    cancel-url:     ${STRIPE_CANCEL_URL:http://localhost:5173/billing/cancel}
+    prices:
+      pro:        ${STRIPE_PRICE_PRO:}
+      growth:     ${STRIPE_PRICE_GROWTH:}
+      enterprise: ${STRIPE_PRICE_ENTERPRISE:}
+
 # ---------------------------------------------------------------------
 # Actuator — used by Railway's health check.  Only health is public.
 # ---------------------------------------------------------------------

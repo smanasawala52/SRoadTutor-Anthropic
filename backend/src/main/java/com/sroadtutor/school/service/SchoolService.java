@@ -9,8 +9,10 @@ import com.sroadtutor.school.dto.SchoolCreateRequest;
 import com.sroadtutor.school.dto.SchoolUpdateRequest;
 import com.sroadtutor.school.model.School;
 import com.sroadtutor.school.repository.SchoolRepository;
+import com.sroadtutor.subscription.service.StripeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +45,14 @@ public class SchoolService {
 
     private final SchoolRepository schoolRepo;
     private final UserRepository userRepo;
+    /** Optional — null when StripeService is autowired but not configured. We still inject it. */
+    private final StripeService stripeService;
 
-    public SchoolService(SchoolRepository schoolRepo, UserRepository userRepo) {
+    @Autowired
+    public SchoolService(SchoolRepository schoolRepo, UserRepository userRepo, StripeService stripeService) {
         this.schoolRepo = schoolRepo;
         this.userRepo = userRepo;
+        this.stripeService = stripeService;
     }
 
     // ============================================================
@@ -102,6 +108,19 @@ public class SchoolService {
                 .metadata("{}")
                 .build();
         school = schoolRepo.save(school);
+
+        // PR12.5 — provision a Stripe Customer if Stripe is configured. Wraps
+        // gracefully when not (createCustomer returns null and we leave
+        // stripe_customer_id null). We do this AFTER the school row is saved
+        // so the metadata can carry the school id back to Stripe.
+        if (stripeService != null) {
+            String stripeCustomerId = stripeService.createCustomer(
+                    school.getId(), school.getName(), caller.getEmail());
+            if (stripeCustomerId != null) {
+                school.setStripeCustomerId(stripeCustomerId);
+                school = schoolRepo.save(school);
+            }
+        }
 
         // Back-link: the user is now a member of the school they just created.
         // We persist this so any downstream tenant lookup ({@code PhoneOwnershipLookup},

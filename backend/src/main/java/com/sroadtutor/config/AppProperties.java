@@ -18,7 +18,8 @@ import java.util.List;
 public record AppProperties(
         Jwt jwt,
         OAuth oauth,
-        Cors cors
+        Cors cors,
+        Stripe stripe
 ) {
 
     public record Jwt(
@@ -42,4 +43,29 @@ public record AppProperties(
             boolean allowCredentials,
             long maxAge
     ) {}
+
+    /**
+     * Stripe billing config (PR12.5). All fields are nullable / optional so the
+     * app boots even when Stripe is not yet provisioned — services fall back
+     * to an admin-mode no-op path when {@code secretKey} is blank.
+     *
+     * <p>{@code prices} maps a {@link com.sroadtutor.subscription.model.PlanTier}
+     * name to a Stripe Price id (e.g. {@code price_1AbCDe...}). Missing entries
+     * mean "no Stripe Checkout for this tier" and the upgrade endpoint will
+     * fall back to admin-mode for those plans.</p>
+     */
+    public record Stripe(
+            String secretKey,
+            String webhookSecret,
+            String successUrl,
+            String cancelUrl,
+            Prices prices
+    ) {
+
+        public record Prices(
+                String pro,
+                String growth,
+                String enterprise
+        ) {}
+    }
 }

@@ -28,6 +28,7 @@
         <sonar.version>4.0.0.4121</sonar.version>
         <springdoc.version>2.6.0</springdoc.version>
         <pdfbox.version>3.0.3</pdfbox.version>
+        <stripe.version>26.13.0-beta.1</stripe.version>
         <!-- Annotation processor versions (not managed by Spring Boot parent) -->
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.2</mapstruct.version>
@@ -143,6 +144,15 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>${pdfbox.version}</version>
+        </dependency>
+
+        <!-- ===================================================================== -->
+        <!-- Stripe Java SDK — billing + Checkout + webhook signature verify (PR12.5) -->
+        <!-- ===================================================================== -->
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>${stripe.version}</version>
         </dependency>
 
         <!-- ===================================================================== -->

@@ -51,6 +51,7 @@ class StudentServiceTest {
     @Mock SchoolRepository        schoolRepo;
     @Mock UserRepository          userRepo;
     @Mock PasswordEncoder         passwordEncoder;
+    @Mock com.sroadtutor.marketplace.service.LeadRoutingService leadRoutingService;
 
     @InjectMocks StudentService service;
 

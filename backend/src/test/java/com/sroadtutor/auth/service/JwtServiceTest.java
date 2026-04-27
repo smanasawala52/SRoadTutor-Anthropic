@@ -34,7 +34,7 @@ class JwtServiceTest {
                 new AppProperties.OAuth(
                         new AppProperties.OAuth.Google("cid", "csecret")),
                 new AppProperties.Cors(java.util.List.of("*"), "GET,POST", "Authorization", true, 3600L)
-        );
+        ,null);
         jwtService = new JwtService(props);
     }
 
@@ -104,7 +104,7 @@ class JwtServiceTest {
                 new AppProperties.OAuth(
                         new AppProperties.OAuth.Google("cid", "csec")),
                 new AppProperties.Cors(java.util.List.of("*"), "GET", "*", true, 3600)
-        );
+        ,null);
         assertThatThrownBy(() -> new JwtService(bad))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("32 bytes");

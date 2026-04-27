@@ -5,6 +5,7 @@ import com.sroadtutor.common.ApiResponse;
 import com.sroadtutor.subscription.dto.PlanCatalogResponse;
 import com.sroadtutor.subscription.dto.SubscriptionMeResponse;
 import com.sroadtutor.subscription.dto.UpgradeRequest;
+import com.sroadtutor.subscription.dto.UpgradeResponse;
 import com.sroadtutor.subscription.service.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,14 +32,13 @@ public class SubscriptionController {
     }
 
     @PostMapping("/upgrade")
-    @Operation(summary = "Admin-mode plan upgrade (PR12 stub — Stripe arrives PR12.5). OWNER only.")
-    public ResponseEntity<ApiResponse<SubscriptionMeResponse>> upgrade(
+    @Operation(summary = "Upgrade plan. Returns Stripe Checkout URL when configured; otherwise admin-mode flips inline.")
+    public ResponseEntity<ApiResponse<UpgradeResponse>> upgrade(
             @Valid @RequestBody UpgradeRequest request
     ) {
-        service.upgrade(SecurityUtil.currentRole(), SecurityUtil.currentUserId(), request);
-        // Re-read to return the canonical view including limits + usage.
-        return ResponseEntity.ok(ApiResponse.of(
-                service.getMine(SecurityUtil.currentUserId())));
+        UpgradeResponse resp = service.upgrade(
+                SecurityUtil.currentRole(), SecurityUtil.currentUserId(), request);
+        return ResponseEntity.ok(ApiResponse.of(resp));
     }
 
     @GetMapping("/plans")

@@ -41,6 +41,7 @@ class SchoolServiceTest {
 
     @Mock SchoolRepository schoolRepo;
     @Mock UserRepository   userRepo;
+    @Mock com.sroadtutor.subscription.service.StripeService stripeService;
 
     @InjectMocks SchoolService service;
 

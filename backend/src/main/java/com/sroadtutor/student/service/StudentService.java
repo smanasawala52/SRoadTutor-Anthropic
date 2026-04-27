@@ -8,6 +8,7 @@ import com.sroadtutor.exception.BadRequestException;
 import com.sroadtutor.exception.ResourceNotFoundException;
 import com.sroadtutor.instructor.model.Instructor;
 import com.sroadtutor.instructor.repository.InstructorRepository;
+import com.sroadtutor.marketplace.service.LeadRoutingService;
 import com.sroadtutor.school.model.School;
 import com.sroadtutor.school.repository.SchoolRepository;
 import com.sroadtutor.student.dto.AddStudentRequest;
@@ -69,19 +70,22 @@ public class StudentService {
     private final SchoolRepository        schoolRepo;
     private final UserRepository          userRepo;
     private final PasswordEncoder         passwordEncoder;
+    private final LeadRoutingService      leadRoutingService;
 
     public StudentService(StudentRepository studentRepo,
                           ParentStudentRepository parentLinkRepo,
                           InstructorRepository instructorRepo,
                           SchoolRepository schoolRepo,
                           UserRepository userRepo,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          LeadRoutingService leadRoutingService) {
         this.studentRepo = studentRepo;
         this.parentLinkRepo = parentLinkRepo;
         this.instructorRepo = instructorRepo;
         this.schoolRepo = schoolRepo;
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
+        this.leadRoutingService = leadRoutingService;
     }
 
     // ============================================================
@@ -256,10 +260,24 @@ public class StudentService {
                     "lessonsRemaining cannot exceed packageTotalLessons");
         }
 
+        // Detect a PASSED transition before applying — graduation trigger
+        // fires only when status flips FROM something else INTO PASSED.
+        boolean transitioningToPassed = req.status() != null
+                && Student.STATUS_PASSED.equals(req.status())
+                && !Student.STATUS_PASSED.equals(student.getStatus());
+
         if (req.status() != null)        student.setStatus(req.status());
         if (req.roadTestDate() != null)  student.setRoadTestDate(req.roadTestDate());
 
         student = studentRepo.save(student);
+
+        // PR17 — graduation trigger: route any pending NEW lead to a
+        // dealership in the school's province. Routing failures are logged
+        // inside the lead service; the student update succeeds either way.
+        if (transitioningToPassed) {
+            leadRoutingService.onStudentPassed(student.getId());
+        }
+
         return StudentResponse.from(student, loadParentLinks(student.getId()));
     }
 
