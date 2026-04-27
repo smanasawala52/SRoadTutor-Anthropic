@@ -131,66 +131,66 @@ public class PdfReportService {
         float left = 50f;
 
         // Header
-        text(cs, font(14, true), left, y, school.getName() == null ? "Driving School" : school.getName());
+        write(cs, left, y, 14, true,  school.getName() == null ? "Driving School" : school.getName());
         y -= 20f;
-        text(cs, font(10, false), left, y, "Student report card");
+        write(cs, left, y, 10, false, "Student report card");
         y -= 14f;
-        text(cs, font(10, false), left, y, "Generated " + nowFormatted(school.getTimezone()));
+        write(cs, left, y, 10, false, "Generated " + nowFormatted(school.getTimezone()));
         y -= 24f;
 
         // Student block
-        text(cs, font(12, true), left, y, "Student: "
-                + (studentUser.getFullName() == null ? studentUser.getEmail() : studentUser.getFullName()));
+        write(cs, left, y, 12, true,
+                "Student: " + (studentUser.getFullName() == null ? studentUser.getEmail() : studentUser.getFullName()));
         y -= 16f;
-        text(cs, font(10, false), left, y, "Status: " + safe(student.getStatus())
-                + "    Lessons remaining: " + student.getLessonsRemaining()
-                + " / " + student.getPackageTotalLessons());
+        write(cs, left, y, 10, false,
+                "Status: " + safe(student.getStatus())
+                        + "    Lessons remaining: " + student.getLessonsRemaining()
+                        + " / " + student.getPackageTotalLessons());
         y -= 14f;
         if (student.getRoadTestDate() != null) {
-            text(cs, font(10, false), left, y, "Road test: " + student.getRoadTestDate());
+            write(cs, left, y, 10, false, "Road test: " + student.getRoadTestDate());
             y -= 14f;
         }
         y -= 8f;
 
         // Readiness block
-        text(cs, font(12, true), left, y, "Road Test Readiness");
+        write(cs, left, y, 12, true,  "Road Test Readiness");
         y -= 16f;
-        String readinessLine = String.format(Locale.ENGLISH,
+        write(cs, left, y, 10, false, String.format(Locale.ENGLISH,
                 "Score: %.1f / 100 over last %d sessions",
-                readiness.averageScore(), readiness.sessionsConsidered());
-        text(cs, font(10, false), left, y, readinessLine);
+                readiness.averageScore(), readiness.sessionsConsidered()));
         y -= 14f;
         if (readiness.anyFailMistakeRecently()) {
-            text(cs, font(10, true), left, y, "WARNING: a FAIL-severity mistake was logged recently.");
+            write(cs, left, y, 10, true, "WARNING: a FAIL-severity mistake was logged recently.");
             y -= 14f;
         }
         y -= 8f;
 
         // Per-session score table (most-recent first)
-        text(cs, font(12, true), left, y, "Recent sessions");
+        write(cs, left, y, 12, true, "Recent sessions");
         y -= 16f;
-        text(cs, font(9, true), left, y, "Session id (8-prefix)");
-        text(cs, font(9, true), left + 200f, y, "Score");
-        text(cs, font(9, true), left + 280f, y, "Demerits");
-        text(cs, font(9, true), left + 360f, y, "FAIL?");
+        write(cs, left,         y, 9, true, "Session id (8-prefix)");
+        write(cs, left + 200f,  y, 9, true, "Score");
+        write(cs, left + 280f,  y, 9, true, "Demerits");
+        write(cs, left + 360f,  y, 9, true, "FAIL?");
         y -= 12f;
         for (var ps : readiness.perSession()) {
             if (y < 280f) break;
-            text(cs, font(9, false), left, y, ps.sessionId().toString().substring(0, 8));
-            text(cs, font(9, false), left + 200f, y, String.valueOf(ps.score()));
-            text(cs, font(9, false), left + 280f, y, String.valueOf(ps.totalDemerits()));
-            text(cs, font(9, false), left + 360f, y, ps.hadFail() ? "Yes" : "No");
+            write(cs, left,         y, 9, false, ps.sessionId().toString().substring(0, 8));
+            write(cs, left + 200f,  y, 9, false, String.valueOf(ps.score()));
+            write(cs, left + 280f,  y, 9, false, String.valueOf(ps.totalDemerits()));
+            write(cs, left + 360f,  y, 9, false, ps.hadFail() ? "Yes" : "No");
             y -= 12f;
         }
         y -= 8f;
 
         // Mistake history (top N)
-        text(cs, font(12, true), left, y, "Mistake history (most recent first)");
+        write(cs, left, y, 12, true, "Mistake history (most recent first)");
         y -= 16f;
-        text(cs, font(9, true), left, y, "Date");
-        text(cs, font(9, true), left + 110f, y, "Category");
-        text(cs, font(9, true), left + 320f, y, "Severity");
-        text(cs, font(9, true), left + 400f, y, "Count");
+        write(cs, left,         y, 9, true, "Date");
+        write(cs, left + 110f,  y, 9, true, "Category");
+        write(cs, left + 320f,  y, 9, true, "Severity");
+        write(cs, left + 400f,  y, 9, true, "Count");
         y -= 12f;
 
         // history is in chronological (oldest-first) order from MistakeLogService;
@@ -203,28 +203,27 @@ public class PdfReportService {
                     : ZonedDateTime.ofInstant(m.loggedAt(),
                                 ZoneId.of(school.getTimezone() == null ? "America/Regina" : school.getTimezone()))
                             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            text(cs, font(9, false), left, y, date);
-            text(cs, font(9, false), left + 110f, y, truncate(m.categoryName(), 36));
-            text(cs, font(9, false), left + 320f, y, m.severity());
-            text(cs, font(9, false), left + 400f, y, String.valueOf(m.count()));
+            write(cs, left,         y, 9, false, date);
+            write(cs, left + 110f,  y, 9, false, truncate(m.categoryName(), 36));
+            write(cs, left + 320f,  y, 9, false, m.severity());
+            write(cs, left + 400f,  y, 9, false, String.valueOf(m.count()));
             y -= 11f;
             written++;
         }
         if (history.size() > written) {
-            text(cs, font(9, false), left, y, "… " + (history.size() - written) + " older row(s) omitted");
+            write(cs, left, y, 9, false, "... " + (history.size() - written) + " older row(s) omitted");
             y -= 12f;
         }
         y -= 8f;
 
         // Payment summary
         if (y > 80f) {
-            text(cs, font(12, true), left, y, "Payments");
+            write(cs, left, y, 12, true, "Payments");
             y -= 16f;
-            String paymentLine = String.format(Locale.ENGLISH,
+            write(cs, left, y, 10, false, String.format(Locale.ENGLISH,
                     "Total paid: $%s %s    Total outstanding: $%s %s",
                     ledger.totalPaid(), ledger.currency(),
-                    ledger.totalOutstanding(), ledger.currency());
-            text(cs, font(10, false), left, y, paymentLine);
+                    ledger.totalOutstanding(), ledger.currency()));
         }
     }
 
@@ -232,30 +231,25 @@ public class PdfReportService {
     // PDF helpers
     // ============================================================
 
-    private static final Map<String, PDType1Font> FONT_CACHE = new HashMap<>();
+    /**
+     * Singletons for the two font faces we use. Size is set at draw time
+     * via {@link PDPageContentStream#setFont}; the {@link PDType1Font}
+     * instance itself is size-agnostic.
+     */
+    private static final PDType1Font HELVETICA      =
+            new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    private static final PDType1Font HELVETICA_BOLD =
+            new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
 
-    private static PDType1Font font(int size, boolean bold) {
-        // PDFBox 3.x: fonts are looked up via the Standard14Fonts enum.
-        String key = (bold ? "B" : "R") + size;
-        return FONT_CACHE.computeIfAbsent(key, k -> bold
-                ? new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
-                : new PDType1Font(Standard14Fonts.FontName.HELVETICA));
-    }
-
-    private static void text(PDPageContentStream cs, PDType1Font fontType,
-                              float x, float y, String s) throws IOException {
-        if (s == null) s = "";
+    /**
+     * Single text-drawing primitive — set font + size, position, render the
+     * (sanitised) string. Each call wraps its own {@code beginText/endText}
+     * pair so we don't have to track state across the layout code.
+     */
+    private static void write(PDPageContentStream cs, float x, float y,
+                                int size, boolean bold, String s) throws IOException {
         cs.beginText();
-        // Default size for cached fonts is 10; we set the actual size based
-        // on the cache key. Helvetica-Bold-12 etc. are inferred from the key.
-        // Simpler: set size explicitly each time using the fontType + integer.
-        cs.setFont(fontType, fontType == FONT_CACHE.getOrDefault("B14", null)
-                ? 14
-                : fontType == FONT_CACHE.getOrDefault("B12", null)
-                    ? 12
-                    : fontType == FONT_CACHE.getOrDefault("B10", null) || fontType == FONT_CACHE.getOrDefault("R10", null)
-                        ? 10
-                        : 9);
+        cs.setFont(bold ? HELVETICA_BOLD : HELVETICA, size);
         cs.newLineAtOffset(x, y);
         cs.showText(sanitise(s));
         cs.endText();
