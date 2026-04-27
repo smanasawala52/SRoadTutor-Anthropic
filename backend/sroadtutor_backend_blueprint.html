@@ -37,47 +37,44 @@ hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
 
 <div class="sec">Backend status — where we are right now</div>
 <div class="phase-bar">
-  <div class="pb p1">PR1–PR7 — Done<span class="pb-sub">Auth · Phone · WhatsApp · Schools · Instructors · Students</span></div>
-  <div class="pb p2">PR8–PR9 — Next<span class="pb-sub">Sessions · Reminders · Payments · Billing</span></div>
-  <div class="pb p3">PR10+ — Later<span class="pb-sub">Mistake logger · Reports · Marketplace · AI</span></div>
+  <div class="pb p1">PR1–PR9 — Done<span class="pb-sub">Auth · Phone · WhatsApp · Schools · Instructors · Students · Invitations · Email Verify · Scheduling</span></div>
+  <div class="pb p2">PR10–PR11 — Next<span class="pb-sub">Reminders · Payments · Billing</span></div>
+  <div class="pb p3">PR12+ — Later<span class="pb-sub">Mistake logger · Reports · Marketplace · AI</span></div>
 </div>
 
-<div class="note ok"><strong>Just shipped (this PR):</strong> the P0 <code>BadRequestException</code> bug is fixed (revert + 5 tests updated to check <code>getCode()</code>), and three big modules landed — <strong>Schools, Instructors, and Students</strong> — with full entities, services, controllers, and unit tests. Total: 24 new production classes, 3 new test classes, ~47 new unit tests, 1 new migration (V9), 13 new error codes, 20 new REST endpoints.</div>
+<div class="note ok"><strong>Just shipped (this session):</strong> the full email-verification flow (issue + redeem with 24h tokens), the owner-invite flow (3 invite types × 2 delivery modes, find-or-create-parent on accept, revoke + reissue, lazy-expire), and the scheduling engine (book / reschedule / cancel / complete / no-show with conflict detection, working-hours validation, and timezone-aware checks). One new migration (V10) for <code>schools.timezone</code> + audit columns on <code>lesson_sessions</code>.</div>
 
 <div class="sec">What's actually built — backend modules done</div>
 <div class="grid g3">
-  <div class="card te"><div class="ct">Auth — signup &amp; login</div><div class="cs">Email + password signup. Google login. Roles: Owner / Instructor / Student / Parent. Picks role at signup.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">JWT + refresh tokens</div><div class="cs">15-min access JWTs. 30-day refresh tokens, rotated on every use, with reuse-detection nuking all the user's tokens if a stolen one is replayed.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Phone numbers (1..N)</div><div class="cs">Up to 5 phones per user / school / instructor / student. One marked primary. E.164 format.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Auth — signup &amp; login</div><div class="cs">Email + password signup. Google login. Roles: Owner / Instructor / Student / Parent.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">JWT + refresh tokens</div><div class="cs">15-min access, 30-day refresh, rotation on every use, reuse-detection.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Email verification (NEW)</div><div class="cs">POST /send issues a 24h token; POST /{token}/confirm flips users.email_verified_at. Public confirm endpoint. One active token per user.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Phone numbers (1..N)</div><div class="cs">Up to 5 phones per user / school / instructor / student. E.164 format. Primary toggle.</div><span class="tag done">Done</span></div>
   <div class="card te"><div class="ct">WhatsApp link generator</div><div class="cs">Generates wa.me click-to-chat links. Templates with placeholders OR free-text. Click-confirm verifies the recipient phone.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Schools (NEW)</div><div class="cs">Owner creates one school. Tax IDs (GST/PST/HST). Plan tier. Soft-deactivate (no hard delete). One-school-per-owner enforced.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Instructor profiles (NEW)</div><div class="cs">Self-register profile (vehicle, license, SGI cert, hourly rate, working hours JSON). Owner attaches them to school via M:N table. Soft delete.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Student management (NEW)</div><div class="cs">Owner or instructor adds a student. One-shot creates the student User (dummy password, must rotate on first login) + Student row + optional Parent link.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Parent linkage (NEW)</div><div class="cs">Adding a student can also link / create a parent by email. Existing parent → just link. New email → create PARENT user with dummy password.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Standard error envelope</div><div class="cs">Every error returns <code>{ code, message, status, timestamp }</code>. Stable codes for the SPA to handle. P0 prefix-bug fixed.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Database migrations</div><div class="cs">9 Flyway migrations now (added V9 for is_active on schools + hourly_rate on instructors).</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Tenant scope checks</div><div class="cs">Every endpoint enforces "you can only see / edit your own school's data". 4-role × 4-resource matrix.</div><span class="tag done">Done</span></div>
-  <div class="card te"><div class="ct">Swagger / OpenAPI docs</div><div class="cs">Live API docs at <code>/swagger-ui.html</code>. Bearer-JWT auth built in.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Schools</div><div class="cs">Owner creates one school. Tax IDs, plan tier, jurisdiction, timezone, soft-deactivate.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Instructor profiles</div><div class="cs">Self-register profile. Owner attaches via M:N. Hourly rate + working hours.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Student management</div><div class="cs">Owner or instructor adds a student. Atomic transaction creates User + Student + optional Parent link.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Owner invitations (NEW)</div><div class="cs">Three invite types (instructor / student / parent), two delivery modes (TOKEN with email link, DUMMY_PWD with test123 password). Pre-populate role-specific row from metadata. Revoke + reissue.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Scheduling engine (NEW)</div><div class="cs">Book / reschedule / cancel / complete / no-show. Conflict detection (instructor + student double-booking). Working-hours validation (timezone-aware). Past-datetime block. lessons_remaining policy.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Standard error envelope</div><div class="cs">Every error returns <code>{ code, message, status, timestamp }</code>. Stable codes for the SPA to handle.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Database migrations</div><div class="cs">10 Flyway migrations now (V10 added schools.timezone + scheduling audit columns).</div><span class="tag done">Done</span></div>
 </div>
 
 <div class="sec">Up next — modules to build</div>
 <div class="grid g3">
-  <div class="card am"><div class="ct">Owner-invite flow</div><div class="cs">Email-token invitations for instructors / students / parents. Invitations table already exists; just needs the issue + accept endpoints + email infra.</div><span class="tag next">PR8</span></div>
-  <div class="card am"><div class="ct">Email verification</div><div class="cs">Send email, click-link to verify. Tokens table exists; needs endpoints.</div><span class="tag next">PR8</span></div>
-  <div class="card am"><div class="ct">Scheduling engine</div><div class="cs">Calendar. Instructor sets availability. Book / edit / cancel. Conflict detection.</div><span class="tag next">PR8/9</span></div>
-  <div class="card am"><div class="ct">Lesson reminders</div><div class="cs">Auto-fires 24h before lesson. Generates wa.me link, sender clicks, recipient gets the message.</div><span class="tag next">PR9</span></div>
-  <div class="card am"><div class="ct">Payment ledger</div><div class="cs">Track owed-per-session. Mark paid / unpaid. Cash + e-transfer first. Stripe online later.</div><span class="tag next">PR10</span></div>
-  <div class="card am"><div class="ct">Subscription billing</div><div class="cs">Free / $29 / $69 / $149 plans. Stripe billing. Plan limits enforced in code (replaces hardcoded 5-phone cap).</div><span class="tag next">PR11</span></div>
+  <div class="card am"><div class="ct">Lesson reminders (auto-fire)</div><div class="cs">Cron job 24h before lesson — generates wa.me link, marks reminder PENDING/SENT. Glues sessions to the existing wa.me link generator.</div><span class="tag next">PR10</span></div>
+  <div class="card am"><div class="ct">Payment ledger</div><div class="cs">Track owed-per-session. Mark paid / unpaid. Cash + e-transfer first. Stripe online later.</div><span class="tag next">PR11</span></div>
+  <div class="card am"><div class="ct">Subscription billing</div><div class="cs">Free / $29 / $69 / $149 plans. Stripe billing. Plan limits enforced in code (replaces hardcoded 5-phone cap).</div><span class="tag next">PR12</span></div>
 </div>
 
 <div class="sec">Later — Phase 2 / Phase 3 modules</div>
 <div class="grid g3">
-  <div class="card co"><div class="ct">SGI mistake logger</div><div class="cs">Pre-loaded SGI mistake categories. Big colour-coded buttons for in-car use. Auto-generates Road Test Readiness score.</div><span class="tag later">Phase 1+</span></div>
-  <div class="card co"><div class="ct">PDF report cards</div><div class="cs">Per-student PDF. Mistake history, improvement over time, readiness %. Shareable via WhatsApp.</div><span class="tag later">Phase 1+</span></div>
+  <div class="card co"><div class="ct">SGI mistake logger</div><div class="cs">In-car mistake categories. Big colour-coded buttons. Auto-generates Road Test Readiness score.</div><span class="tag later">Phase 1+</span></div>
+  <div class="card co"><div class="ct">PDF report cards</div><div class="cs">Per-student PDF. Mistake history, improvement over time, readiness %.</div><span class="tag later">Phase 1+</span></div>
   <div class="card co"><div class="ct">Owner dashboard</div><div class="cs">Total revenue, unpaid sessions, active students, instructor workloads, monthly MRR.</div><span class="tag later">Phase 1+</span></div>
-  <div class="card co"><div class="ct">First Car Matchmaker</div><div class="cs">Parent portal widget. Vehicle preferences + financing readiness. Pre-qualifies before student passes test.</div><span class="tag later">Phase 2</span></div>
+  <div class="card co"><div class="ct">First Car Matchmaker</div><div class="cs">Parent portal widget. Vehicle preferences + financing readiness.</div><span class="tag later">Phase 2</span></div>
   <div class="card co"><div class="ct">Dealership lead routing</div><div class="cs">When student passes road test, auto-route lead to partnered dealership. $200–$500 bounty.</div><span class="tag later">Phase 2</span></div>
-  <div class="card co"><div class="ct">Risk Score data product</div><div class="cs">Anonymized mistake logs → proprietary risk scores. Sell to auto insurers. PIPEDA compliant.</div><span class="tag later">Phase 3</span></div>
+  <div class="card co"><div class="ct">Risk Score data product</div><div class="cs">Anonymized mistake logs → proprietary risk scores. Sell to auto insurers.</div><span class="tag later">Phase 3</span></div>
 </div>
 
 <hr>
@@ -86,86 +83,49 @@ hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
 <table class="table">
   <tr><th>Table</th><th>What it stores</th><th>Status</th></tr>
   <tr><td><strong>users</strong></td><td>Everyone who can log in. Email, username, password hash, role, auth provider, language.</td><td><span class="pill g">Live + entity</span></td></tr>
-  <tr><td><strong>refresh_tokens</strong></td><td>Server-side refresh tokens. Stores SHA-256 hash, not the raw token.</td><td><span class="pill g">Live + entity</span></td></tr>
-  <tr><td><strong>email_verification_tokens</strong></td><td>One-shot tokens for "click to verify your email". Schema ready, endpoints not yet.</td><td><span class="pill a">Schema only</span></td></tr>
-  <tr><td><strong>schools</strong></td><td>Driving school tenants. Tax IDs, plan tier, business reg #, jurisdiction, is_active (V9).</td><td><span class="pill g">Live + entity</span></td></tr>
-  <tr><td><strong>instructors</strong></td><td>Instructor profile rows. Vehicle, plate, bio, working hours JSON, hourly_rate (V9).</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>refresh_tokens</strong></td><td>Server-side refresh tokens. SHA-256 hash, not raw.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>email_verification_tokens</strong></td><td>One-shot tokens for "click to verify your email". 24h TTL.</td><td><span class="pill g">Live + entity (PR8)</span></td></tr>
+  <tr><td><strong>schools</strong></td><td>Driving school tenants. Tax IDs, plan tier, jurisdiction, timezone.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>instructors</strong></td><td>Instructor profile rows. Vehicle, plate, bio, working hours JSON, hourly_rate.</td><td><span class="pill g">Live + entity</span></td></tr>
   <tr><td><strong>instructor_schools</strong></td><td>An instructor can be at multiple schools. Joined / left dates.</td><td><span class="pill g">Live + entity</span></td></tr>
   <tr><td><strong>students</strong></td><td>Student profile rows. Package, lessons remaining, status.</td><td><span class="pill g">Live + entity</span></td></tr>
   <tr><td><strong>parent_student</strong></td><td>Many-parents-per-student link table.</td><td><span class="pill g">Live + entity</span></td></tr>
-  <tr><td><strong>phone_numbers</strong></td><td>1..N phones for any user / school / instructor / student. E.164 format.</td><td><span class="pill g">Live + entity</span></td></tr>
-  <tr><td><strong>invitations</strong></td><td>Owner-issued invites. Token link or dummy-password mode.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>phone_numbers</strong></td><td>1..N phones for any user / school / instructor / student. E.164.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>invitations</strong></td><td>Owner-issued invites. Token link or dummy-password mode. Metadata JSONB.</td><td><span class="pill g">Live + entity (PR8)</span></td></tr>
   <tr><td><strong>whatsapp_templates</strong></td><td>Reusable message bodies with placeholders.</td><td><span class="pill g">Live + entity</span></td></tr>
   <tr><td><strong>whatsapp_message_log</strong></td><td>Audit row for every wa.me link generated. Click timestamp.</td><td><span class="pill g">Live + entity</span></td></tr>
-  <tr><td>sessions</td><td>Booked lessons. Scheduled-at, duration, status.</td><td><span class="pill r">Schema only · PR8</span></td></tr>
-  <tr><td>payments</td><td>Cash / e-transfer / Stripe transactions per session.</td><td><span class="pill r">Schema only · PR10</span></td></tr>
-  <tr><td>subscriptions</td><td>Plan tier + Stripe subscription id per school.</td><td><span class="pill r">Schema only · PR11</span></td></tr>
+  <tr><td><strong>lesson_sessions</strong> (NEW)</td><td>Booked / completed / cancelled / no-show lessons. Audit columns for who-cancelled.</td><td><span class="pill g">Live + entity (PR9)</span></td></tr>
+  <tr><td>payments</td><td>Cash / e-transfer / Stripe transactions per session.</td><td><span class="pill r">Schema only · PR11</span></td></tr>
+  <tr><td>subscriptions</td><td>Plan tier + Stripe subscription id per school.</td><td><span class="pill r">Schema only · PR12</span></td></tr>
 </table>
 
 <hr>
 
-<div class="sec">REST endpoints — what's live right now</div>
+<div class="sec">REST endpoints — what's live right now (54 total)</div>
 <div class="grid g2">
   <div class="card pu"><div class="ct">/auth (5 endpoints)</div><div class="cs">POST /signup · POST /login · POST /google · POST /refresh · POST /logout</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/auth/email-verify (2 endpoints, NEW)</div><div class="cs">POST /send (auth required) · POST /{token}/confirm (public)</div><span class="tag done">Done</span></div>
   <div class="card pu"><div class="ct">/api/phone-numbers (7 endpoints)</div><div class="cs">POST · GET (list) · GET /{id} · PUT /{id} · DELETE /{id} · POST /{id}/primary · POST /{id}/whatsapp-optin</div><span class="tag done">Done</span></div>
-  <div class="card pu"><div class="ct">/api/whatsapp/links (2 endpoints)</div><div class="cs">POST (generate wa.me link + audit log) · POST /{logId}/click-confirm (verifies the recipient phone)</div><span class="tag done">Done</span></div>
-  <div class="card pu"><div class="ct">/api/schools (6 endpoints) NEW</div><div class="cs">POST (create) · GET /me · GET /{id} · PUT /{id} · POST /{id}/deactivate · POST /{id}/reactivate</div><span class="tag done">Done</span></div>
-  <div class="card pu"><div class="ct">/api/instructors (6 endpoints) NEW</div><div class="cs">POST /me (self-register) · GET /me · GET /{id} · PUT /{id} · POST /{id}/deactivate · plus school-scoped attach/detach/list</div><span class="tag done">Done</span></div>
-  <div class="card pu"><div class="ct">/api/schools/{schoolId}/instructors (3 endpoints) NEW</div><div class="cs">GET (roster) · POST /{instructorId}/attach · POST /{instructorId}/detach</div><span class="tag done">Done</span></div>
-  <div class="card pu"><div class="ct">/api/schools/{schoolId}/students (2 endpoints) NEW</div><div class="cs">POST (add student + optional parent link) · GET (list)</div><span class="tag done">Done</span></div>
-  <div class="card pu"><div class="ct">/api/students (5 endpoints) NEW</div><div class="cs">GET /me · GET /{id} · PUT /{id} · POST /{id}/parents (link) · DELETE /{id}/parents/{parentUserId}</div><span class="tag done">Done</span></div>
-  <div class="card bl"><div class="ct">/actuator/health · /swagger-ui.html</div><div class="cs">Health probe for Railway. Swagger docs page (paste a JWT, hit endpoints from the browser).</div><span class="tag done">Done</span></div>
-  <div class="card am"><div class="ct">/api/invitations (planned)</div><div class="cs">POST /instructor · POST /student · POST /parent · POST /{token}/accept</div><span class="tag next">PR8</span></div>
-  <div class="card am"><div class="ct">/api/auth/email-verify (planned)</div><div class="cs">POST /send · POST /{token}/confirm</div><span class="tag next">PR8</span></div>
-  <div class="card am"><div class="ct">/api/sessions (planned)</div><div class="cs">POST /book · PUT /{id} · DELETE /{id} · GET /calendar · POST /{id}/complete</div><span class="tag next">PR8/9</span></div>
+  <div class="card pu"><div class="ct">/api/whatsapp/links (2 endpoints)</div><div class="cs">POST (generate wa.me link + audit log) · POST /{logId}/click-confirm</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/schools (6 endpoints)</div><div class="cs">POST (create) · GET /me · GET /{id} · PUT /{id} · POST /{id}/deactivate · POST /{id}/reactivate</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/instructors (5 endpoints)</div><div class="cs">POST /me · GET /me · GET /{id} · PUT /{id} · POST /{id}/deactivate</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/schools/{id}/instructors (3 endpoints)</div><div class="cs">GET (roster) · POST /{instructorId}/attach · POST /{instructorId}/detach</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/schools/{id}/students (2 endpoints)</div><div class="cs">POST (add student + optional parent) · GET (list)</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/students (5 endpoints)</div><div class="cs">GET /me · GET /{id} · PUT /{id} · POST /{id}/parents (link) · DELETE /{id}/parents/{parentUserId}</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/schools/{id}/invitations (4 endpoints, NEW)</div><div class="cs">POST /instructor · POST /student · POST /parent · GET (list, with status filter)</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/invitations (4 endpoints, NEW)</div><div class="cs">POST /{id}/revoke · POST /{id}/reissue · GET /lookup/{token} (public) · POST /{token}/accept (public)</div><span class="tag done">Done</span></div>
+  <div class="card pu"><div class="ct">/api/sessions (7 endpoints, NEW)</div><div class="cs">POST (book) · GET /{id} · PUT /{id} (reschedule) · POST /{id}/cancel · POST /{id}/complete · POST /{id}/no-show · GET (calendar with date-range filter)</div><span class="tag done">Done</span></div>
 </div>
 
 <hr>
 
 <div class="sec">Who can do what — the rules</div>
 <table class="table">
-  <tr><th>Role</th><th>Schools</th><th>Instructors</th><th>Students</th><th>Phones</th></tr>
-  <tr><td><strong>Owner</strong></td><td>Create + edit own school only</td><td>Attach / detach instructors at own school. Edit any instructor at own school.</td><td>Add students at own school. Edit / list any student at own school.</td><td>Manage own + own school's instructors / students</td></tr>
-  <tr><td><strong>Instructor</strong></td><td>GET /me only</td><td>Edit own profile only</td><td>Add students at school they're attached to. Edit / list only their assigned students.</td><td>Manage own user + own instructor row</td></tr>
-  <tr><td><strong>Student</strong></td><td>GET /me only</td><td>—</td><td>View own profile only</td><td>Manage own user + own student row</td></tr>
-  <tr><td><strong>Parent</strong></td><td>GET /me only</td><td>—</td><td>View linked-student profiles only</td><td>Manage own user + linked-student phones</td></tr>
-</table>
-
-<hr>
-
-<div class="sec">Error codes the SPA can rely on (22 + 13 NEW = 35 total)</div>
-<table class="table">
-  <tr><th>Code</th><th>HTTP</th><th>When it happens</th></tr>
-  <tr><td>EMAIL_ALREADY_EXISTS</td><td>400</td><td>Signup with an email already in use</td></tr>
-  <tr><td>EMAIL_USED_WITH_DIFFERENT_PROVIDER</td><td>400</td><td>Google login with an email that's a local account (or vice versa)</td></tr>
-  <tr><td>ROLE_REQUIRED</td><td>400</td><td>First-time Google signup without picking a role</td></tr>
-  <tr><td>INVALID_PHONE_NUMBER</td><td>400</td><td>Bad country code or national number format</td></tr>
-  <tr><td>PHONE_LIMIT_EXCEEDED</td><td>400</td><td>Trying to add a 6th phone for an owner</td></tr>
-  <tr><td>PHONE_ALREADY_EXISTS</td><td>400</td><td>Same phone added twice for the same owner</td></tr>
-  <tr><td>WHATSAPP_DISABLED</td><td>400</td><td>Tried to send a wa.me link to a number that's opted out</td></tr>
-  <tr><td>TEMPLATE_INACTIVE</td><td>400</td><td>Selected template was deactivated</td></tr>
-  <tr><td>MISSING_BODY_OR_TEMPLATE</td><td>400</td><td>Wa.me request with no template AND no body</td></tr>
-  <tr><td>PLACEHOLDER_MISSING</td><td>400</td><td>Template uses <code>{{name}}</code> but caller didn't supply it</td></tr>
-  <tr><td><strong>NOT_OWNER</strong></td><td>400</td><td>NEW · Non-OWNER tried to create a school</td></tr>
-  <tr><td><strong>ALREADY_OWN_SCHOOL</strong></td><td>400</td><td>NEW · Owner already has a school (one-per-owner rule)</td></tr>
-  <tr><td><strong>USER_ALREADY_IN_SCHOOL</strong></td><td>400</td><td>NEW · User already pinned to a different school</td></tr>
-  <tr><td><strong>SCHOOL_INACTIVE</strong></td><td>400</td><td>NEW · Cannot edit / attach to a deactivated school</td></tr>
-  <tr><td><strong>NOT_INSTRUCTOR</strong></td><td>400</td><td>NEW · Non-INSTRUCTOR tried to self-register a profile</td></tr>
-  <tr><td><strong>INSTRUCTOR_ALREADY_EXISTS</strong></td><td>400</td><td>NEW · This user already has an instructor profile</td></tr>
-  <tr><td><strong>INSTRUCTOR_INACTIVE</strong></td><td>400</td><td>NEW · Cannot edit / attach a deactivated instructor</td></tr>
-  <tr><td><strong>ALREADY_ATTACHED</strong></td><td>400</td><td>NEW · Instructor already actively attached to this school</td></tr>
-  <tr><td><strong>STUDENT_EMAIL_ALREADY_EXISTS</strong></td><td>400</td><td>NEW · Student email already in use</td></tr>
-  <tr><td><strong>INSTRUCTOR_WRONG_SCHOOL</strong></td><td>400</td><td>NEW · Assigned instructor not at this school</td></tr>
-  <tr><td><strong>REMAINING_GT_TOTAL</strong></td><td>400</td><td>NEW · lessonsRemaining cannot exceed packageTotalLessons</td></tr>
-  <tr><td><strong>PARENT_EMAIL_BELONGS_TO_OTHER_ROLE</strong></td><td>400</td><td>NEW · Parent email exists but with role != PARENT</td></tr>
-  <tr><td><strong>PARENT_ALREADY_LINKED</strong></td><td>400</td><td>NEW · This parent is already linked to this student</td></tr>
-  <tr><td>INVALID_CREDENTIALS / USE_OAUTH_LOGIN / ACCOUNT_DISABLED</td><td>401</td><td>Login failures (wrong password / OAuth-managed / inactive)</td></tr>
-  <tr><td>INVALID_TOKEN / INVALID_REFRESH_TOKEN / REFRESH_TOKEN_REVOKED</td><td>401</td><td>JWT / refresh-token failures (refresh-revoked also nukes all of user's tokens)</td></tr>
-  <tr><td>FORBIDDEN</td><td>403</td><td>Authenticated, but you don't have access to this resource</td></tr>
-  <tr><td>NOT_FOUND</td><td>404</td><td>Looked up something by id that doesn't exist</td></tr>
-  <tr><td>VALIDATION_ERROR</td><td>400</td><td>Request body failed validation (returns per-field errors)</td></tr>
-  <tr><td>CONFLICT</td><td>409</td><td>Database integrity constraint hit (rare; usually a race)</td></tr>
-  <tr><td>INTERNAL_ERROR</td><td>500</td><td>Something unexpected. Stack trace logged server-side, never sent.</td></tr>
+  <tr><th>Role</th><th>Schools</th><th>Instructors</th><th>Students</th><th>Sessions</th><th>Invitations</th></tr>
+  <tr><td><strong>Owner</strong></td><td>Create + edit own school</td><td>Attach / detach. Edit any at own school.</td><td>Add / edit / list any at own school</td><td>Book / cancel / complete / no-show / reschedule. Override working-hours.</td><td>Issue all 3 types. Revoke / reissue.</td></tr>
+  <tr><td><strong>Instructor</strong></td><td>GET /me only</td><td>Edit own profile only</td><td>Add students. Edit / list only their assigned.</td><td>Book / reschedule for self. Complete / no-show their own sessions.</td><td>Issue student invites only.</td></tr>
+  <tr><td><strong>Student</strong></td><td>GET /me only</td><td>—</td><td>View own profile</td><td>Book / reschedule for self. Cancel own. View own calendar.</td><td>—</td></tr>
+  <tr><td><strong>Parent</strong></td><td>GET /me only</td><td>—</td><td>View linked-student profiles</td><td>Cancel linked-student session. View linked-student calendar.</td><td>—</td></tr>
 </table>
 
 <hr>
@@ -173,34 +133,30 @@ hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
 <div class="sec">Numbers that matter</div>
 <table class="table">
   <tr><th>What</th><th>Before this PR</th><th>After this PR</th></tr>
-  <tr><td>Java source files (production)</td><td>60</td><td><strong>~84</strong></td></tr>
-  <tr><td>Production classes</td><td>41</td><td><strong>~65</strong></td></tr>
-  <tr><td>Test classes</td><td>11</td><td><strong>14</strong></td></tr>
-  <tr><td>Unit tests</td><td>119/124 (5 failing)</td><td><strong>~166 (target: all green)</strong></td></tr>
-  <tr><td>REST endpoints live</td><td>14</td><td><strong>34</strong></td></tr>
-  <tr><td>JPA-mapped database tables</td><td>8</td><td><strong>11</strong></td></tr>
-  <tr><td>Flyway migrations</td><td>8</td><td><strong>9</strong></td></tr>
-  <tr><td>Error codes in active use</td><td>22</td><td><strong>35</strong></td></tr>
+  <tr><td>Java source files (production)</td><td>~84</td><td><strong>~120</strong></td></tr>
+  <tr><td>Test classes</td><td>14</td><td><strong>17</strong></td></tr>
+  <tr><td>REST endpoints live</td><td>34</td><td><strong>54</strong></td></tr>
+  <tr><td>JPA-mapped database tables</td><td>11</td><td><strong>12</strong> (lesson_sessions added)</td></tr>
+  <tr><td>Flyway migrations</td><td>9</td><td><strong>10</strong></td></tr>
+  <tr><td>Error codes in active use</td><td>35</td><td><strong>~60</strong></td></tr>
 </table>
 
 <hr>
 
-<div class="sec">Build order — what to ship next, in this order</div>
+<div class="sec">Build order — what to ship next</div>
 <table class="table">
   <tr><th>#</th><th>What</th><th>Why this order</th></tr>
-  <tr><td>0</td><td>Run <code>mvn -B verify</code> locally — confirm green</td><td>I can't run Maven in my sandbox; you do.</td></tr>
-  <tr><td>1</td><td>Owner-invite flow + email verification endpoints</td><td>Polishes the existing School / Instructor / Student modules so onboarding doesn't need dummy passwords.</td></tr>
-  <tr><td>2</td><td>Sessions — scheduling engine</td><td>Pulls phone.primary for reminders, instructor for time slots — proves wa.me + Phone + Instructor + Student all work end-to-end.</td></tr>
-  <tr><td>3</td><td>Reminders — auto-fire 24h before lesson</td><td>Glues sessions to the wa.me link generator we already built.</td></tr>
-  <tr><td>4</td><td>Payments — ledger</td><td>Independent of scheduling. Could land in parallel.</td></tr>
-  <tr><td>5</td><td>Subscriptions + plan limits</td><td>Replaces the hardcoded 5-phone cap. Adds instructor + student caps.</td></tr>
-  <tr><td>6</td><td>SGI mistake logger + readiness score</td><td>The in-car UX. Big colour-coded buttons.</td></tr>
-  <tr><td>7</td><td>PDF report cards</td><td>Shareable via WhatsApp once #6 has data.</td></tr>
-  <tr><td>8</td><td>Owner dashboard</td><td>Pulls everything above into one place.</td></tr>
+  <tr><td>0</td><td>Run <code>mvn -B verify</code> locally — confirm green</td><td>I can't run Maven in my sandbox.</td></tr>
+  <tr><td>1</td><td>Reminders module — auto-fire 24h before lesson</td><td>Glues sessions to the wa.me link generator we already built.</td></tr>
+  <tr><td>2</td><td>Payments — ledger</td><td>Independent of reminders. Could land in parallel.</td></tr>
+  <tr><td>3</td><td>Subscriptions + plan limits</td><td>Replaces hardcoded 5-phone cap. Adds instructor + student caps. Stripe wire-up.</td></tr>
+  <tr><td>4</td><td>SGI mistake logger + readiness score</td><td>The in-car UX. Big colour-coded buttons.</td></tr>
+  <tr><td>5</td><td>PDF report cards</td><td>Shareable via WhatsApp once #4 has data.</td></tr>
+  <tr><td>6</td><td>Owner dashboard</td><td>Pulls everything above into one place.</td></tr>
 </table>
 
-<div class="note">Rule we hold to: every PR keeps the build green. <code>mvn -B verify</code> must pass with all tests + coverage gate. No "fix the tests later" commits.</div>
+<div class="note">Rule we hold to: every PR keeps the build green. <code>mvn -B verify</code> must pass with all tests + coverage gate.</div>
 
-<div class="note warn">For the deep version of this — every request flow step-by-step, every code-review finding with file/line citations, every ADR, every tech-debt item — see <code>sroadtutor_backend_workflow.html</code> in this same folder.</div>
+<div class="note warn">For the deep version of this — every request flow, every code-review finding with file/line citations, every ADR, every tech-debt item — see <code>sroadtutor_backend_workflow.html</code> in this same folder.</div>
 
 </div>

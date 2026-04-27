@@ -15,6 +15,7 @@ public record SchoolMeResponse(
         String name,
         String jurisdiction,
         String province,
+        String timezone,
         String planTier,
         boolean active
 ) {
@@ -25,6 +26,7 @@ public record SchoolMeResponse(
                 s.getName(),
                 s.getJurisdiction(),
                 s.getProvince(),
+                s.getTimezone(),
                 s.getPlanTier(),
                 s.isActive()
         );

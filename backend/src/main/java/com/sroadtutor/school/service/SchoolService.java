@@ -173,6 +173,24 @@ public class SchoolService {
         if (req.name() != null)         school.setName(req.name().trim());
         if (req.jurisdiction() != null) school.setJurisdiction(req.jurisdiction());
         if (req.province() != null)     school.setProvince(req.province());
+        if (req.timezone() != null) {
+            String tz = req.timezone().trim();
+            if (tz.isEmpty()) {
+                // explicit empty string is not a valid timezone — refuse rather
+                // than silently revert to default
+                throw new BadRequestException(
+                        "INVALID_TIMEZONE",
+                        "timezone must be a non-blank IANA zone id");
+            }
+            try {
+                java.time.ZoneId.of(tz);
+            } catch (java.time.DateTimeException ex) {
+                throw new BadRequestException(
+                        "INVALID_TIMEZONE",
+                        "Unknown timezone: " + tz);
+            }
+            school.setTimezone(tz);
+        }
 
         // Tax IDs accept blanks meaning "clear it"; otherwise trim + persist.
         if (req.gstNumber() != null) school.setGstNumber(nullIfBlank(req.gstNumber()));

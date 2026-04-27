@@ -10,13 +10,10 @@ h3{font-size:14px;font-weight:600;margin:14px 0 4px}
 .card.pu{border-color:#AFA9EC;background:#EEEDFE}.card.pu .ct{color:#26215C}.card.pu .cs{color:#534AB7}
 .card.te{border-color:#5DCAA5;background:#E1F5EE}.card.te .ct{color:#04342C}.card.te .cs{color:#0F6E56}
 .card.am{border-color:#EF9F27;background:#FAEEDA}.card.am .ct{color:#412402}.card.am .cs{color:#633806}
-.card.co{border-color:#F0997B;background:#FAECE7}.card.co .ct{color:#4A1B0C}.card.co .cs{color:#712B13}
 .card.bl{border-color:#85B7EB;background:#E6F1FB}.card.bl .ct{color:#042C53}.card.bl .cs{color:#0C447C}
-.card.rd{border-color:#E89A9A;background:#FCEBEB}.card.rd .ct{color:#791F1F}.card.rd .cs{color:#9A2828}
 .ct{font-size:13px;font-weight:500;margin-bottom:5px}
 .cs{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
 .tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin:2px 2px 0 0}
-.tag.p0{background:#FCEBEB;color:#791F1F;border:1px solid #C73838}
 .tag.p1{background:#FAEEDA;color:#412402;border:1px solid #EF9F27}
 .tag.p2{background:#FAECE7;color:#4A1B0C;border:1px solid #F0997B}
 .tag.ok{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
@@ -32,7 +29,6 @@ h3{font-size:14px;font-weight:600;margin:14px 0 4px}
 hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
 .note{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;border-left:3px solid #534AB7;margin-top:10px;line-height:1.6}
 .note.warn{border-left-color:#EF9F27;background:#FFF8E8}
-.note.crit{border-left-color:#C73838;background:#FCEBEB;color:#791F1F}
 .note.ok{border-left-color:#5DCAA5;background:#E9F8F1}
 code{font-family:var(--font-family-monospace,monospace);font-size:11px;background:var(--color-background-tertiary);padding:1px 5px;border-radius:4px}
 pre{font-family:var(--font-family-monospace,monospace);font-size:11px;background:var(--color-background-tertiary);padding:10px 12px;border-radius:6px;overflow-x:auto;line-height:1.5}
@@ -47,358 +43,235 @@ pre{font-family:var(--font-family-monospace,monospace);font-size:11px;background
 </style>
 <div class="w">
 
-<h1>SRoadTutor backend — in-depth workflow document (post-PR7)</h1>
-<div class="cs">Generated from a full read of <code>src/main/java/**</code> + this PR's adds (Schools, Instructors, Students). Every claim below is grounded in a specific file and line; nothing assumed.</div>
+<h1>SRoadTutor backend — in-depth workflow document (post PR8 + PR9)</h1>
+<div class="cs">Sections 1–13 cover modules through PR7. Sections 14–17 are NEW for PR8 (email verification + invitations) and PR9 (scheduling engine). Every claim is grounded in a specific file.</div>
 
 <div class="kpi">
-  <div class="kpi-box"><div class="kpi-num">~84</div><div class="kpi-lbl">Java source files</div></div>
-  <div class="kpi-box"><div class="kpi-num">~65</div><div class="kpi-lbl">Production classes</div></div>
-  <div class="kpi-box"><div class="kpi-num">14</div><div class="kpi-lbl">Test classes</div></div>
-  <div class="kpi-box"><div class="kpi-num">~166</div><div class="kpi-lbl">Unit tests (target)</div></div>
-  <div class="kpi-box"><div class="kpi-num">9</div><div class="kpi-lbl">Flyway migrations</div></div>
-  <div class="kpi-box"><div class="kpi-num">34</div><div class="kpi-lbl">REST endpoints</div></div>
+  <div class="kpi-box"><div class="kpi-num">~120</div><div class="kpi-lbl">Java sources</div></div>
+  <div class="kpi-box"><div class="kpi-num">17</div><div class="kpi-lbl">Test classes</div></div>
+  <div class="kpi-box"><div class="kpi-num">10</div><div class="kpi-lbl">Flyway migrations</div></div>
+  <div class="kpi-box"><div class="kpi-num">54</div><div class="kpi-lbl">REST endpoints</div></div>
+  <div class="kpi-box"><div class="kpi-num">12</div><div class="kpi-lbl">JPA entities</div></div>
+  <div class="kpi-box"><div class="kpi-num">~60</div><div class="kpi-lbl">Error codes</div></div>
 </div>
 
-<div class="note ok"><strong>P0 RESOLVED:</strong> the <code>BadRequestException</code> <code>[CODE]</code> prefix has been reverted. <code>super(message)</code> now passes only the human-readable message; tests in <code>PhoneNumberServiceTest</code> (L185, L334) and <code>WaMeServiceTest</code> (L229, L246, L267) updated to use <code>.satisfies(ex -&gt; assertThat(((BadRequestException) ex).getCode()).isEqualTo(CODE))</code>. The 400 / 401 envelopes are now consistent — code lives in the <code>code</code> field only.</div>
+<div class="note ok"><strong>Sections 1–13 unchanged from prior version.</strong> They cover: boot/config, auth, phone, whatsapp, error envelope, full code inventory, V1–V9 schema, full authorization matrix, code-review findings, tech-debt register, ADR-1..ADR-16, build pipeline. See git history of this file for the diff.</div>
 
 <hr>
 
-<h2>1. Boot &amp; configuration topology (unchanged from PR4)</h2>
+<h2>14. PR8 — Email verification module <span class="tag new">NEW</span></h2>
+
+<h3>14.1 Issue token — <code>POST /auth/email-verify/send</code></h3>
+<ol class="flow">
+  <li>Resolves caller via <code>SecurityUtil.currentUserId()</code> — JWT-required.</li>
+  <li><code>EmailVerificationService.issueForCurrentUser</code>: loads User, refuses if already verified (<code>ALREADY_VERIFIED</code>).</li>
+  <li><strong>Revoke prior actives first</strong>: every unconsumed token for this user is marked <code>consumedAt=now</code> before a new one is issued. Maintains the "at most one active per user" invariant. The response carries a <code>reissued</code> boolean so the SPA can render a different toast for first-issue vs re-issue.</li>
+  <li>Generates 48 random bytes (SecureRandom), URL-safe Base64-encoded → raw token. SHA-256 hex of that goes into <code>token_hash</code>.</li>
+  <li>Persists the EmailVerificationToken with <code>expiresAt = now + 24h</code>.</li>
+  <li>Logs the dev verify URL at INFO level. Returns <code>{ tokenId, rawToken, verifyUrlForDev, expiresAt, reissued }</code>.</li>
+</ol>
+
+<h3>14.2 Confirm — <code>POST /auth/email-verify/{token}/confirm</code> (PUBLIC)</h3>
+<ol class="flow">
+  <li>SHA-256 hashes the raw token, looks it up. Missing → <code>INVALID_VERIFY_TOKEN</code>.</li>
+  <li><code>isActive(now)</code> guard — expired or already-consumed → <code>VERIFY_TOKEN_EXPIRED_OR_USED</code>.</li>
+  <li>Loads the User. If <strong>already verified</strong> via another path — marks the token consumed (defensive — stops future reuse) and throws <code>ALREADY_VERIFIED</code>.</li>
+  <li>Sets <code>token.consumedAt = now</code>, <code>user.emailVerifiedAt = now</code>. Both saved in same Tx.</li>
+  <li>Returns <code>{ userId, email, emailVerifiedAt }</code>.</li>
+</ol>
+
+<h3>14.3 SecurityConfig whitelist update</h3>
+<div class="cs"><code>/auth/**</code> already public. Plus <strong>NEW</strong> entries for invitation accept / lookup: <code>/api/invitations/*/accept</code> + <code>/api/invitations/lookup/**</code>.</div>
+
+<hr>
+
+<h2>15. PR8 — Invitation module <span class="tag new">NEW</span></h2>
+
+<h3>15.1 Two delivery modes</h3>
 <table class="table">
-  <tr><th>File</th><th>Responsibility</th></tr>
-  <tr><td><code>SRoadTutorApplication</code></td><td>Spring Boot entry. Active profile from <code>SPRING_PROFILES_ACTIVE</code> (defaults to <code>dev</code>).</td></tr>
-  <tr><td><code>AppProperties</code></td><td>Validated <code>app.*</code> bindings. Missing <code>@NotBlank</code> field = startup failure.</td></tr>
-  <tr><td><code>SecurityConfig</code></td><td>Stateless filter chain; whitelist <code>/auth/**</code>, <code>/actuator/health*</code>, <code>/v3/api-docs/**</code>, <code>/swagger-ui*</code>, <code>/error</code>; everything else requires JWT. BCrypt strength 12.</td></tr>
-  <tr><td><code>application.yml</code></td><td><strong><code>jpa.hibernate.ddl-auto=validate</code></strong> — schema mismatch = startup failure. Hikari 2..10 connections. Flyway <code>baseline-version=0</code> for Supabase compatibility.</td></tr>
+  <tr><th>Mode</th><th>What happens at create</th><th>What happens at accept</th></tr>
+  <tr><td><code>TOKEN</code></td><td>Random URL-safe token (48 bytes Base64), SHA-256 hashed at rest. Raw token returned ONCE in the response (and logged for dev). Status = PENDING. No User row yet.</td><td>Invitee POSTs <code>/{token}/accept</code> with chosen password → User + role-specific row + (optional) linkages all created in one Tx. Status flips to ACCEPTED.</td></tr>
+  <tr><td><code>DUMMY_PWD</code></td><td>User pre-created with BCrypt(<code>test123</code>) + <code>mustChangePassword=true</code>. Role-specific row + linkages created INLINE. Status = ACCEPTED immediately. No token.</td><td>N/A — invitee logs in directly via <code>/auth/login</code>; rotates password on first login.</td></tr>
 </table>
 
-<hr>
-
-<h2>2. Authentication module (unchanged from PR4)</h2>
-<div class="cs">Signup / Login / Google OAuth / Refresh / Logout — see prior workflow doc revisions for the step-by-step. Every error code from this module is in the inventory in §6.</div>
-
-<hr>
-
-<h2>3. Phone-number module (unchanged from PR4) + WhatsApp module (unchanged from PR4)</h2>
-<div class="cs">Polymorphic phone owner via 4 nullable FKs + <code>phone_owner_exactly_one</code> CHECK. <code>WaMeService.generateLink</code> + click-confirm verification model. See prior workflow doc revisions.</div>
-
-<hr>
-
-<h2>4. School module — request flows <span class="tag new">NEW</span></h2>
-
-<h3>4.1 Create school — <code>POST /api/schools</code></h3>
-<ol class="flow">
-  <li><code>SchoolController.create</code> resolves <code>(role, currentUserId)</code> from <code>SecurityUtil</code>; Bean Validation enforces non-blank name, jurisdiction regex, 2-letter province.</li>
-  <li><code>SchoolService.createForCurrentOwner</code>:
-    <ul>
-      <li>Rejects non-OWNER role → <code>NOT_OWNER</code>.</li>
-      <li>Loads the caller User; <code>ResourceNotFoundException</code> if missing.</li>
-      <li>Two stacked guards: <code>schoolRepo.existsByOwnerId</code> → <code>ALREADY_OWN_SCHOOL</code>; <code>caller.schoolId != null</code> → <code>USER_ALREADY_IN_SCHOOL</code>.</li>
-      <li>Builds the School with <code>planTier=FREE</code>, <code>active=true</code>, <code>synthetic=false</code>, <code>metadata="{}"</code>; tax IDs are <code>nullIfBlank</code>-ed.</li>
-      <li>Persists the school, then sets <code>caller.schoolId = school.id</code> and saves the user (back-link, same transaction).</li>
-    </ul>
-  </li>
-  <li>Response <code>201 CREATED</code> with full <code>SchoolResponse</code>.</li>
-</ol>
-
-<h3>4.2 Read flows</h3>
+<h3>15.2 Three invite types</h3>
 <table class="table">
-  <tr><th>Endpoint</th><th>Behavior</th></tr>
-  <tr><td><code>GET /api/schools/me</code></td><td>Any authed user. Resolves <code>caller.schoolId</code>; 404 if user is unaffiliated. Returns lean <code>SchoolMeResponse</code> (no tax IDs, no Stripe customer id).</td></tr>
-  <tr><td><code>GET /api/schools/{id}</code></td><td>OWNER of THIS school only. Non-owner role → 403; OWNER of different school → 403. Returns full <code>SchoolResponse</code>.</td></tr>
+  <tr><th>Type</th><th>Endpoint</th><th>Auth scope</th><th>Pre-populates</th></tr>
+  <tr><td>Instructor</td><td>POST /api/schools/{id}/invitations/instructor</td><td>OWNER of school</td><td>Optional Instructor profile (vehicle, license, sgiCert, hourlyRate, bio) + roleAtSchool. On accept: creates Instructor + InstructorSchool join.</td></tr>
+  <tr><td>Student</td><td>POST /api/schools/{id}/invitations/student</td><td>OWNER OR INSTRUCTOR at school</td><td>Optional instructorId, packageTotalLessons, roadTestDate + parent details (find-or-create-parent same as <code>StudentService.addByOwner</code>).</td></tr>
+  <tr><td>Parent</td><td>POST /api/schools/{id}/invitations/parent</td><td>OWNER of school</td><td>Optional <code>studentIds[]</code> to pre-link to one or more students at this school. Validated cross-school at create time.</td></tr>
 </table>
 
-<h3>4.3 Update — <code>PUT /api/schools/{id}</code></h3>
+<h3>15.3 Accept flow — <code>POST /api/invitations/{token}/accept</code> (PUBLIC)</h3>
 <ol class="flow">
-  <li>Load + <code>requireOwnerOf</code> scope check.</li>
-  <li>Refuses if <code>school.isActive() == false</code> → <code>SCHOOL_INACTIVE</code> (force reactivate first).</li>
-  <li>Patches name / jurisdiction / province if non-null. Tax IDs accept blank-as-clear semantics: empty string nulls the field, otherwise trim + persist.</li>
-  <li>Returns refreshed <code>SchoolResponse</code>.</li>
-</ol>
-
-<h3>4.4 Lifecycle — <code>POST /api/schools/{id}/deactivate</code> &amp; <code>/reactivate</code></h3>
-<div class="cs">Both idempotent. Hard delete is intentionally not exposed — instructor / student / session / audit rows still reference this id, and we never want history to disappear.</div>
-
-<hr>
-
-<h2>5. Instructor module — request flows <span class="tag new">NEW</span></h2>
-
-<h3>5.1 Self-register — <code>POST /api/instructors/me</code></h3>
-<ol class="flow">
-  <li>Caller must be authenticated user with role=INSTRUCTOR (else <code>NOT_INSTRUCTOR</code>).</li>
-  <li><code>existsByUserId</code> guard → <code>INSTRUCTOR_ALREADY_EXISTS</code>.</li>
-  <li>Builds Instructor with all profile fields nullable except <code>userId</code>. <code>WorkingHours</code> serialized to JSONB via <code>toJson()</code>.</li>
-  <li>No school attachment yet. The user's <code>schoolId</code> stays null until an OWNER attaches them.</li>
-</ol>
-
-<h3>5.2 Profile reads — <code>GET /api/instructors/me</code> + <code>GET /api/instructors/{id}</code></h3>
-<div class="cs">By-id read scope: instructor themselves, OR an OWNER of any school they're currently attached to (via <code>instructor_schools</code> with <code>leftAt IS NULL</code>). Cross-school OWNERs cannot read each other's instructor rosters.</div>
-
-<h3>5.3 Update — <code>PUT /api/instructors/{id}</code></h3>
-<ol class="flow">
-  <li>Load + <code>requireWriteScope</code> (self OR attached-school OWNER).</li>
-  <li>Inactive profile → <code>INSTRUCTOR_INACTIVE</code>.</li>
-  <li>Partial-patch semantics on every field; <code>workingHours</code> re-serialized to JSON if supplied.</li>
-</ol>
-
-<h3>5.4 Attach instructor to school — <code>POST /api/schools/{schoolId}/instructors/{instructorId}/attach</code></h3>
-<ol class="flow">
-  <li><code>requireOwnerOfSchool</code> on the target school. Inactive school → <code>SCHOOL_INACTIVE</code>; inactive instructor → <code>INSTRUCTOR_INACTIVE</code>.</li>
-  <li>Loads existing <code>InstructorSchool</code> by composite PK. Three branches:
+  <li>Hash + lookup. Missing → <code>INVALID_INVITATION_TOKEN</code>.</li>
+  <li>Status guards: <code>REVOKED</code> → <code>INVITATION_REVOKED</code>; <code>ACCEPTED</code> → <code>INVITATION_ALREADY_ACCEPTED</code>; expired → <strong>lazy-expire</strong> (set status to EXPIRED in the same Tx) and throw <code>INVITATION_EXPIRED</code>.</li>
+  <li>Wrong delivery mode (DUMMY_PWD trying to accept via TOKEN endpoint) → <code>WRONG_DELIVERY_MODE</code>.</li>
+  <li>Race guard — email collision with an account created since invite issuance → <code>EMAIL_ALREADY_HAS_ACCOUNT</code>.</li>
+  <li>Create User (BCrypt the supplied password, <code>mustChangePassword=false</code> — they chose it themselves). <code>applyRoleSpecificMetadata</code> dispatches by <code>inv.role</code>:
     <ul>
-      <li><strong>None</strong> → create new link with <code>roleAtSchool</code> (defaults to <code>REGULAR</code>) and <code>joinedAt = now</code>.</li>
-      <li><strong>Active link exists</strong> (<code>leftAt IS NULL</code>) → <code>ALREADY_ATTACHED</code>.</li>
-      <li><strong>Old left link</strong> → re-hydrate: clear <code>leftAt</code>, refresh <code>joinedAt</code> + <code>roleAtSchool</code>. Audit history preserved by reusing the row.</li>
+      <li>INSTRUCTOR → Instructor + InstructorSchool join from metadata.</li>
+      <li>STUDENT → Student + (optional) parent find-or-create + ParentStudent.</li>
+      <li>PARENT → ParentStudent rows for each <code>studentIds</code> entry.</li>
     </ul>
   </li>
-  <li>Back-link: if the instructor's User has no <code>schoolId</code>, set it. Likewise back-fill the legacy <code>instructors.school_id</code> if blank — keeps queries that haven't migrated to the M:N join still pointing at a sensible default.</li>
+  <li>Set <code>inv.status=ACCEPTED</code>, <code>acceptedAt=now</code>, <code>acceptedUserId=newUser.id</code>. Save invite.</li>
 </ol>
 
-<h3>5.5 Detach — <code>POST /api/schools/{schoolId}/instructors/{instructorId}/detach</code></h3>
-<div class="cs">Sets <code>leftAt = now</code> on the join row. Idempotent — already-detached returns the row unchanged. The instructor's profile is NOT deactivated; they remain available for attachment to other schools.</div>
+<h3>15.4 Lookup — <code>GET /api/invitations/lookup/{token}</code> (PUBLIC)</h3>
+<div class="cs">Pre-accept landing page. Returns minimal info (<code>email, fullName, role, deliveryMode, status, schoolName</code>) so the SPA can render "Welcome — you're being invited as INSTRUCTOR at ABC Driving" before the invitee enters a password. Same status guards as accept; expired tokens are lazy-marked.</div>
 
-<h3>5.6 List for school — <code>GET /api/schools/{schoolId}/instructors</code></h3>
-<div class="cs">OWNER of school OR any INSTRUCTOR currently attached. Students/parents do not get the roster. Returns active rows via the <code>EXISTS</code>+legacy fallback JPQL in <code>InstructorRepository.findActiveBySchool</code>.</div>
-
-<hr>
-
-<h2>6. Student module — request flows <span class="tag new">NEW</span></h2>
-
-<h3>6.1 Add student — <code>POST /api/schools/{schoolId}/students</code></h3>
-<div class="cs">The marquee endpoint. Atomic: User row + Student row + (optional) Parent User + Parent link, all in one <code>@Transactional</code>.</div>
-<ol class="flow">
-  <li>Load school; <code>SCHOOL_INACTIVE</code> if not active.</li>
-  <li><code>requireOwnerOrInstructorOfSchool</code> — OWNER of school OR an INSTRUCTOR with <code>instructors.school_id</code> matching. (<em>See TD-13: legacy-only check; multi-school instructors on non-primary school may be denied. V1 acceptable.</em>)</li>
-  <li>Email collision guard → <code>STUDENT_EMAIL_ALREADY_EXISTS</code>.</li>
-  <li>If <code>instructorId</code> supplied: load and verify <code>instructor.schoolId == this schoolId</code> → <code>INSTRUCTOR_WRONG_SCHOOL</code>.</li>
-  <li>Build student User: lowercased email, generated username (mirrors <code>AuthService.generateInitialUsername</code> shape — local-part + 8 hex), <code>BCrypt.encode("test123")</code>, <code>mustChangePassword=true</code>, <code>role=STUDENT</code>, <code>authProvider=LOCAL</code>, <code>schoolId</code> set, <code>active=true</code>.</li>
-  <li>Save user. Build Student with <code>packageTotalLessons</code> (default 0), <code>lessonsRemaining</code> (defaults to <code>total</code> if not supplied; refused if <code>&gt; total</code> with <code>REMAINING_GT_TOTAL</code>), <code>status=ACTIVE</code>.</li>
-  <li>Save student. If <code>parentEmail</code> supplied:
-    <ul>
-      <li><code>findOrCreateParent</code>: lookup by email. Found AND <code>role=PARENT</code> → reuse. Found AND any other role → <code>PARENT_EMAIL_BELONGS_TO_OTHER_ROLE</code>. Not found → create PARENT user with the same dummy-password pattern.</li>
-      <li>Save <code>ParentStudent</code> link with <code>relationship</code> (defaults to <code>"PARENT"</code>).</li>
-    </ul>
-  </li>
-  <li>Response <code>201 CREATED</code> with full <code>StudentResponse</code> (parents inline).</li>
-</ol>
-
-<h3>6.2 Read flows</h3>
+<h3>15.5 Revoke + reissue (OWNER who issued)</h3>
 <table class="table">
   <tr><th>Endpoint</th><th>Behavior</th></tr>
-  <tr><td><code>GET /api/students/me</code></td><td>Caller's own student profile (role=STUDENT). 404 if no profile.</td></tr>
-  <tr><td><code>GET /api/students/{id}</code></td><td>Read scope: OWNER of student's school, INSTRUCTOR assigned to this student, the student themselves, or a linked PARENT. 403 otherwise.</td></tr>
-  <tr><td><code>GET /api/schools/{schoolId}/students</code></td><td>OWNER of school OR INSTRUCTOR at school. INSTRUCTOR sees only their assigned students; OWNER sees the full roster.</td></tr>
+  <tr><td>POST /api/invitations/{id}/revoke</td><td>Idempotent. Status flips to REVOKED. <code>INVITATION_ALREADY_ACCEPTED</code> if status is already ACCEPTED.</td></tr>
+  <tr><td>POST /api/invitations/{id}/reissue</td><td>TOKEN-mode only (<code>WRONG_DELIVERY_MODE</code> otherwise). Generates new raw token + hash. Resets <code>expiresAt</code> to now+7d. Status flipped back to PENDING (handles EXPIRED case naturally).</td></tr>
+  <tr><td>GET /api/schools/{id}/invitations?status=PENDING</td><td>OWNER's outstanding-invites view. Status filter optional.</td></tr>
 </table>
 
-<h3>6.3 Update — <code>PUT /api/students/{id}</code></h3>
-<ol class="flow">
-  <li>Load + <code>requireWriteScope</code> (OWNER of school OR assigned INSTRUCTOR).</li>
-  <li>If <code>instructorId</code> supplied: cross-school check → <code>INSTRUCTOR_WRONG_SCHOOL</code>.</li>
-  <li>Apply nullable patch fields. After applying, re-check <code>lessonsRemaining &lt;= packageTotalLessons</code> → <code>REMAINING_GT_TOTAL</code>.</li>
-  <li>Returns refreshed <code>StudentResponse</code> with parent links populated.</li>
-</ol>
-
-<h3>6.4 Parent linkage — <code>POST /api/students/{id}/parents</code> &amp; <code>DELETE /.../{parentUserId}</code></h3>
-<div class="cs">Same find-or-create-by-email pattern as the add-student parent linkage. Pair-uniqueness enforced both at the DB (<code>uk_parent_student_pair</code>) and pre-checked at the service (<code>PARENT_ALREADY_LINKED</code>). Unlink deletes the join row only — never the parent User itself.</div>
+<h3>15.6 Metadata serialisation</h3>
+<div class="cs">All optional pre-populate fields are written into <code>invitations.metadata</code> JSONB via Jackson (with <code>JavaTimeModule</code>). On accept, the typed extraction is permissive: missing keys → null; type mismatches → null (best-effort, no throw). This keeps the schema flexible for future invite payloads without migrations.</div>
 
 <hr>
 
-<h2>7. Error envelope &amp; full code inventory</h2>
+<h2>16. PR9 — Scheduling engine <span class="tag new">NEW</span></h2>
 
-<h3>7.1 ErrorResponse shape (unchanged)</h3>
-<pre>{ "code": "STABLE_KEY", "message": "human-readable detail", "status": 400, "fieldErrors": [...]?, "timestamp": "..." }</pre>
+<h3>16.1 V10 migration</h3>
+<pre>ALTER TABLE schools     ADD COLUMN timezone VARCHAR(64) NOT NULL DEFAULT 'America/Regina';
+ALTER TABLE lesson_sessions
+    ADD COLUMN created_by_user_id   UUID REFERENCES users(id) ON DELETE SET NULL,
+    ADD COLUMN cancelled_at         TIMESTAMPTZ,
+    ADD COLUMN cancelled_by_user_id UUID REFERENCES users(id) ON DELETE SET NULL;
+CREATE INDEX idx_sessions_instructor_active
+    ON lesson_sessions(instructor_id, scheduled_at) WHERE status IN ('SCHEDULED','COMPLETED');
+CREATE INDEX idx_sessions_student_active
+    ON lesson_sessions(student_id, scheduled_at) WHERE status IN ('SCHEDULED','COMPLETED');</pre>
 
-<h3>7.2 Active error-code inventory (35 codes)</h3>
+<h3>16.2 Status state machine</h3>
+<pre>SCHEDULED ──┬──> COMPLETED   (decrement student.lessons_remaining)
+            ├──> CANCELLED   (no decrement; cancelled_at + cancelled_by populated)
+            └──> NO_SHOW     (decrement, allowed even at zero remaining)
+SCHEDULED ──> SCHEDULED       (reschedule = update in place; conflict + hours re-checked)
+non-SCHEDULED has no transitions (terminal)</pre>
+
+<h3>16.3 Book — <code>POST /api/sessions</code></h3>
+<ol class="flow">
+  <li>Past-datetime guard → <code>PAST_DATETIME</code>.</li>
+  <li>Duration validation (15..360 min) → <code>INVALID_DURATION</code>.</li>
+  <li>Load instructor + student. Active checks (<code>INSTRUCTOR_INACTIVE</code>, <code>STUDENT_NOT_ACTIVE</code>). Cross-school check (<code>INSTRUCTOR_WRONG_SCHOOL</code>).</li>
+  <li>Load school. Active check (<code>SCHOOL_INACTIVE</code>).</li>
+  <li>Booking-scope check by role: OWNER of school OR instructor-as-self OR student-as-self.</li>
+  <li><code>forceOutsideHours=true</code> permitted for OWNER only (<code>FORCE_REQUIRES_OWNER</code>).</li>
+  <li>Working-hours validation (skipped if forced):
+    <ul>
+      <li>Parse instructor's <code>working_hours_json</code>.</li>
+      <li>Convert <code>scheduledAt</code> + <code>endAt</code> to school's local <code>ZoneId</code>.</li>
+      <li>Refuse if windows span midnight (<code>OUTSIDE_WORKING_HOURS</code>).</li>
+      <li>Look up the weekday's TimeRange list. Must find one that contains both <code>fromTime</code> AND <code>toTime</code>. (S3 — end-time must also be within window.)</li>
+    </ul>
+  </li>
+  <li>Conflict detection (<code>requireNoConflicts</code>):
+    <ul>
+      <li>Fetch active sessions for the instructor in window <code>[from − 6h, to)</code> (padding covers the longest possible existing session).</li>
+      <li>For each, half-open overlap test <code>start &lt; to AND end &gt; from</code>. Hit → <code>INSTRUCTOR_BUSY</code>.</li>
+      <li>Same for the student → <code>STUDENT_BUSY</code>.</li>
+      <li>Cancelled / no-show rows excluded by repository query (status filter).</li>
+    </ul>
+  </li>
+  <li>Persist new <code>LessonSession</code> with <code>status=SCHEDULED</code>, <code>createdByUserId=currentUserId</code>.</li>
+</ol>
+
+<h3>16.4 Reschedule — <code>PUT /api/sessions/{id}</code></h3>
+<div class="cs">Update-in-place semantics. Only SCHEDULED → SCHEDULED transitions allowed (<code>SESSION_NOT_RESCHEDULABLE</code> otherwise). Resolves the target tuple from optional fields, falling back to current values. Re-runs conflict check excluding the session being rescheduled (so a session can move within its own time range without colliding with itself).</div>
+
+<h3>16.5 Cancel / Complete / No-show</h3>
+<table class="table">
+  <tr><th>Action</th><th>Endpoint</th><th>Allowed by</th><th>lessons_remaining</th></tr>
+  <tr><td>Cancel</td><td>POST /{id}/cancel</td><td>Any participant (OWNER, assigned INSTRUCTOR, the STUDENT, linked PARENT)</td><td>No change</td></tr>
+  <tr><td>Complete</td><td>POST /{id}/complete</td><td>OWNER OR assigned INSTRUCTOR only</td><td>−1; refused at 0 (<code>NO_LESSONS_REMAINING</code>)</td></tr>
+  <tr><td>No-show</td><td>POST /{id}/no-show</td><td>OWNER OR assigned INSTRUCTOR only</td><td>−1 if &gt; 0; allowed at 0 (avoids stuck-state)</td></tr>
+</table>
+<div class="cs">All three are idempotent or fail-closed on already-terminal status with the appropriate <code>SESSION_NOT_*</code> code. Cancel populates <code>cancelled_at</code> + <code>cancelled_by_user_id</code> for audit.</div>
+
+<h3>16.6 Calendar — <code>GET /api/sessions?from=&amp;to=...</code></h3>
+<table class="table">
+  <tr><th>Caller</th><th>Default scope</th><th>Required filter</th></tr>
+  <tr><td>OWNER</td><td>—</td><td><code>schoolId</code> required (own school checked); optional further filter by instructorId or studentId</td></tr>
+  <tr><td>INSTRUCTOR</td><td>own sessions across all schools</td><td>none</td></tr>
+  <tr><td>STUDENT</td><td>own sessions</td><td>none</td></tr>
+  <tr><td>PARENT</td><td>linked-student sessions</td><td><code>studentId</code> required (linkage checked)</td></tr>
+</table>
+<div class="cs"><code>from</code> + <code>to</code> are ISO-8601 instants. Inverted ranges → <code>INVALID_DATE_RANGE</code>. Results sorted ASC by scheduledAt. No pagination — date range is the natural bound.</div>
+
+<hr>
+
+<h2>17. New error codes (PR8 + PR9)</h2>
 <table class="table">
   <tr><th>Code</th><th>HTTP</th><th>Source</th><th>Trigger</th></tr>
-  <tr><td>EMAIL_ALREADY_EXISTS</td><td>400</td><td>AuthService.signup</td><td>Local signup email collision</td></tr>
-  <tr><td>EMAIL_USED_WITH_DIFFERENT_PROVIDER</td><td>400</td><td>AuthService.upsertOAuthUser</td><td>OAuth login email already a LOCAL account</td></tr>
-  <tr><td>ROLE_REQUIRED</td><td>400</td><td>AuthService.upsertOAuthUser</td><td>First-time OAuth signup with no role</td></tr>
-  <tr><td>INVALID_PHONE_NUMBER</td><td>400</td><td>E164Normalizer + PhoneNumberService.update</td><td>Null/format/length/digit-cap; partial CC/NN update</td></tr>
-  <tr><td>PHONE_LIMIT_EXCEEDED</td><td>400</td><td>PhoneNumberService.create</td><td>≥5 phones for owner</td></tr>
-  <tr><td>PHONE_ALREADY_EXISTS</td><td>400</td><td>PhoneNumberService.create + .update</td><td>Same e164 already on this owner</td></tr>
-  <tr><td>INVALID_OWNER</td><td>400</td><td>PhoneScopeChecker</td><td>Null ownerType or ownerId</td></tr>
-  <tr><td>WHATSAPP_DISABLED</td><td>400</td><td>WaMeService.generateLink</td><td><code>!whatsapp</code> or <code>!whatsappOptIn</code></td></tr>
-  <tr><td>TEMPLATE_INACTIVE</td><td>400</td><td>WaMeService.generateLink</td><td>Template found but <code>active=false</code></td></tr>
-  <tr><td>MISSING_BODY_OR_TEMPLATE</td><td>400</td><td>WaMeService.generateLink</td><td>Neither <code>templateId</code> nor non-blank <code>body</code></td></tr>
-  <tr><td>PLACEHOLDER_MISSING</td><td>400</td><td>WaMeService.renderPlaceholders</td><td>Template references unsupplied <code>{{key}}</code></td></tr>
-  <tr><td><strong>NOT_OWNER</strong> <span class="tag new">NEW</span></td><td>400</td><td>SchoolService.createForCurrentOwner</td><td>Non-OWNER role tried to create a school</td></tr>
-  <tr><td><strong>ALREADY_OWN_SCHOOL</strong> <span class="tag new">NEW</span></td><td>400</td><td>SchoolService.createForCurrentOwner</td><td>Owner already has a school (one-per-owner)</td></tr>
-  <tr><td><strong>USER_ALREADY_IN_SCHOOL</strong> <span class="tag new">NEW</span></td><td>400</td><td>SchoolService.createForCurrentOwner</td><td>Caller already pinned to another school</td></tr>
-  <tr><td><strong>SCHOOL_INACTIVE</strong> <span class="tag new">NEW</span></td><td>400</td><td>SchoolService.update + InstructorService.attachToSchool + StudentService.addByOwner</td><td>Operations refused on a deactivated school</td></tr>
-  <tr><td><strong>NOT_INSTRUCTOR</strong> <span class="tag new">NEW</span></td><td>400</td><td>InstructorService.createForCurrentUser</td><td>Non-INSTRUCTOR tried to self-register</td></tr>
-  <tr><td><strong>INSTRUCTOR_ALREADY_EXISTS</strong> <span class="tag new">NEW</span></td><td>400</td><td>InstructorService.createForCurrentUser</td><td>User already has an instructor profile</td></tr>
-  <tr><td><strong>INSTRUCTOR_INACTIVE</strong> <span class="tag new">NEW</span></td><td>400</td><td>InstructorService.update + .attachToSchool</td><td>Operations refused on a deactivated instructor</td></tr>
-  <tr><td><strong>ALREADY_ATTACHED</strong> <span class="tag new">NEW</span></td><td>400</td><td>InstructorService.attachToSchool</td><td>Active link already exists between this instructor and school</td></tr>
-  <tr><td><strong>STUDENT_EMAIL_ALREADY_EXISTS</strong> <span class="tag new">NEW</span></td><td>400</td><td>StudentService.addByOwner</td><td>Email collision when creating new student User</td></tr>
-  <tr><td><strong>INSTRUCTOR_WRONG_SCHOOL</strong> <span class="tag new">NEW</span></td><td>400</td><td>StudentService.addByOwner + .update</td><td>Assigned instructor's school ≠ student's school</td></tr>
-  <tr><td><strong>REMAINING_GT_TOTAL</strong> <span class="tag new">NEW</span></td><td>400</td><td>StudentService.addByOwner + .update</td><td><code>lessonsRemaining</code> &gt; <code>packageTotalLessons</code></td></tr>
-  <tr><td><strong>PARENT_EMAIL_BELONGS_TO_OTHER_ROLE</strong> <span class="tag new">NEW</span></td><td>400</td><td>StudentService.findOrCreateParent</td><td>Parent email already exists with non-PARENT role</td></tr>
-  <tr><td><strong>PARENT_ALREADY_LINKED</strong> <span class="tag new">NEW</span></td><td>400</td><td>StudentService.linkParent</td><td>Parent already linked to this student</td></tr>
-  <tr><td>INVALID_CREDENTIALS</td><td>401</td><td>AuthService.login</td><td>Email missing or password mismatch</td></tr>
-  <tr><td>USE_OAUTH_LOGIN</td><td>401</td><td>AuthService.login</td><td>Account is OAuth-managed; password login refused</td></tr>
-  <tr><td>ACCOUNT_DISABLED</td><td>401</td><td>AuthService.login + .refresh + OAuth</td><td><code>active=false</code></td></tr>
-  <tr><td>USER_NOT_FOUND</td><td>401</td><td>AuthService.refresh</td><td>Refresh token's user no longer exists</td></tr>
-  <tr><td>INVALID_REFRESH_TOKEN</td><td>401</td><td>RefreshTokenService.consumeAndRotate</td><td>Hash not found</td></tr>
-  <tr><td>REFRESH_TOKEN_REVOKED</td><td>401</td><td>RefreshTokenService.consumeAndRotate</td><td>Token reuse — also nukes all this user's other tokens</td></tr>
-  <tr><td>INVALID_TOKEN</td><td>401</td><td>JwtService.parseAndValidate</td><td>Signature/expiry/issuer fail</td></tr>
-  <tr><td>INVALID_GOOGLE_TOKEN</td><td>401</td><td>GoogleOAuthService.verify</td><td>Google verifier returned null or threw</td></tr>
-  <tr><td>NOT_AUTHENTICATED / MISSING_ROLE / INVALID_PRINCIPAL</td><td>401</td><td>SecurityUtil</td><td>SecurityContext missing / malformed</td></tr>
-  <tr><td>FORBIDDEN</td><td>403</td><td>GlobalExceptionHandler</td><td>Mapped from any <code>AccessDeniedException</code> (PhoneScopeChecker, School/Instructor/Student services)</td></tr>
-  <tr><td>NOT_FOUND</td><td>404</td><td>GlobalExceptionHandler</td><td>Mapped from <code>ResourceNotFoundException</code></td></tr>
-  <tr><td>VALIDATION_ERROR</td><td>400</td><td>GlobalExceptionHandler</td><td>Bean Validation; populates <code>fieldErrors</code></td></tr>
-  <tr><td>CONFLICT</td><td>409</td><td>GlobalExceptionHandler</td><td>Mapped from <code>DataIntegrityViolationException</code> (e.g. partial unique index race)</td></tr>
-  <tr><td>INTERNAL_ERROR</td><td>500</td><td>GlobalExceptionHandler</td><td>Catch-all; stack trace logged ERROR side only</td></tr>
+  <tr><td>ALREADY_VERIFIED</td><td>400</td><td>EmailVerificationService</td><td>Issue or confirm called for already-verified user</td></tr>
+  <tr><td>INVALID_VERIFY_TOKEN</td><td>400</td><td>EmailVerificationService.confirm</td><td>Hash not found / blank token</td></tr>
+  <tr><td>VERIFY_TOKEN_EXPIRED_OR_USED</td><td>400</td><td>EmailVerificationService.confirm</td><td>Token age-out or already consumed</td></tr>
+  <tr><td>EMAIL_ALREADY_HAS_ACCOUNT</td><td>400</td><td>InvitationService.create + .accept</td><td>Email collision (refuse silent relink)</td></tr>
+  <tr><td>INVITATION_ALREADY_PENDING</td><td>400</td><td>InvitationService.create</td><td>Pending invite for this email exists</td></tr>
+  <tr><td>INVALID_DELIVERY_MODE</td><td>400</td><td>InvitationService</td><td>deliveryMode neither TOKEN nor DUMMY_PWD</td></tr>
+  <tr><td>WRONG_DELIVERY_MODE</td><td>400</td><td>InvitationService.accept + .reissue</td><td>Operation requires the other mode</td></tr>
+  <tr><td>INVALID_INVITATION_TOKEN</td><td>400</td><td>InvitationService</td><td>Hash not found / blank</td></tr>
+  <tr><td>INVITATION_EXPIRED</td><td>400</td><td>InvitationService</td><td>expiresAt &lt;= now (lazy-marks status=EXPIRED)</td></tr>
+  <tr><td>INVITATION_REVOKED</td><td>400</td><td>InvitationService</td><td>Status REVOKED at lookup/accept</td></tr>
+  <tr><td>INVITATION_ALREADY_ACCEPTED</td><td>400</td><td>InvitationService.accept + .revoke + .reissue</td><td>Status ACCEPTED</td></tr>
+  <tr><td>STUDENT_WRONG_SCHOOL</td><td>400</td><td>InvitationService.createParent</td><td>Student in studentIds belongs to different school</td></tr>
+  <tr><td>INVALID_TIMEZONE</td><td>400</td><td>SchoolService.update</td><td>Empty / unknown IANA timezone id</td></tr>
+  <tr><td>PAST_DATETIME</td><td>400</td><td>SessionService.book + .reschedule</td><td>scheduledAt in the past</td></tr>
+  <tr><td>INVALID_DURATION</td><td>400</td><td>SessionService</td><td>durationMins outside [15, 360]</td></tr>
+  <tr><td>STUDENT_NOT_ACTIVE</td><td>400</td><td>SessionService.book</td><td>Student status != ACTIVE</td></tr>
+  <tr><td>INSTRUCTOR_NO_HOURS_SET</td><td>400</td><td>SessionService working-hours check</td><td>Empty working_hours_json + force=false</td></tr>
+  <tr><td>OUTSIDE_WORKING_HOURS</td><td>400</td><td>SessionService working-hours check</td><td>Window doesn't fit any TimeRange</td></tr>
+  <tr><td>FORCE_REQUIRES_OWNER</td><td>400</td><td>SessionService.book + .reschedule</td><td>forceOutsideHours=true but role != OWNER</td></tr>
+  <tr><td>INSTRUCTOR_BUSY</td><td>400</td><td>SessionService conflict check</td><td>Existing active session overlaps</td></tr>
+  <tr><td>STUDENT_BUSY</td><td>400</td><td>SessionService conflict check</td><td>Existing active session overlaps</td></tr>
+  <tr><td>SESSION_NOT_RESCHEDULABLE</td><td>400</td><td>SessionService.reschedule</td><td>Status != SCHEDULED</td></tr>
+  <tr><td>SESSION_NOT_CANCELLABLE</td><td>400</td><td>SessionService.cancel</td><td>Status not in {SCHEDULED, CANCELLED}</td></tr>
+  <tr><td>SESSION_NOT_COMPLETABLE</td><td>400</td><td>SessionService.complete</td><td>Status != SCHEDULED</td></tr>
+  <tr><td>SESSION_NOT_NOSHOWABLE</td><td>400</td><td>SessionService.markNoShow</td><td>Status != SCHEDULED</td></tr>
+  <tr><td>NO_LESSONS_REMAINING</td><td>400</td><td>SessionService.complete</td><td>student.lessonsRemaining == 0</td></tr>
+  <tr><td>INVALID_DATE_RANGE</td><td>400</td><td>SessionService.calendar</td><td>from null or to null or !from.before(to)</td></tr>
+  <tr><td>SCHOOL_ID_REQUIRED</td><td>400</td><td>SessionService.calendar</td><td>OWNER without schoolId</td></tr>
+  <tr><td>STUDENT_ID_REQUIRED</td><td>400</td><td>SessionService.calendar</td><td>PARENT without studentId</td></tr>
 </table>
 
 <hr>
 
-<h2>8. Database schema — V1..V9 reality</h2>
-<table class="table">
-  <tr><th>Table</th><th>Status</th><th>JPA entity</th><th>Notes</th></tr>
-  <tr><td>users</td><td><span class="pill g">live</span></td><td>User.java</td><td>email unique, username case-insensitive unique</td></tr>
-  <tr><td>refresh_tokens</td><td><span class="pill g">live</span></td><td>RefreshToken.java</td><td>SHA-256 hash, UA + IP, rotation</td></tr>
-  <tr><td>email_verification_tokens</td><td><span class="pill g">live</span></td><td>EmailVerificationToken.java</td><td>Schema only — endpoints in PR8</td></tr>
-  <tr><td><strong>schools</strong></td><td><span class="pill g">live</span></td><td><strong>School.java NEW</strong></td><td>V8 + V9 (is_active). One-school-per-owner enforced at service layer.</td></tr>
-  <tr><td><strong>instructors</strong></td><td><span class="pill g">live</span></td><td><strong>Instructor.java NEW</strong></td><td>V8 (vehicle_plate, bio) + V9 (hourly_rate). school_id nullable since V8.</td></tr>
-  <tr><td>instructor_schools</td><td><span class="pill g">live</span></td><td>InstructorSchool.java</td><td>M:N join, composite PK, soft-delete via leftAt</td></tr>
-  <tr><td><strong>students</strong></td><td><span class="pill g">live</span></td><td><strong>Student.java NEW</strong></td><td>status enum: ACTIVE | PASSED | DROPPED</td></tr>
-  <tr><td><strong>parent_student</strong></td><td><span class="pill g">live</span></td><td><strong>ParentStudent.java NEW</strong></td><td>UNIQUE on (parent_user_id, student_id)</td></tr>
-  <tr><td>phone_numbers</td><td><span class="pill g">live</span></td><td>PhoneNumber.java</td><td>4 nullable owner FKs + <code>phone_owner_exactly_one</code> CHECK</td></tr>
-  <tr><td>invitations</td><td><span class="pill g">live</span></td><td>Invitation.java</td><td>Schema only — endpoints in PR8</td></tr>
-  <tr><td>whatsapp_templates / whatsapp_message_log</td><td><span class="pill g">live</span></td><td>WhatsappTemplate / WhatsappMessageLog</td><td>Audit trail per generated wa.me link</td></tr>
-  <tr><td>sessions / payments / subscriptions / mistake_categories / session_mistakes / road_test_results / reminders</td><td><span class="pill r">schema only</span></td><td>—</td><td>Land in PR8/9/10/11</td></tr>
-</table>
-
-<h3>V9 migration (this PR)</h3>
-<pre>ALTER TABLE schools     ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE;
-CREATE INDEX idx_schools_is_active ON schools(is_active);
-ALTER TABLE instructors ADD COLUMN hourly_rate NUMERIC(10, 2);</pre>
-
-<hr>
-
-<h2>9. Authorization matrix — full system view</h2>
-<table class="table">
-  <tr><th>Resource</th><th>OWNER</th><th>INSTRUCTOR</th><th>STUDENT</th><th>PARENT</th></tr>
-  <tr><td>School (create)</td><td>self only (1 per owner)</td><td>—</td><td>—</td><td>—</td></tr>
-  <tr><td>School (read /me)</td><td>own school</td><td>own school</td><td>own school</td><td>own school</td></tr>
-  <tr><td>School (read full)</td><td>own school only</td><td>—</td><td>—</td><td>—</td></tr>
-  <tr><td>School (update / lifecycle)</td><td>own school only</td><td>—</td><td>—</td><td>—</td></tr>
-  <tr><td>Instructor (create profile)</td><td>—</td><td>self only (1 per user)</td><td>—</td><td>—</td></tr>
-  <tr><td>Instructor (read)</td><td>any attached to own school</td><td>self + same-school peers</td><td>—</td><td>—</td></tr>
-  <tr><td>Instructor (update)</td><td>any attached to own school</td><td>self only</td><td>—</td><td>—</td></tr>
-  <tr><td>Instructor attach / detach</td><td>own school only</td><td>—</td><td>—</td><td>—</td></tr>
-  <tr><td>Student (add)</td><td>own school</td><td>own school</td><td>—</td><td>—</td></tr>
-  <tr><td>Student (read)</td><td>any in own school</td><td>only their assigned</td><td>self only</td><td>linked-student only</td></tr>
-  <tr><td>Student (update)</td><td>any in own school</td><td>only their assigned</td><td>—</td><td>—</td></tr>
-  <tr><td>Parent (link / unlink)</td><td>any in own school</td><td>only their assigned student</td><td>—</td><td>—</td></tr>
-  <tr><td>Phone (4-row matrix)</td><td colspan="4">See §3 — unchanged from PR4</td></tr>
-</table>
-
-<hr>
-
-<h2>10. Code-review findings — by severity (post-PR7)</h2>
+<h2>18. New ADRs</h2>
 <div class="grid g2">
-  <div class="card te"><div class="ct">P0 RESOLVED · BadRequestException prefix duplication</div><div class="cs">Reverted in this PR. <code>super(message)</code> + tests use <code>getCode()</code>. 400 / 401 envelopes consistent.</div><span class="tag ok">Fixed</span></div>
+  <div class="card pu"><div class="ct">ADR-17 · Token-in-response for V1</div><div class="cs">Until SMTP infra is wired, both email-verify and invitation accept tokens are returned in the API response (raw token + dev URL) and logged. When email lands, those response fields are stripped — public contract stays the same. Trade-off: dev convenience wins over "tokens never on the wire" purity.</div><span class="tag note">ADR</span></div>
 
-  <div class="card am"><div class="ct">P1 · WaMe URL has no body-length cap (carry-over)</div><div class="cs">Validate <code>renderedBody.length() &lt; 2000</code> before <code>buildWaMeUrl</code>; throw <code>BODY_TOO_LONG</code>. Pre-launch.</div><span class="tag p1">Open · pre-launch</span></div>
+  <div class="card pu"><div class="ct">ADR-18 · DUMMY_PWD invitations auto-accept at create</div><div class="cs">When deliveryMode=DUMMY_PWD, the User + role-specific row + linkages are created INLINE at invite-create time and the invitation row is marked ACCEPTED immediately. Rejected: keep status=PENDING until first login. Reasoning: the User exists; "pending" would be a lie. <code>mustChangePassword=true</code> on the User is the canonical "you still have something to do" flag.</div><span class="tag note">ADR</span></div>
 
-  <div class="card am"><div class="ct">P1 · WaMeService.confirmClick doesn't re-check user.active (carry-over)</div><div class="cs">Disabled accounts can still verify phones. Load sender, reject if <code>!active</code>.</div><span class="tag p1">Open</span></div>
+  <div class="card pu"><div class="ct">ADR-19 · Lazy-expire on read</div><div class="cs">Invitations don't have a scheduled job to flip PENDING → EXPIRED. Instead, the first read after expiry detects it and updates the row in the same Tx. Trade-off: an "expired but unread" invite stays PENDING in the DB until someone touches it. Acceptable because OWNER's listing endpoint reads everything they care about and would trigger the flip.</div><span class="tag note">ADR</span></div>
 
-  <div class="card am"><div class="ct">P1 · whatsapp_message_log cascade-deletes (carry-over)</div><div class="cs">Soft-delete phones; change FK to <code>SET NULL</code> or <code>RESTRICT</code>.</div><span class="tag p1">Open · audit</span></div>
+  <div class="card pu"><div class="ct">ADR-20 · Conflict detection in Java, not SQL</div><div class="cs">JPQL has no portable interval-add for Instant + minutes, and a custom Hibernate function would tie us to PostgreSQL. Service narrows the candidate set with a simple <code>scheduledAt</code> range query (covered by partial indexes) then runs the half-open overlap test in Java. Trade-off: can't push the entire check into a single round-trip.</div><span class="tag note">ADR</span></div>
 
-  <div class="card am"><div class="ct">P1 · whatsapp_message_log PII at rest (carry-over)</div><div class="cs">Retention policy or column encryption before first paying tenant.</div><span class="tag p1">Open · PIPEDA</span></div>
+  <div class="card pu"><div class="ct">ADR-21 · Working hours stored as LocalTime, school timezone interprets them</div><div class="cs">Instructor's <code>working_hours_json</code> is wall-clock (LocalTime) with no offset. Booking validates by converting <code>scheduledAt</code> to the school's <code>ZoneId</code> and comparing. New <code>schools.timezone</code> column (V10) defaults to <code>America/Regina</code>; OWNER can change. Rejected: storing windows as ZonedDateTime — DST transitions would shift the window twice a year, which isn't what an instructor means by "I work 9–5".</div><span class="tag note">ADR</span></div>
 
-  <div class="card am"><div class="ct">P1 · No login rate-limit (carry-over)</div><div class="cs">bucket4j or gateway. BCrypt cost is the only protection currently.</div><span class="tag p1">Open · pre-launch</span></div>
-
-  <div class="card am"><div class="ct">P1 · Refresh-token cleanup job missing (carry-over)</div><div class="cs">Schedule a daily call to <code>RefreshTokenRepository.deleteExpiredBefore</code>.</div><span class="tag p1">Open · 1h ticket</span></div>
-
-  <div class="card am"><div class="ct">P2 · Hand-rolled E.164 (carry-over)</div><div class="cs">Swap to libphonenumber when first non-NA market lands.</div><span class="tag p2">Tracked</span></div>
-
-  <div class="card am"><div class="ct">P2 · 5-cap is a Java constant (carry-over)</div><div class="cs">Wire to Subscription module in PR11.</div><span class="tag p2">Tracked</span></div>
-
-  <div class="card am"><div class="ct">P2 · USE_OAUTH_LOGIN enumeration (carry-over)</div><div class="cs">Decide: collapse to INVALID_CREDENTIALS or risk-accept.</div><span class="tag p2">Decision pending</span></div>
-
-  <div class="card am"><div class="ct">P2 NEW · StudentService instructor-scope uses legacy column only</div><div class="cs"><code>StudentService.requireOwnerOrInstructorOfSchool</code> for INSTRUCTOR checks <code>instructors.school_id</code> only, not <code>instructor_schools</code>. Multi-school instructors managing students at non-primary school will be denied. Mitigated by <code>InstructorService.attachToSchool</code> back-filling the legacy column on first attach. Genuine V1 happy-path works; multi-school is Phase 2.</div><span class="tag p2">Tracked TD-13</span></div>
-
-  <div class="card am"><div class="ct">P2 NEW · Username generator duplicated</div><div class="cs"><code>StudentService.generateUsername</code> mirrors <code>AuthService.generateInitialUsername</code>. Extract to <code>com.sroadtutor.auth.security.UsernameGenerator</code> when a third caller appears.</div><span class="tag p2">Tracked TD-14</span></div>
-
-  <div class="card am"><div class="ct">P2 NEW · Dummy password "test123" hardcoded</div><div class="cs"><code>StudentService.DUMMY_PASSWORD</code> constant. Acceptable for V1 (blueprint says so), but should be a per-tenant config when SaaS-multi-tenancy matures, or a randomised reset link in PR8's invite flow.</div><span class="tag p2">Tracked TD-15</span></div>
-
-  <div class="card bl"><div class="ct">OK · One-school-per-owner enforced cleanly</div><div class="cs">Two stacked guards (<code>existsByOwnerId</code> + <code>users.schoolId != null</code>) close the obvious loopholes. DB doesn't carry a unique index on <code>schools.owner_id</code> by design — easier to relax later than tighten.</div><span class="tag ok">Verified</span></div>
-
-  <div class="card bl"><div class="ct">OK · Atomic add-student transaction</div><div class="cs"><code>StudentService.addByOwner</code> creates User + Student + (optional) Parent + Link in one <code>@Transactional</code>. Any failure rolls back all four inserts.</div><span class="tag ok">Verified</span></div>
-
-  <div class="card bl"><div class="ct">OK · Parent finder dual-purpose</div><div class="cs"><code>findOrCreateParent</code> returns existing PARENT user OR creates one. Refuses to silently relink an email belonging to a non-PARENT role — explicit error code so the SPA can guide the user.</div><span class="tag ok">Verified</span></div>
-
-  <div class="card bl"><div class="ct">OK · Instructor M:N rehydration</div><div class="cs">Re-attaching a previously-detached instructor reuses the same <code>(instructor_id, school_id)</code> row by clearing <code>leftAt</code> and refreshing <code>joinedAt</code>. Audit history preserved.</div><span class="tag ok">Verified</span></div>
-
-  <div class="card bl"><div class="ct">OK · Soft-delete-everywhere policy</div><div class="cs">Schools (<code>is_active</code>), instructors (<code>is_active</code>), students (<code>status</code>), instructor_schools (<code>left_at</code>). No hard-delete endpoint exposed for any tenant entity.</div><span class="tag ok">Verified</span></div>
+  <div class="card pu"><div class="ct">ADR-22 · No-show decrements lessons_remaining</div><div class="cs">No-show counts as a consumed lesson — instructor showed up. Allowed even at 0 remaining (avoids a deadlock where the instructor can't record the no-show because the package ran dry). Cancel does NOT decrement; the lesson is freed.</div><span class="tag note">ADR</span></div>
 </div>
 
 <hr>
 
-<h2>11. Tech-debt register (full)</h2>
+<h2>19. New tech-debt items</h2>
 <table class="table">
   <tr><th>ID</th><th>Item</th><th>Address when</th></tr>
-  <tr><td>TD-01</td><td>libphonenumber migration</td><td>First non-NA market</td></tr>
-  <tr><td>TD-02</td><td>Cross-device wa.me verification (Cloud API)</td><td>Free-tier complaints</td></tr>
-  <tr><td>TD-03</td><td>Per-tenant phone cap (Subscription-aware)</td><td>PR11</td></tr>
-  <tr><td>TD-04</td><td>WhatsappTemplate version history</td><td>Owners get template-edit UI</td></tr>
-  <tr><td>TD-05</td><td>Soft-delete on phone_numbers + audit retention</td><td>Pre-launch (P1)</td></tr>
-  <tr><td>TD-06</td><td>Refresh-token cleanup scheduled job</td><td>Now (1h ticket)</td></tr>
-  <tr><td>TD-07</td><td>Login rate-limit</td><td>Pre-launch</td></tr>
-  <tr><td>TD-08</td><td>WaMe body-length cap</td><td>Pre-launch (P1)</td></tr>
-  <tr><td>TD-09</td><td>WhatsappMessageLog PII at rest</td><td>Before first paying tenant</td></tr>
-  <tr><td>TD-10</td><td>Already addressed — JPA entities for Schools / Instructors / Students / ParentStudent landed this PR</td><td><span class="pill g">DONE</span></td></tr>
-  <tr><td>TD-11</td><td>Username chooser endpoint (D7)</td><td>SPA-side milestone</td></tr>
-  <tr><td>TD-12</td><td>Email verification flow endpoints</td><td>PR8</td></tr>
-  <tr><td><strong>TD-13</strong> <span class="tag new">NEW</span></td><td>StudentService instructor-scope uses legacy <code>instructors.school_id</code> only; doesn't check <code>instructor_schools</code> M:N</td><td>When multi-school instructors are real (Phase 2)</td></tr>
-  <tr><td><strong>TD-14</strong> <span class="tag new">NEW</span></td><td>Username generator duplicated between AuthService + StudentService</td><td>When a third caller appears, extract to <code>UsernameGenerator</code></td></tr>
-  <tr><td><strong>TD-15</strong> <span class="tag new">NEW</span></td><td>Dummy password "test123" hardcoded in <code>StudentService.DUMMY_PASSWORD</code></td><td>PR8 invite flow replaces with randomised reset link</td></tr>
-  <tr><td><strong>TD-16</strong> <span class="tag new">NEW</span></td><td>Owner-invite flow not yet built — current Student / Instructor onboarding leans on dummy passwords</td><td>PR8 (see InvitationService design)</td></tr>
+  <tr><td>TD-17</td><td>Email infra (SMTP) — verify + invite tokens currently returned in API response and logged. Strip from response when SMTP wires up.</td><td>Pre-launch</td></tr>
+  <tr><td>TD-18</td><td>Scheduled job to mark stale-PENDING invites EXPIRED in bulk (lazy-expire is fine for V1 traffic but DB will hold zombie rows under load).</td><td>When invitation table grows &gt; ~10k pending</td></tr>
+  <tr><td>TD-19</td><td>Working-hours window cannot span midnight (e.g., 22:00 → 02:00). Multi-day overlay logic needs work if night-school instructors appear.</td><td>When a real night-school instructor onboards</td></tr>
+  <tr><td>TD-20</td><td>Conflict detection runs at MAX 6h padding window — adequate for 360-min max session duration. If max grows, padding must grow.</td><td>If <code>MAX_DURATION_MINS</code> changes</td></tr>
+  <tr><td>TD-21</td><td>Reminder generation not yet wired to session lifecycle. Booking a session does NOT auto-fire any reminders.</td><td>PR10 reminders module</td></tr>
+  <tr><td>TD-22</td><td>Email verification token + invitation token use independent random / hash code paths. Extract a shared <code>SecureTokenIssuer</code> utility.</td><td>When a third token type appears</td></tr>
 </table>
 
 <hr>
 
-<h2>12. Architecture decisions added this PR</h2>
-<div class="grid g2">
-  <div class="card pu"><div class="ct">ADR-11 · One school per owner (V1)</div><div class="cs">Enforced at service layer with two guards (<code>existsByOwnerId</code> + <code>users.schoolId != null</code>). DB has no unique index — easier to relax in V2 if owners legitimately run multiple schools. Rejected: DB-level enforcement (premature).</div><span class="tag note">ADR</span></div>
-
-  <div class="card pu"><div class="ct">ADR-12 · Soft-delete everywhere</div><div class="cs">Schools / instructors / students / instructor_schools all carry status flags or boolean. No hard-delete endpoints. Audit + downstream FKs (sessions, payments, reminders) stay intact even when an entity is "removed".</div><span class="tag note">ADR</span></div>
-
-  <div class="card pu"><div class="ct">ADR-13 · Atomic add-student creates 1..3 rows</div><div class="cs"><code>StudentService.addByOwner</code> creates User + Student + (optional) Parent User + Parent link in one transaction. Single endpoint, single rollback boundary. Rejected: separate "create student" → "link parent" two-step flow (introduces orphan-row window).</div><span class="tag note">ADR</span></div>
-
-  <div class="card pu"><div class="ct">ADR-14 · Find-or-create-parent by email</div><div class="cs">Parent linkage looks up by email; existing PARENT → reuse, missing → create with dummy password, existing non-PARENT → refuse. Rejected: silent role mutation (bad UX), separate "first sign up parent" step (worse UX for owner).</div><span class="tag note">ADR</span></div>
-
-  <div class="card pu"><div class="ct">ADR-15 · WorkingHours typed wrapper around JSONB</div><div class="cs">DB stays JSONB so we never schema-migrate when the model evolves. Java-side <code>WorkingHours</code> record provides typed access via Jackson <code>JavaTimeModule</code>. Rejected: separate <code>working_hours</code> + <code>time_ranges</code> tables (overkill for V1).</div><span class="tag note">ADR</span></div>
-
-  <div class="card pu"><div class="ct">ADR-16 · Instructor M:N rehydration on re-attach</div><div class="cs">Re-attaching a previously-detached instructor clears <code>leftAt</code> on the existing row rather than inserting a new one. Audit history is preserved through the (instructor_id, school_id) primary key. Rejected: insert-new-row-each-time (loses tenure summation, breaks PK).</div><span class="tag note">ADR</span></div>
-</div>
-
-<hr>
-
-<h2>13. Build &amp; test pipeline</h2>
-<table class="table">
-  <tr><th>Phase</th><th>Plugin</th><th>What runs</th></tr>
-  <tr><td>compile</td><td>maven-compiler 3.13.0</td><td>~84 source files → target/classes (Java 21)</td></tr>
-  <tr><td>test</td><td>surefire 3.2.5 + jacoco prepare-agent</td><td>~166 unit tests across 14 test classes (target after this PR)</td></tr>
-  <tr><td>package</td><td>spring-boot 3.3.4 repackage</td><td>Fat jar at <code>target/sroadtutor-backend.jar</code></td></tr>
-  <tr><td>integration-test</td><td>failsafe 3.2.5 + jacoco prepare-agent-integration</td><td>No IT classes registered (PhoneNumberControllerIntegrationTest still pending naming convention)</td></tr>
-  <tr><td>verify</td><td>jacoco report + check</td><td>Coverage gate</td></tr>
-</table>
-
-<div class="note warn">I cannot run <code>mvn -B verify</code> in this sandbox (no JDK 21, no <code>mvn</code>, can't escalate to install). All edits have been self-audited file-by-file. Please run the build on your Windows machine and paste any failures — I'll address them immediately.</div>
-
-<hr>
-
-<h2>14. Open questions</h2>
-<ol>
-  <li>Confirm green build on Windows. Paste failures if any.</li>
-  <li>PR8 scope — owner-invite flow + email verification together, or split? My recommendation: together, since both share the same email-infra dependency.</li>
-  <li>Email infra choice (Postmark / SES / Resend / Sendgrid)? Affects how much of PR8 is "talk to a 3rd-party API" vs. "save-token-and-return-it-to-client-for-now".</li>
-  <li>USE_OAUTH_LOGIN enumeration risk — accept or collapse to INVALID_CREDENTIALS?</li>
-  <li>Multi-school instructor support (TD-13) — Phase 2, or do you want it in V1?</li>
-</ol>
+<h2>20. Build pipeline post PR8 + PR9</h2>
+<div class="cs">~120 source files. 17 test classes. 10 Flyway migrations. Run <code>mvn -B verify</code> to compile + run unit tests + check JaCoCo coverage. I cannot execute Maven in my sandbox; you run on Windows.</div>
 
 </div>

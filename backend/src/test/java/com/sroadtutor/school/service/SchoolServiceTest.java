@@ -256,7 +256,7 @@ class SchoolServiceTest {
         when(schoolRepo.findById(schoolId)).thenReturn(Optional.of(school));
         when(schoolRepo.save(any(School.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        var req = new SchoolUpdateRequest("New Name", null, "AB",
+        var req = new SchoolUpdateRequest("New Name", null, "AB", null,
                 "GST-1", null, null, null);
 
         School updated = service.update(Role.OWNER, ownerId, schoolId, req);
@@ -275,7 +275,7 @@ class SchoolServiceTest {
         when(schoolRepo.findById(schoolId)).thenReturn(Optional.of(school));
         when(schoolRepo.save(any(School.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        var req = new SchoolUpdateRequest(null, null, null,
+        var req = new SchoolUpdateRequest(null, null, null, null,
                 "   ", null, null, null);
 
         School updated = service.update(Role.OWNER, ownerId, schoolId, req);
@@ -290,7 +290,7 @@ class SchoolServiceTest {
                 .name("X").active(false).build();
         when(schoolRepo.findById(schoolId)).thenReturn(Optional.of(school));
 
-        var req = new SchoolUpdateRequest("New", null, null, null, null, null, null);
+        var req = new SchoolUpdateRequest("New", null, null, null, null, null, null, null);
 
         assertThatThrownBy(() -> service.update(Role.OWNER, ownerId, schoolId, req))
                 .isInstanceOf(BadRequestException.class)
@@ -305,10 +305,43 @@ class SchoolServiceTest {
                 .name("X").active(true).build();
         when(schoolRepo.findById(schoolId)).thenReturn(Optional.of(school));
 
-        var req = new SchoolUpdateRequest("New", null, null, null, null, null, null);
+        var req = new SchoolUpdateRequest("New", null, null, null, null, null, null, null);
 
         assertThatThrownBy(() -> service.update(Role.OWNER, UUID.randomUUID(), schoolId, req))
                 .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void update_validatesTimezone() {
+        UUID ownerId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
+        School school = School.builder().id(schoolId).ownerId(ownerId)
+                .name("X").active(true).timezone("America/Regina").build();
+        when(schoolRepo.findById(schoolId)).thenReturn(Optional.of(school));
+
+        var req = new SchoolUpdateRequest(null, null, null, "Not/A/Real/Zone",
+                null, null, null, null);
+
+        assertThatThrownBy(() -> service.update(Role.OWNER, ownerId, schoolId, req))
+                .isInstanceOf(BadRequestException.class)
+                .satisfies(ex -> assertThat(((BadRequestException) ex).getCode())
+                        .isEqualTo("INVALID_TIMEZONE"));
+    }
+
+    @Test
+    void update_acceptsValidTimezone() {
+        UUID ownerId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
+        School school = School.builder().id(schoolId).ownerId(ownerId)
+                .name("X").active(true).timezone("America/Regina").build();
+        when(schoolRepo.findById(schoolId)).thenReturn(Optional.of(school));
+        when(schoolRepo.save(any(School.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        var req = new SchoolUpdateRequest(null, null, null, "America/Toronto",
+                null, null, null, null);
+
+        School after = service.update(Role.OWNER, ownerId, schoolId, req);
+        assertThat(after.getTimezone()).isEqualTo("America/Toronto");
     }
 
     // ---------------- deactivate / reactivate ----------------

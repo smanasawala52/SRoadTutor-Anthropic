@@ -26,6 +26,10 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_PATHS = {
             "/auth/**",
+            // PR8 — invitation accept must be reachable by an unauthenticated
+            // invitee clicking the email link before they have credentials.
+            "/api/invitations/*/accept",
+            "/api/invitations/lookup/**",
             "/actuator/health",
             "/actuator/health/**",
             "/actuator/info",

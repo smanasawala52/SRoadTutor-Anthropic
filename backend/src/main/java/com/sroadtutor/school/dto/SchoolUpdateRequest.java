@@ -20,6 +20,12 @@ public record SchoolUpdateRequest(
                 message = "province must be a 2-letter uppercase code")
         @Size(max = 8) String province,
 
+        /**
+         * IANA timezone, e.g. "America/Regina". Used by the scheduling engine
+         * to interpret instructor working_hours_json windows.
+         */
+        @Size(max = 64) String timezone,
+
         @Size(max = 40) String gstNumber,
         @Size(max = 40) String pstNumber,
         @Size(max = 40) String hstNumber,

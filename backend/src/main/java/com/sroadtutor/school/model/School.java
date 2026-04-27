@@ -96,6 +96,17 @@ public class School {
     private String businessRegistrationNumber;
 
     /**
+     * IANA timezone (e.g. {@code America/Regina}) — used by the scheduling
+     * engine to interpret instructor {@code working_hours_json} windows
+     * (which are {@link java.time.LocalTime}, no offset). Defaults to
+     * {@code America/Regina} per V10 migration; owners can change via
+     * the school update endpoint.
+     */
+    @Column(name = "timezone", nullable = false, length = 64)
+    @Builder.Default
+    private String timezone = "America/Regina";
+
+    /**
      * Free-form metadata bag — used for SPA-side feature flags, brand colours,
      * etc. Stored as JSONB; modeled as raw JSON string on the Java side because
      * V1 doesn't read structured fields out of it.
