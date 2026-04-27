@@ -27,6 +27,7 @@
         <jacoco.version>0.8.12</jacoco.version>
         <sonar.version>4.0.0.4121</sonar.version>
         <springdoc.version>2.6.0</springdoc.version>
+        <pdfbox.version>3.0.3</pdfbox.version>
         <!-- Annotation processor versions (not managed by Spring Boot parent) -->
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.2</mapstruct.version>
@@ -133,6 +134,15 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- ===================================================================== -->
+        <!-- PDFBox — PDF report-card generation (PR14)                              -->
+        <!-- ===================================================================== -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>${pdfbox.version}</version>
         </dependency>
 
         <!-- ===================================================================== -->
