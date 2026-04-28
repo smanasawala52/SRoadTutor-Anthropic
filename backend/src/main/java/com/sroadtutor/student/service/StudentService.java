@@ -8,6 +8,7 @@ import com.sroadtutor.exception.BadRequestException;
 import com.sroadtutor.exception.ResourceNotFoundException;
 import com.sroadtutor.instructor.model.Instructor;
 import com.sroadtutor.instructor.repository.InstructorRepository;
+import com.sroadtutor.insurance.service.InsuranceLeadService;
 import com.sroadtutor.marketplace.service.LeadRoutingService;
 import com.sroadtutor.school.model.School;
 import com.sroadtutor.school.repository.SchoolRepository;
@@ -71,6 +72,7 @@ public class StudentService {
     private final UserRepository          userRepo;
     private final PasswordEncoder         passwordEncoder;
     private final LeadRoutingService      leadRoutingService;
+    private final InsuranceLeadService    insuranceLeadService;
 
     public StudentService(StudentRepository studentRepo,
                           ParentStudentRepository parentLinkRepo,
@@ -78,7 +80,8 @@ public class StudentService {
                           SchoolRepository schoolRepo,
                           UserRepository userRepo,
                           PasswordEncoder passwordEncoder,
-                          LeadRoutingService leadRoutingService) {
+                          LeadRoutingService leadRoutingService,
+                          InsuranceLeadService insuranceLeadService) {
         this.studentRepo = studentRepo;
         this.parentLinkRepo = parentLinkRepo;
         this.instructorRepo = instructorRepo;
@@ -86,6 +89,7 @@ public class StudentService {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.leadRoutingService = leadRoutingService;
+        this.insuranceLeadService = insuranceLeadService;
     }
 
     // ============================================================
@@ -274,8 +278,10 @@ public class StudentService {
         // PR17 — graduation trigger: route any pending NEW lead to a
         // dealership in the school's province. Routing failures are logged
         // inside the lead service; the student update succeeds either way.
+        // PR18 — same trigger fires the insurance pipeline.
         if (transitioningToPassed) {
             leadRoutingService.onStudentPassed(student.getId());
+            insuranceLeadService.onStudentPassed(student.getId());
         }
 
         return StudentResponse.from(student, loadParentLinks(student.getId()));
