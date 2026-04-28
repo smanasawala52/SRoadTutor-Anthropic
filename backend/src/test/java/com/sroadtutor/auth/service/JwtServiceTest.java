@@ -33,8 +33,9 @@ class JwtServiceTest {
                 new AppProperties.Jwt(SECRET, 15, 30, "sroadtutor-test"),
                 new AppProperties.OAuth(
                         new AppProperties.OAuth.Google("cid", "csecret")),
-                new AppProperties.Cors(java.util.List.of("*"), "GET,POST", "Authorization", true, 3600L)
-        ,null);
+                new AppProperties.Cors(java.util.List.of("*"), "GET,POST", "Authorization", true, 3600L),
+                new AppProperties.Stripe(null, null, null, null,
+                        new AppProperties.Stripe.Prices(null, null, null)));
         jwtService = new JwtService(props);
     }
 
@@ -103,8 +104,9 @@ class JwtServiceTest {
                 new AppProperties.Jwt("short", 15, 30, "iss"),
                 new AppProperties.OAuth(
                         new AppProperties.OAuth.Google("cid", "csec")),
-                new AppProperties.Cors(java.util.List.of("*"), "GET", "*", true, 3600)
-        ,null);
+                new AppProperties.Cors(java.util.List.of("*"), "GET", "*", true, 3600),
+                new AppProperties.Stripe(null, null, null, null,
+                        new AppProperties.Stripe.Prices(null, null, null)));
         assertThatThrownBy(() -> new JwtService(bad))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("32 bytes");

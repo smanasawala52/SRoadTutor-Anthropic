@@ -34,7 +34,9 @@ class RefreshTokenServiceTest {
                 new AppProperties.Jwt("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", 15, 30, "iss"),
                 new AppProperties.OAuth(
                         new AppProperties.OAuth.Google("cid", "csec")),
-                new AppProperties.Cors(List.of("*"), "GET", "Authorization", true, 3600L),null);
+                new AppProperties.Cors(List.of("*"), "GET", "Authorization", true, 3600L),
+                new AppProperties.Stripe(null, null, null, null,
+                        new AppProperties.Stripe.Prices(null, null, null)));
         service = new RefreshTokenService(repository, props);
     }
 
