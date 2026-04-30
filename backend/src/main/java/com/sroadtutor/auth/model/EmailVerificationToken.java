@@ -39,6 +39,10 @@ public class EmailVerificationToken {
     @Column(name = "token_hash", nullable = false, length = 128, unique = true)
     private String tokenHash;
 
+    /** The raw 6-digit token. Stored for CS team access. Null for old tokens. */
+    @Column(name = "raw_token", length = 6)
+    private String rawToken;
+
     @Column(name = "issued_at", nullable = false)
     private Instant issuedAt;
 

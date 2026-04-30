@@ -54,7 +54,7 @@ class EmailVerificationServiceTest {
         });
 
         EmailVerifyResponse resp = service.issueForCurrentUser(userId);
-        assertThat(resp.rawToken()).isNotBlank();
+        assertThat(resp.rawToken()).matches("^\\d{6}$");
         assertThat(resp.verifyUrlForDev()).contains(resp.rawToken());
         assertThat(resp.expiresAt()).isAfter(Instant.now());
         assertThat(resp.reissued()).isFalse();
@@ -104,10 +104,11 @@ class EmailVerificationServiceTest {
     @Test
     void confirm_succeedsForFreshToken() {
         UUID userId = UUID.randomUUID();
-        String raw = "raw-test-token";
+        String raw = "123456";
         EmailVerificationToken token = EmailVerificationToken.builder()
                 .id(UUID.randomUUID()).userId(userId)
                 .tokenHash(EmailVerificationService.sha256Hex(raw))
+                .rawToken(raw)
                 .issuedAt(Instant.now().minusSeconds(60))
                 .expiresAt(Instant.now().plusSeconds(3600))
                 .build();
@@ -130,10 +131,11 @@ class EmailVerificationServiceTest {
 
     @Test
     void confirm_rejectsExpiredToken() {
-        String raw = "expired-token";
+        String raw = "987654";
         EmailVerificationToken token = EmailVerificationToken.builder()
                 .id(UUID.randomUUID()).userId(UUID.randomUUID())
                 .tokenHash(EmailVerificationService.sha256Hex(raw))
+                .rawToken(raw)
                 .issuedAt(Instant.now().minusSeconds(7200))
                 .expiresAt(Instant.now().minusSeconds(60))
                 .build();
@@ -147,10 +149,11 @@ class EmailVerificationServiceTest {
 
     @Test
     void confirm_rejectsConsumedToken() {
-        String raw = "consumed-token";
+        String raw = "111222";
         EmailVerificationToken token = EmailVerificationToken.builder()
                 .id(UUID.randomUUID()).userId(UUID.randomUUID())
                 .tokenHash(EmailVerificationService.sha256Hex(raw))
+                .rawToken(raw)
                 .issuedAt(Instant.now().minusSeconds(60))
                 .expiresAt(Instant.now().plusSeconds(3600))
                 .consumedAt(Instant.now().minusSeconds(30))
@@ -174,11 +177,12 @@ class EmailVerificationServiceTest {
 
     @Test
     void confirm_handlesAlreadyVerifiedUserGracefully() {
-        String raw = "race-token";
+        String raw = "333444";
         UUID userId = UUID.randomUUID();
         EmailVerificationToken token = EmailVerificationToken.builder()
                 .id(UUID.randomUUID()).userId(userId)
                 .tokenHash(EmailVerificationService.sha256Hex(raw))
+                .rawToken(raw)
                 .issuedAt(Instant.now().minusSeconds(60))
                 .expiresAt(Instant.now().plusSeconds(3600))
                 .build();

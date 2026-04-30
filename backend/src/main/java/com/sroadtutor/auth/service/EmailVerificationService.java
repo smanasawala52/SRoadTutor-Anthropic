@@ -93,10 +93,11 @@ public class EmailVerificationService {
             reissued = true;
         }
 
-        String rawToken = randomUrlSafeToken();
+        String rawToken = random6DigitToken();
         EmailVerificationToken token = EmailVerificationToken.builder()
                 .userId(currentUserId)
                 .tokenHash(sha256Hex(rawToken))
+                .rawToken(rawToken)
                 .issuedAt(now)
                 .expiresAt(now.plus(TOKEN_TTL))
                 .build();
@@ -170,10 +171,9 @@ public class EmailVerificationService {
     // Helpers
     // ============================================================
 
-    private String randomUrlSafeToken() {
-        byte[] bytes = new byte[48];
-        random.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    private String random6DigitToken() {
+        int code = 100000 + random.nextInt(900000);
+        return String.valueOf(code);
     }
 
     static String sha256Hex(String raw) {

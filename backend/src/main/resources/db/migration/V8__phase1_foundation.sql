@@ -274,7 +274,8 @@ CREATE INDEX ix_whatsapp_log_school_time  ON whatsapp_message_log(school_id, lin
 CREATE TABLE email_verification_tokens (
     id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id     UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    token_hash  VARCHAR(128) NOT NULL UNIQUE,    -- sha-256 hex
+    token_hash  VARCHAR(128) NOT NULL UNIQUE,
+    raw_token  VARCHAR(6) NULL,  -- sha-256 hex
     issued_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     expires_at  TIMESTAMPTZ  NOT NULL,
     consumed_at TIMESTAMPTZ
