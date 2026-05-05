@@ -1,85 +1,88 @@
 # =============================================================================
-#  SRoadTutor — Mobile CI
+#  SRoadTutor — Android (frontend) CI
 # =============================================================================
-#  Runs on every push / PR touching /mobile. Steps:
+#  Runs on every push / PR that touches /frontend. Steps:
 #    1. Checkout
-#    2. Set up Flutter 3.24 (stable)
-#    3. `flutter pub get`
-#    4. `flutter analyze` (static checks: lints + strict casts)
-#    5. `dart run build_runner build` (Drift + Riverpod code-gen)
-#    6. `flutter test --coverage` (unit + widget tests)
-#    7. Upload the lcov file
-#    8. On pushes to main/qa: build the QA APK and upload as an artifact
-#       so you can download + side-load on a friend's phone from the GitHub
-#       Actions page.
+#    2. Set up JDK 17 + Gradle cache
+#    3. `chmod +x gradlew` (Windows-committed wrappers lose the +x bit)
+#    4. `./gradlew :app:lintDebug :app:testDebugUnitTest`
+#    5. `./gradlew :app:assembleDebug` (debug APK build)
+#    6. Upload lint report + APK as artifacts
 # =============================================================================
 
-name: Mobile CI
+name: Android CI
 
 on:
   push:
     branches: [main, qa, develop]
     paths:
-      - 'mobile/**'
+      - 'frontend/**'
       - '.github/workflows/mobile-ci.yml'
   pull_request:
     branches: [main, qa, develop]
     paths:
-      - 'mobile/**'
+      - 'frontend/**'
 
 concurrency:
-  group: mobile-${{ github.ref }}
+  group: android-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   analyze-and-test:
-    name: Analyze + Test
+    name: Lint + Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17 (for Android Gradle build)
+      - name: Set up JDK 17 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Flutter 3.24 (stable)
-        uses: subosito/flutter-action@v2
+      - name: Cache Gradle
+        uses: actions/cache@v4
         with:
-          flutter-version: '3.24.x'
-          channel: stable
-          cache: true
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('frontend/**/*.gradle*', 'frontend/**/gradle-wrapper.properties', 'frontend/gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-      - name: flutter pub get
-        working-directory: mobile
-        run: flutter pub get
+      - name: Make Gradle Wrapper executable
+        # Files committed from Windows lose the +x bit; restore it so the
+        # wrapper can run on the Linux runner.
+        working-directory: frontend
+        run: chmod +x ./gradlew
 
-      - name: Generate code (Drift + Riverpod)
-        working-directory: mobile
-        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Run lint + unit tests
+        working-directory: frontend
+        run: ./gradlew --no-daemon :app:lintDebug :app:testDebugUnitTest
 
-      - name: flutter analyze
-        working-directory: mobile
-        run: flutter analyze
-
-      - name: flutter test (with coverage)
-        working-directory: mobile
-        run: flutter test --coverage --reporter expanded
-
-      - name: Upload lcov coverage
+      - name: Upload Lint report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-coverage
-          path: mobile/coverage/lcov.info
+          name: android-lint-report
+          path: frontend/app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
           retention-days: 14
 
-  build-qa-apk:
-    name: Build QA APK
+      - name: Upload Test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports
+          path: frontend/app/build/reports/tests/testDebugUnitTest
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build-debug-apk:
+    name: Build Debug APK
     needs: analyze-and-test
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/qa')
     runs-on: ubuntu-latest
@@ -93,27 +96,28 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: subosito/flutter-action@v2
+      - name: Cache Gradle
+        uses: actions/cache@v4
         with:
-          flutter-version: '3.24.x'
-          channel: stable
-          cache: true
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('frontend/**/*.gradle*', 'frontend/**/gradle-wrapper.properties', 'frontend/gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-      - name: flutter pub get
-        working-directory: mobile
-        run: flutter pub get
+      - name: Make Gradle Wrapper executable
+        working-directory: frontend
+        run: chmod +x ./gradlew
 
-      - name: Generate code
-        working-directory: mobile
-        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Assemble debug APK
+        working-directory: frontend
+        run: ./gradlew --no-daemon :app:assembleDebug
 
-      - name: Build APK (QA flavor, release)
-        working-directory: mobile
-        run: flutter build apk --release --flavor qa -t lib/main_qa.dart
-
-      - name: Upload APK
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: sroadtutor-qa-apk
-          path: mobile/build/app/outputs/flutter-apk/app-qa-release.apk
+          name: sroadtutor-debug-apk
+          path: frontend/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
           retention-days: 30
