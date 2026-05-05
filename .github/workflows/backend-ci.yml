@@ -67,6 +67,12 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
+      - name: Make Maven Wrapper executable
+        # Files committed from Windows lose the +x bit; restore it so the
+        # wrapper can run on the Linux runner.
+        working-directory: backend
+        run: chmod +x ./mvnw
+
       - name: Maven verify (unit + integration + JaCoCo gate)
         working-directory: backend
         env:
