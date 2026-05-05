@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">SRoadTutor</string>
+    <string name="app_tagline">قُد بذكاء، تعلّم بسرعة</string>
+
+    <string name="lang_en">English</string>
+    <string name="lang_pa">ਪੰਜਾਬੀ</string>
+    <string name="lang_hi">हिन्दी</string>
+    <string name="lang_ur">اردو</string>
+    <string name="lang_bn">বাংলা</string>
+    <string name="lang_ar">العربية</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_yue">廣東話</string>
+    <string name="lang_fil">Filipino</string>
+    <string name="language">اللغة</string>
+    <string name="select_language">اختر اللغة</string>
+
+    <string name="sign_in">تسجيل الدخول</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="login">دخول</string>
+    <string name="logout">خروج</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="full_name">الاسم الكامل</string>
+    <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="or">أو</string>
+    <string name="sign_in_with_google">تسجيل الدخول بـ Google</string>
+    <string name="new_to_app">جديد على SRoadTutor؟</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="role_owner">مالك المدرسة</string>
+    <string name="role_instructor">مدرّب</string>
+    <string name="role_student">طالب</string>
+    <string name="role_parent">ولي أمر</string>
+
+    <string name="verify_email">تأكيد البريد</string>
+    <string name="verification_code">رمز التحقق</string>
+    <string name="resend_code">إعادة إرسال</string>
+    <string name="back_to_login">العودة لتسجيل الدخول</string>
+
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_sessions">الجلسات</string>
+    <string name="nav_schools">المدارس</string>
+    <string name="nav_team">الفريق</string>
+    <string name="nav_students">الطلاب</string>
+    <string name="nav_alerts">التنبيهات</string>
+    <string name="nav_market">السوق</string>
+    <string name="nav_auto">سيارة</string>
+    <string name="nav_cover">تأمين</string>
+    <string name="nav_invites">دعوات</string>
+    <string name="nav_billing">الفواتير</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <string name="session_calendar">تقويم الجلسات</string>
+    <string name="book_session">حجز جلسة</string>
+    <string name="reschedule">إعادة جدولة</string>
+    <string name="reschedule_session">إعادة جدولة الجلسة</string>
+    <string name="cancel">إلغاء</string>
+    <string name="complete">إكمال</string>
+    <string name="no_show">لم يحضر</string>
+    <string name="log_mistakes">تسجيل أخطاء</string>
+    <string name="view_mistakes">عرض الأخطاء</string>
+    <string name="instructor">مدرّب</string>
+    <string name="student">طالب</string>
+    <string name="scheduled_at">الوقت</string>
+    <string name="duration_minutes">المدة (دقائق)</string>
+    <string name="location_optional">المكان (اختياري)</string>
+    <string name="book">حجز</string>
+    <string name="save">حفظ</string>
+    <string name="no_sessions_in_window">لا توجد جلسات خلال 7 أيام.</string>
+    <string name="parent_pick_child_hint">افتح ملف طفلك.</string>
+
+    <string name="status_scheduled">مجدولة</string>
+    <string name="status_completed">مكتملة</string>
+    <string name="status_cancelled">ملغاة</string>
+
+    <string name="add_student">إضافة طالب</string>
+    <string name="add_new_student">إضافة طالب جديد</string>
+    <string name="student_email">بريد الطالب</string>
+    <string name="package_lessons_hint">الباقة (مثلاً 10 دروس)</string>
+    <string name="add">إضافة</string>
+    <string name="link_parent_account">ربط حساب ولي الأمر</string>
+    <string name="unlink_parent_account">فك ربط ولي الأمر</string>
+    <string name="parent_email_address">بريد ولي الأمر</string>
+    <string name="link">ربط</string>
+    <string name="select_student_hint">اختر طالباً لعرض التفاصيل</string>
+    <string name="package_type">نوع الباقة</string>
+    <string name="readiness_score">درجة الجاهزية</string>
+    <string name="not_calculated">لم تُحسب</string>
+    <string name="linked_parent">ولي الأمر المرتبط</string>
+    <string name="no_parent_linked">لا يوجد ولي أمر مرتبط</string>
+    <string name="view_report_card">عرض كرت التقرير</string>
+    <string name="view_risk_diagnostics">عرض المخاطر</string>
+    <string name="financial_ledger">السجل المالي</string>
+    <string name="manage_phone_numbers">إدارة الأرقام</string>
+    <string name="deactivate_student">إلغاء تفعيل الطالب</string>
+    <string name="reactivate_student">إعادة تفعيل الطالب</string>
+
+    <string name="select_instructor_hint">اختر مدرّباً للتفاصيل</string>
+    <string name="instructor_details">تفاصيل المدرّب</string>
+    <string name="license_no">رقم الرخصة</string>
+    <string name="sgi_certificate">شهادة SGI</string>
+    <string name="vehicle">المركبة</string>
+    <string name="bio">السيرة</string>
+    <string name="no_bio_provided">لا توجد سيرة</string>
+
+    <string name="whatsapp">WhatsApp</string>
+    <string name="whatsapp_not_installed">WhatsApp غير مثبّت</string>
+    <string name="no_primary_phone">لا يوجد رقم أساسي</string>
+
+    <string name="back">رجوع</string>
+    <string name="refresh">تحديث</string>
+    <string name="retry">إعادة</string>
+    <string name="dash">—</string>
+    <string name="loading">جاري التحميل…</string>
+    <string name="welcome">مرحباً بك في SRoadTutor</string>
+    <string name="dashboard_preparing">لوحتك قيد التجهيز.</string>
+</resources>

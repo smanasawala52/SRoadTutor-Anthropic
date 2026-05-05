@@ -63,6 +63,9 @@ public class AuthService {
         // deterministic-but-unique by combining the email's local-part with a short
         // UUID suffix. Service layer always lowercases (uniqueness is on LOWER(username)).
         String username = generateInitialUsername(email);
+        String langPref = request.languagePref() == null || request.languagePref().isBlank()
+                ? "en"
+                : request.languagePref().trim().toLowerCase();
         User user = User.builder()
                 .email(email)
                 .username(username)
@@ -70,6 +73,7 @@ public class AuthService {
                 .fullName(request.fullName())
                 .role(request.role())
                 .authProvider(AuthProvider.LOCAL)
+                .languagePref(langPref)
                 .active(true)
                 .build();
         user = userRepository.save(user);

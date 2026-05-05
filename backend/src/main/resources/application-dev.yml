@@ -33,10 +33,18 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    # Dev-only fallback so local boot doesn't require an env var. Override in
+    # CI / deploy environments. Length must be >= 32 bytes (HS256 requirement).
+    secret: ${JWT_SECRET:dev-only-secret-change-me-please-do-not-use-in-production-ever-ok-thanks}
     access-token-expiration-minutes: ${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:15}
     refresh-token-expiration-days: ${JWT_REFRESH_TOKEN_EXPIRATION_DAYS:30}
     issuer: sroadtutor-dev
+  oauth:
+    google:
+      # Dev defaults so the app context can build even without OAuth wired up;
+      # actual Google login still requires real env vars.
+      client-id: ${GOOGLE_OAUTH_CLIENT_ID:dev-google-client-id}
+      client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:dev-google-client-secret}
 
 logging:
   level:

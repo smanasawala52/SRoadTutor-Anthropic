@@ -53,6 +53,7 @@ class SessionServiceTest {
     @Mock InstructorRepository    instructorRepo;
     @Mock StudentRepository       studentRepo;
     @Mock ParentStudentRepository parentLinkRepo;
+    @Mock com.sroadtutor.auth.repository.UserRepository userRepo;
     @Mock ReminderService         reminderService;
     @Mock PaymentService          paymentService;
 

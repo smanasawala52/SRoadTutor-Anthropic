@@ -17,6 +17,10 @@ import jakarta.validation.constraints.Size;
  * <p>Phone is intentionally absent from signup. It is collected post-auth via
  * {@code POST /api/phone-numbers} (PR4) so the same flow handles WhatsApp opt-in
  * and verification consistently for every channel a user might add.</p>
+ *
+ * <p>{@code languagePref} is the BCP-47-ish language tag the SPA picked
+ * pre-signup (e.g. "en", "pa", "hi", "ur", "bn", "ar", "ko", "yue", "fil").
+ * Optional — defaults to English server-side when blank.</p>
  */
 public record SignupRequest(
         @NotBlank @Email @Size(max = 254) String email,
@@ -26,5 +30,6 @@ public record SignupRequest(
                 message = "Password must contain at least one letter and one number")
         String password,
         @NotBlank @Size(max = 200) String fullName,
-        @NotNull Role role
+        @NotNull Role role,
+        @Size(max = 8) String languagePref
 ) {}

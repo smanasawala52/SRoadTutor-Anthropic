@@ -1,0 +1,173 @@
+<style>
+.w{padding:1rem 0;font-size:14px;color:var(--color-text-primary);line-height:1.6}
+.sec{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary);margin:24px 0 10px}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.card.pu{border-color:#AFA9EC;background:#EEEDFE}.card.pu .ct{color:#26215C}.card.pu .cs{color:#534AB7}
+.card.te{border-color:#5DCAA5;background:#E1F5EE}.card.te .ct{color:#04342C}.card.te .cs{color:#0F6E56}
+.card.am{border-color:#EF9F27;background:#FAEEDA}.card.am .ct{color:#412402}.card.am .cs{color:#633806}
+.card.co{border-color:#F0997B;background:#FAECE7}.card.co .ct{color:#4A1B0C}.card.co .cs{color:#712B13}
+.card.bl{border-color:#85B7EB;background:#E6F1FB}.card.bl .ct{color:#042C53}.card.bl .cs{color:#0C447C}
+.ct{font-size:13px;font-weight:500;margin-bottom:5px}
+.cs{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin:2px 2px 0 0}
+.tag.done{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
+.tag.next{background:#FAEEDA;color:#412402;border:1px solid #EF9F27}
+.tag.later{background:#FAECE7;color:#4A1B0C;border:1px solid #F0997B}
+.tag.fix{background:#FCEBEB;color:#791F1F;border:1px solid #C73838}
+.tag.db{background:#E6F1FB;color:#042C53;border:1px solid #85B7EB}
+.phase-bar{display:flex;gap:0;border-radius:var(--border-radius-lg);overflow:hidden;border:1px solid var(--color-border-tertiary);margin-bottom:10px}
+.pb{flex:1;padding:10px 12px;text-align:center;font-size:12px;font-weight:500}
+.pb.p1{background:#E1F5EE;color:#085041}.pb.p2{background:#FAEEDA;color:#412402}.pb.p3{background:#FAECE7;color:#4A1B0C}
+.pb-sub{font-size:11px;font-weight:400;color:var(--color-text-tertiary);display:block;margin-top:2px}
+.table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.table th{text-align:left;padding:7px 10px;background:var(--color-background-tertiary);color:var(--color-text-secondary);font-weight:500;font-size:11px}
+.table td{padding:7px 10px;border-top:1px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:top}
+.table tr:first-child td{border-top:none}
+.pill{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-right:3px}
+.pill.g{background:#E1F5EE;color:#085041}.pill.p{background:#EEEDFE;color:#26215C}.pill.a{background:#FAEEDA;color:#412402}.pill.r{background:#FCEBEB;color:#791F1F}
+hr{border:none;border-top:1px solid var(--color-border-tertiary);margin:20px 0}
+.note{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;border-left:3px solid #534AB7;margin-top:10px;line-height:1.6}
+.note.warn{border-left-color:#EF9F27;background:#FFF8E8}
+.note.ok{border-left-color:#5DCAA5;background:#E9F8F1}
+@media(max-width:520px){.g2,.g3{grid-template-columns:1fr}}
+</style>
+<div class="w">
+
+<div class="sec">Backend status — where we are right now</div>
+<div class="phase-bar">
+  <div class="pb p1">PR1–PR15 — Phase 1 done<span class="pb-sub">Auth · Phone · WhatsApp · Schools · Instructors · Students · Invitations · Email Verify · Scheduling · Reminders · Payments · Subscriptions · Mistake Logger · PDF Reports · Owner Dashboard</span></div>
+  <div class="pb p2">PR12.5 + PR16–18 — Phase 2 done<span class="pb-sub">Full Stripe · Matchmaker · Dealership Routing · Payouts · Insurance Routing</span></div>
+  <div class="pb p3">PR19/20 — Phase 3 started<span class="pb-sub">Risk Score · AV Telemetry</span></div>
+</div>
+
+<div class="note ok"><strong>Just shipped (this session):</strong> Insurance lead routing (graduation trigger fires alongside dealership — auto-routes to broker in the same province, mark-quoted bounty trigger, mark-converted, mark-dead), New Driver Risk Score (PIPEDA-compliant SHA-256 anonymization with JWT-secret salt, LOW/MEDIUM/HIGH/CRITICAL classifier driven off readiness + FAIL flag, OWNER-scoped generate + read + tier-distribution aggregate), AV edge-case Telemetry (vehicle telemetry events linked to logged mistakes via cascade FK, signed offset_ms for lead-up vs recovery snapshots, dataset-summary stub).</div>
+
+<div class="sec">Phase 1 modules</div>
+<div class="grid g3">
+  <div class="card te"><div class="ct">Auth · JWT · refresh</div><div class="cs">Email + password, Google OAuth, 4 roles, rotation + reuse-detection.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Email verification</div><div class="cs">24h tokens. Issue + redeem.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Phone numbers (1..N)</div><div class="cs">Plan-tier-aware caps. E.164. Primary toggle.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">WhatsApp link generator</div><div class="cs">wa.me click-to-chat. Templates + placeholders. Click-confirm.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Schools</div><div class="cs">Tax IDs, plan tier, jurisdiction, timezone, soft-deactivate. Stripe Customer auto-created on create.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Instructor profiles</div><div class="cs">Self-register or invite. M:N attach. Hours, hourly rate.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Student management</div><div class="cs">Owner/instructor adds. Atomic User+Student+Parent. Graduation trigger on PASSED.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Owner invitations</div><div class="cs">3 types × 2 modes. Pre-populate role-specific row from metadata.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Scheduling engine</div><div class="cs">Conflict detection + working-hours validation (timezone-aware).</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Lesson reminders</div><div class="cs">@Scheduled cron pre-generates 24h-before. Manual fire by instructor.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Payment ledger</div><div class="cs">Auto-create UNPAID at session COMPLETE. Manual record + mark-paid.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Subscriptions + plan limits</div><div class="cs">FREE/PRO/GROWTH/ENTERPRISE. Per-tenant caps.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">SGI mistake logger</div><div class="cs">Pre-seeded catalog. Weighted readiness over last 5 sessions.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">PDF report cards</div><div class="cs">Apache PDFBox 3.0.3. One-page A4.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Owner dashboard</div><div class="cs">Revenue + outstanding + active students + sessions + MRR + per-instructor workloads.</div><span class="tag done">Done</span></div>
+</div>
+
+<div class="sec">Phase 2 modules</div>
+<div class="grid g3">
+  <div class="card te"><div class="ct">Full Stripe wire-up</div><div class="cs">Stripe Java SDK 26.13. Customer-on-school-create. Hosted Checkout. Signature-verified webhook → plan flip. Falls back to admin-mode when STRIPE_SECRET_KEY blank.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">First Car Matchmaker</div><div class="cs">PARENT-only POST. Vehicle preferences JSON, budget, financing flag. One NEW lead per student (re-submit overwrites).</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Dealership Lead Routing</div><div class="cs">Graduation trigger on student PASSED → finds active dealership in school's province → routes lead. OWNER converts → auto-creates $100 PENDING instructor payout.</div><span class="tag done">Done</span></div>
+  <div class="card te"><div class="ct">Insurance Lead Routing (NEW)</div><div class="cs">Graduation trigger fires alongside dealership routing. Province-match preferred, nationwide fallback. Lifecycle: NEW → ROUTED → QUOTED (bounty trigger) → CONVERTED. Province-keyed brokers seeded by admin.</div><span class="tag done">Done</span></div>
+</div>
+
+<div class="sec">Phase 3 modules</div>
+<div class="grid g2">
+  <div class="card co"><div class="ct">New Driver Risk Score (NEW)</div><div class="cs">PIPEDA-compliant: SHA-256(studentId + JWT-secret-salt) anonymization. LOW/MEDIUM/HIGH/CRITICAL classifier — readiness ≥ 90 → LOW, ≥ 70 → MEDIUM, ≥ 50 → HIGH, anything below OR any FAIL recently → CRITICAL. Generate (OWNER-scoped, upsert-by-hash), read by hash, tier-distribution aggregate. B2B API key gate is TD.</div><span class="tag done">Done</span></div>
+  <div class="card co"><div class="ct">AV edge-case Telemetry (NEW)</div><div class="cs">Vehicle-telemetry events linked to logged mistakes (1..N per mistake). Signed offset_ms (negative = lead-up, positive = recovery). Owner attaches via JSON payload. Dataset summary endpoint stub for AV-research B2B; row-level export gated on B2B API key (TD).</div><span class="tag done">Done</span></div>
+</div>
+
+<hr>
+
+<div class="sec">Database — what's actually in the database right now</div>
+<table class="table">
+  <tr><th>Table</th><th>What it stores</th><th>Status</th></tr>
+  <tr><td><strong>users · refresh_tokens · email_verification_tokens</strong></td><td>Auth core.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>schools</strong></td><td>Tenants. Tax IDs, plan tier, timezone, Stripe customer id.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>instructors / instructor_schools</strong></td><td>Profiles + M:N attach.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>students / parent_student</strong></td><td>Profiles + parent links.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>phone_numbers / invitations / whatsapp_*</strong></td><td>Comms primitives.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>lesson_sessions / reminders</strong></td><td>Scheduling + 24h reminder pre-gen.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>payments</strong></td><td>Auto-created UNPAID at COMPLETE + manual rows.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>subscriptions / subscription_usage</strong></td><td>Plan + Stripe sub id + monthly wa.me counter.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>mistake_categories / session_mistakes</strong></td><td>SGI catalog + per-session log.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>dealerships / dealership_leads / instructor_payouts</strong></td><td>Phase 2 dealership marketplace.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>insurance_brokers</strong> (NEW)</td><td>Partnered brokers. Province-keyed routing.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>insurance_leads</strong> (NEW)</td><td>Graduation-routed leads. NEW → ROUTED → QUOTED → CONVERTED.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>risk_scores</strong> (NEW entity)</td><td>Anonymized hashes + tier + mistake profile JSONB.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td><strong>telemetry_events</strong> (NEW)</td><td>Vehicle telemetry per session_mistake. ON DELETE CASCADE.</td><td><span class="pill g">Live + entity</span></td></tr>
+  <tr><td>training_topics / driver_payment_settings / road_test_results</td><td>Schema only.</td><td><span class="pill r">Schema only</span></td></tr>
+</table>
+
+<hr>
+
+<div class="sec">REST endpoints — what's live right now (~95 total)</div>
+<div class="grid g2">
+  <div class="card pu"><div class="ct">/auth + /auth/email-verify (7)</div><div class="cs">signup · login · google · refresh · logout · email-verify/send · email-verify/{token}/confirm</div></div>
+  <div class="card pu"><div class="ct">/api/phone-numbers (7) · /api/whatsapp/links (2)</div><div class="cs">Phone CRUD · primary · whatsapp-optin · wa.me link · click-confirm</div></div>
+  <div class="card pu"><div class="ct">/api/schools (6) + /api/instructors + scope (8)</div><div class="cs">School CRUD + instructor profile + attach/detach</div></div>
+  <div class="card pu"><div class="ct">/api/students (5) + scope (2)</div><div class="cs">Add by owner · me · CRUD · link/unlink parents</div></div>
+  <div class="card pu"><div class="ct">/api/invitations + scope (8)</div><div class="cs">Issue 3 types · revoke · reissue · public lookup · public accept · list</div></div>
+  <div class="card pu"><div class="ct">/api/sessions (7) · /api/reminders (3)</div><div class="cs">Book · reschedule · cancel · complete · no-show · calendar · pending · per-session · fire</div></div>
+  <div class="card pu"><div class="ct">/api/payments (5) · /api/subscriptions + /api/stripe (4)</div><div class="cs">Record · mark-paid · ledger · outstanding · me · upgrade (Stripe Checkout OR admin) · public plans · public Stripe webhook</div></div>
+  <div class="card pu"><div class="ct">/api/mistakes + scope (5)</div><div class="cs">categories · log · session list · student history · readiness</div></div>
+  <div class="card pu"><div class="ct">/api/students/{id}/report-card.pdf · /api/dashboard/owner</div><div class="cs">PDF download · OWNER home rollup</div></div>
+  <div class="card pu"><div class="ct">/api/marketplace (7)</div><div class="cs">PARENT matchmaker submit · my leads · GET dealerships · OWNER school leads · convert · payouts · mark-paid</div></div>
+  <div class="card pu"><div class="ct">/api/insurance (6) NEW</div><div class="cs">GET brokers · OWNER school leads · /leads/{id}/quote · /leads/{id}/convert · /leads/{id}/dead</div></div>
+  <div class="card pu"><div class="ct">/api/risk (3) NEW</div><div class="cs">POST /scores/students/{id}/generate · GET /scores/{hash} · GET /aggregate</div></div>
+  <div class="card pu"><div class="ct">/api/telemetry (3) NEW</div><div class="cs">POST /mistakes/{id}/events · GET /mistakes/{id}/events · GET /dataset/summary</div></div>
+</div>
+
+<hr>
+
+<div class="sec">Marketplace lifecycle (PR16/17/18)</div>
+<table class="table">
+  <tr><th>Lead type</th><th>Created when</th><th>Routed by</th><th>Bounty fires on</th></tr>
+  <tr><td>Dealership</td><td>PARENT submits matchmaker form (PR16)</td><td>Graduation trigger picks dealership in same province (PR17)</td><td>OWNER marks CONVERTED → $100 instructor payout auto-created</td></tr>
+  <tr><td>Insurance</td><td>Auto-created at graduation (PR18 — no parent form)</td><td>Province-match preferred, nationwide fallback</td><td>OWNER marks QUOTED → bounty payable to platform</td></tr>
+</table>
+
+<hr>
+
+<div class="sec">PIPEDA / data-safety design (Phase 3)</div>
+<table class="table">
+  <tr><th>Concern</th><th>Mitigation</th></tr>
+  <tr><td>Risk-score row tied to a real student</td><td>SHA-256(studentId + jwt-secret-salt). Insurer never sees the salt; the platform retains it. Single-source breach can't link hash → student.</td></tr>
+  <tr><td>Risk-score endpoint leaks individual data</td><td>OWNER-only in V1. B2B API key gate is TD before insurer enablement.</td></tr>
+  <tr><td>Aggregate endpoint leaks segments</td><td>Counts-by-tier only. No school-level, jurisdiction-level, or time-bucket detail in V1.</td></tr>
+  <tr><td>Telemetry contains identifying info</td><td>Owner-curated payload — owner decides what's shipped. Schema is opaque JSONB so no required-fields contract leaks identity.</td></tr>
+  <tr><td>Telemetry dataset endpoint</td><td>Counts-only summary. Row-level export is TD with B2B API key.</td></tr>
+</table>
+
+<hr>
+
+<div class="sec">Numbers that matter</div>
+<table class="table">
+  <tr><th>What</th><th>Now</th></tr>
+  <tr><td>Java source files (production)</td><td><strong>~225</strong></td></tr>
+  <tr><td>Test classes</td><td><strong>~28</strong></td></tr>
+  <tr><td>REST endpoints live</td><td><strong>~95</strong></td></tr>
+  <tr><td>JPA-mapped database tables</td><td><strong>25</strong></td></tr>
+  <tr><td>Flyway migrations</td><td><strong>13</strong> (V13 added insurance + telemetry)</td></tr>
+  <tr><td>Error codes in active use</td><td><strong>~110</strong></td></tr>
+  <tr><td>Maven dependencies added</td><td><strong>Apache PDFBox 3.0.3</strong> + <strong>stripe-java 26.13.0</strong></td></tr>
+  <tr><td>Plan tiers</td><td>FREE / PRO ($29) / GROWTH ($69) / ENTERPRISE ($149)</td></tr>
+  <tr><td>Cron jobs</td><td>1 (reminder sweep — every 15 min)</td></tr>
+</table>
+
+<hr>
+
+<div class="sec">Up next</div>
+<table class="table">
+  <tr><th>#</th><th>What</th></tr>
+  <tr><td>1</td><td>B2B API key auth — gate /api/risk and /api/telemetry/dataset for licensed insurers + AV-research firms.</td></tr>
+  <tr><td>2</td><td>Tax-prep export (CRA-ready CSV/API).</td></tr>
+  <tr><td>3</td><td>Multi-page PDF reports.</td></tr>
+  <tr><td>4</td><td>Round-robin / weighted dealership routing when multiple per province.</td></tr>
+  <tr><td>5</td><td>Encrypted-at-rest CRM API keys for dealerships + brokers.</td></tr>
+</table>
+
+<div class="note">Rule: every PR keeps the build green. <code>mvn -B verify</code> must pass.</div>
+<div class="note warn">Deep version with file/line citations: <code>sroadtutor_backend_workflow.html</code>.</div>
+
+</div>

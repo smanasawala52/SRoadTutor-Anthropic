@@ -93,8 +93,8 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (ExpiredJwtException ex) {
-            log.warn("DEV MODE: Bypassing JWT expiration for token");
-            return ex.getClaims();
+            log.debug("JWT expired: {}", ex.getMessage());
+            throw new UnauthorizedException("TOKEN_EXPIRED", "Access token expired — refresh required");
         } catch (JwtException | IllegalArgumentException ex) {
             log.debug("JWT validation failed: {}", ex.getMessage());
             throw new UnauthorizedException("INVALID_TOKEN", "Invalid or expired access token");

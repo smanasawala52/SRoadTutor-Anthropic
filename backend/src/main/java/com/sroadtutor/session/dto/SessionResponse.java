@@ -9,7 +9,9 @@ public record SessionResponse(
         UUID id,
         UUID schoolId,
         UUID instructorId,
+        String instructorName,
         UUID studentId,
+        String studentName,
         Instant scheduledAt,
         Instant endAt,
         int durationMins,
@@ -23,12 +25,19 @@ public record SessionResponse(
         Instant updatedAt
 ) {
 
+    /** Backwards-compat — use {@link #fromEntity(LessonSession, String, String)} when names are available. */
     public static SessionResponse fromEntity(LessonSession s) {
+        return fromEntity(s, null, null);
+    }
+
+    public static SessionResponse fromEntity(LessonSession s, String instructorName, String studentName) {
         return new SessionResponse(
                 s.getId(),
                 s.getSchoolId(),
                 s.getInstructorId(),
+                instructorName,
                 s.getStudentId(),
+                studentName,
                 s.getScheduledAt(),
                 s.getEndAt(),
                 s.getDurationMins(),

@@ -49,21 +49,21 @@ public class InstructorController {
                 SecurityUtil.currentUserId(),
                 request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.of(InstructorResponse.fromEntity(i)));
+                .body(ApiResponse.of(service.toResponse(i)));
     }
 
     @GetMapping("/api/instructors/me")
     @Operation(summary = "Get the caller's instructor profile.")
     public ResponseEntity<ApiResponse<InstructorResponse>> getMe() {
         var i = service.getMine(SecurityUtil.currentUserId());
-        return ResponseEntity.ok(ApiResponse.of(InstructorResponse.fromEntity(i)));
+        return ResponseEntity.ok(ApiResponse.of(service.toResponse(i)));
     }
 
     @GetMapping("/api/instructors/{id}")
     @Operation(summary = "Get an instructor profile by id (self or attached-school OWNER).")
     public ResponseEntity<ApiResponse<InstructorResponse>> get(@PathVariable UUID id) {
         var i = service.getById(SecurityUtil.currentRole(), SecurityUtil.currentUserId(), id);
-        return ResponseEntity.ok(ApiResponse.of(InstructorResponse.fromEntity(i)));
+        return ResponseEntity.ok(ApiResponse.of(service.toResponse(i)));
     }
 
     @PutMapping("/api/instructors/{id}")
@@ -77,7 +77,7 @@ public class InstructorController {
                 SecurityUtil.currentUserId(),
                 id,
                 request);
-        return ResponseEntity.ok(ApiResponse.of(InstructorResponse.fromEntity(i)));
+        return ResponseEntity.ok(ApiResponse.of(service.toResponse(i)));
     }
 
     @PostMapping("/api/instructors/{id}/deactivate")
@@ -87,7 +87,7 @@ public class InstructorController {
                 SecurityUtil.currentRole(),
                 SecurityUtil.currentUserId(),
                 id);
-        return ResponseEntity.ok(ApiResponse.of(InstructorResponse.fromEntity(i)));
+        return ResponseEntity.ok(ApiResponse.of(service.toResponse(i)));
     }
 
     // ----- school-scoped (attach / detach / list) -----
@@ -102,7 +102,7 @@ public class InstructorController {
                 SecurityUtil.currentUserId(),
                 schoolId);
         return ResponseEntity.ok(ApiResponse.of(
-                list.stream().map(InstructorResponse::fromEntity).toList()));
+                list.stream().map(service::toResponse).toList()));
     }
 
     @PostMapping("/api/schools/{schoolId}/instructors/{instructorId}/attach")

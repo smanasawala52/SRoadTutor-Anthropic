@@ -6,6 +6,7 @@ import com.sroadtutor.auth.repository.UserRepository;
 import com.sroadtutor.exception.BadRequestException;
 import com.sroadtutor.exception.ResourceNotFoundException;
 import com.sroadtutor.instructor.dto.InstructorCreateRequest;
+import com.sroadtutor.instructor.dto.InstructorResponse;
 import com.sroadtutor.instructor.dto.InstructorUpdateRequest;
 import com.sroadtutor.instructor.model.Instructor;
 import com.sroadtutor.instructor.model.InstructorSchool;
@@ -351,5 +352,16 @@ public class InstructorService {
         if (s == null) return null;
         String t = s.trim();
         return t.isEmpty() ? null : t;
+    }
+
+    /**
+     * Build an InstructorResponse with the owning User's fullName / email
+     * eagerly loaded. Use everywhere instead of {@code InstructorResponse.fromEntity(i)}
+     * so SPA clients always see a meaningful instructor name in lists.
+     */
+    @Transactional(readOnly = true)
+    public InstructorResponse toResponse(Instructor instructor) {
+        User user = userRepo.findById(instructor.getUserId()).orElse(null);
+        return InstructorResponse.fromEntity(instructor, user);
     }
 }

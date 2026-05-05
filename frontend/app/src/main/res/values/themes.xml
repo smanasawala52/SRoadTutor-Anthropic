@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.SRoadTutor" parent="Theme.Material3.Light.NoActionBar" />
+</resources>

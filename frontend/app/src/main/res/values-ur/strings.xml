@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">SRoadTutor</string>
+    <string name="app_tagline">ہوشیاری سے چلائیں، تیزی سے سیکھیں</string>
+
+    <string name="lang_en">English</string>
+    <string name="lang_pa">ਪੰਜਾਬੀ</string>
+    <string name="lang_hi">हिन्दी</string>
+    <string name="lang_ur">اردو</string>
+    <string name="lang_bn">বাংলা</string>
+    <string name="lang_ar">العربية</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_yue">廣東話</string>
+    <string name="lang_fil">Filipino</string>
+    <string name="language">زبان</string>
+    <string name="select_language">زبان منتخب کریں</string>
+
+    <string name="sign_in">سائن ان</string>
+    <string name="sign_up">سائن اپ</string>
+    <string name="login">لاگ ان</string>
+    <string name="logout">لاگ آؤٹ</string>
+    <string name="email">ای میل ایڈریس</string>
+    <string name="password">پاس ورڈ</string>
+    <string name="full_name">پورا نام</string>
+    <string name="forgot_password">پاس ورڈ بھول گئے؟</string>
+    <string name="or">یا</string>
+    <string name="sign_in_with_google">Google سے سائن ان کریں</string>
+    <string name="new_to_app">SRoadTutor پر نئے؟</string>
+    <string name="create_account">اکاؤنٹ بنائیں</string>
+    <string name="role_owner">اسکول مالک</string>
+    <string name="role_instructor">انسٹرکٹر</string>
+    <string name="role_student">طالب علم</string>
+    <string name="role_parent">والدین</string>
+
+    <string name="verify_email">ای میل کی تصدیق کریں</string>
+    <string name="verification_code">تصدیقی کوڈ</string>
+    <string name="resend_code">کوڈ دوبارہ بھیجیں</string>
+    <string name="back_to_login">لاگ ان پر واپس</string>
+
+    <string name="nav_home">ہوم</string>
+    <string name="nav_sessions">سیشنز</string>
+    <string name="nav_schools">اسکول</string>
+    <string name="nav_team">ٹیم</string>
+    <string name="nav_students">طلباء</string>
+    <string name="nav_alerts">انتباہات</string>
+    <string name="nav_market">مارکیٹ</string>
+    <string name="nav_auto">آٹو</string>
+    <string name="nav_cover">انشورنس</string>
+    <string name="nav_invites">دعوت نامے</string>
+    <string name="nav_billing">بلنگ</string>
+    <string name="nav_settings">سیٹنگز</string>
+
+    <string name="session_calendar">سیشن کیلنڈر</string>
+    <string name="book_session">سیشن بک کریں</string>
+    <string name="reschedule">دوبارہ شیڈول</string>
+    <string name="reschedule_session">سیشن دوبارہ شیڈول کریں</string>
+    <string name="cancel">منسوخ</string>
+    <string name="complete">مکمل</string>
+    <string name="no_show">غیر حاضر</string>
+    <string name="log_mistakes">غلطیاں درج کریں</string>
+    <string name="view_mistakes">غلطیاں دیکھیں</string>
+    <string name="instructor">انسٹرکٹر</string>
+    <string name="student">طالب علم</string>
+    <string name="scheduled_at">وقت</string>
+    <string name="duration_minutes">دورانیہ (منٹ)</string>
+    <string name="location_optional">مقام (اختیاری)</string>
+    <string name="book">بک کریں</string>
+    <string name="save">محفوظ</string>
+    <string name="no_sessions_in_window">اگلے 7 دنوں میں کوئی سیشن نہیں۔</string>
+    <string name="parent_pick_child_hint">اپنے بچے کا پروفائل کھولیں۔</string>
+
+    <string name="status_scheduled">شیڈول</string>
+    <string name="status_completed">مکمل</string>
+    <string name="status_cancelled">منسوخ</string>
+
+    <string name="add_student">طالب علم شامل کریں</string>
+    <string name="add_new_student">نیا طالب علم شامل کریں</string>
+    <string name="student_email">طالب علم کا ای میل</string>
+    <string name="package_lessons_hint">پیکج (مثلاً 10 اسباق)</string>
+    <string name="add">شامل کریں</string>
+    <string name="link_parent_account">والدین کا اکاؤنٹ منسلک کریں</string>
+    <string name="unlink_parent_account">والدین کا اکاؤنٹ غیر منسلک کریں</string>
+    <string name="parent_email_address">والدین کا ای میل</string>
+    <string name="link">منسلک کریں</string>
+    <string name="select_student_hint">تفصیلات دیکھنے کیلئے طالب علم منتخب کریں</string>
+    <string name="package_type">پیکج کی قسم</string>
+    <string name="readiness_score">تیاری اسکور</string>
+    <string name="not_calculated">حساب نہیں کیا گیا</string>
+    <string name="linked_parent">منسلک والدین</string>
+    <string name="no_parent_linked">کوئی والدین منسلک نہیں</string>
+    <string name="view_report_card">رپورٹ کارڈ دیکھیں</string>
+    <string name="view_risk_diagnostics">خطرہ دیکھیں</string>
+    <string name="financial_ledger">مالی کھاتہ</string>
+    <string name="manage_phone_numbers">فون نمبر منظم کریں</string>
+    <string name="deactivate_student">طالب علم غیر فعال کریں</string>
+    <string name="reactivate_student">طالب علم دوبارہ فعال</string>
+
+    <string name="select_instructor_hint">تفصیلات کیلئے انسٹرکٹر منتخب کریں</string>
+    <string name="instructor_details">انسٹرکٹر تفصیلات</string>
+    <string name="license_no">لائسنس نمبر</string>
+    <string name="sgi_certificate">SGI سرٹیفکیٹ</string>
+    <string name="vehicle">گاڑی</string>
+    <string name="bio">تعارف</string>
+    <string name="no_bio_provided">کوئی تعارف نہیں</string>
+
+    <string name="whatsapp">WhatsApp</string>
+    <string name="whatsapp_not_installed">WhatsApp انسٹال نہیں</string>
+    <string name="no_primary_phone">بنیادی فون نہیں</string>
+
+    <string name="back">واپس</string>
+    <string name="refresh">تازہ کریں</string>
+    <string name="retry">دوبارہ کوشش</string>
+    <string name="dash">—</string>
+    <string name="loading">لوڈ ہو رہا ہے…</string>
+    <string name="welcome">SRoadTutor میں خوش آمدید</string>
+    <string name="dashboard_preparing">آپ کا ڈیش بورڈ تیار ہو رہا ہے۔</string>
+</resources>

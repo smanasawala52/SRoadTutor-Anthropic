@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">SRoadTutor</string>
+    <string name="app_tagline">Magmaneho nang Matalino, Matuto nang Mabilis</string>
+
+    <string name="lang_en">English</string>
+    <string name="lang_pa">ਪੰਜਾਬੀ</string>
+    <string name="lang_hi">हिन्दी</string>
+    <string name="lang_ur">اردو</string>
+    <string name="lang_bn">বাংলা</string>
+    <string name="lang_ar">العربية</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_yue">廣東話</string>
+    <string name="lang_fil">Filipino</string>
+    <string name="language">Wika</string>
+    <string name="select_language">Pumili ng wika</string>
+
+    <string name="sign_in">Mag-sign In</string>
+    <string name="sign_up">Mag-sign Up</string>
+    <string name="login">Mag-login</string>
+    <string name="logout">Mag-logout</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="full_name">Buong Pangalan</string>
+    <string name="forgot_password">Nakalimutan ang password?</string>
+    <string name="or">O</string>
+    <string name="sign_in_with_google">Mag-sign in gamit ang Google</string>
+    <string name="new_to_app">Bago sa SRoadTutor?</string>
+    <string name="create_account">Gumawa ng Account</string>
+    <string name="role_owner">May-ari ng Paaralan</string>
+    <string name="role_instructor">Tagapagsanay</string>
+    <string name="role_student">Mag-aaral</string>
+    <string name="role_parent">Magulang</string>
+
+    <string name="verify_email">I-verify ang Email</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="resend_code">Ipadala muli ang code</string>
+    <string name="back_to_login">Bumalik sa Login</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_sessions">Sesyon</string>
+    <string name="nav_schools">Paaralan</string>
+    <string name="nav_team">Koponan</string>
+    <string name="nav_students">Mag-aaral</string>
+    <string name="nav_alerts">Abiso</string>
+    <string name="nav_market">Merkado</string>
+    <string name="nav_auto">Sasakyan</string>
+    <string name="nav_cover">Insurance</string>
+    <string name="nav_invites">Imbitasyon</string>
+    <string name="nav_billing">Bayarin</string>
+    <string name="nav_settings">Mga Setting</string>
+
+    <string name="session_calendar">Kalendaryo ng Sesyon</string>
+    <string name="book_session">Mag-book ng Sesyon</string>
+    <string name="reschedule">Baguhin ang Iskedyul</string>
+    <string name="reschedule_session">Baguhin ang Iskedyul ng Sesyon</string>
+    <string name="cancel">Kanselahin</string>
+    <string name="complete">Kumpleto</string>
+    <string name="no_show">Hindi Pumunta</string>
+    <string name="log_mistakes">Itala ang Pagkakamali</string>
+    <string name="view_mistakes">Tingnan ang Pagkakamali</string>
+    <string name="instructor">Tagapagsanay</string>
+    <string name="student">Mag-aaral</string>
+    <string name="scheduled_at">Oras</string>
+    <string name="duration_minutes">Tagal (minuto)</string>
+    <string name="location_optional">Lokasyon (opsyonal)</string>
+    <string name="book">I-book</string>
+    <string name="save">I-save</string>
+    <string name="no_sessions_in_window">Walang sesyon sa susunod na 7 araw.</string>
+    <string name="parent_pick_child_hint">Buksan ang profile ng iyong anak.</string>
+
+    <string name="status_scheduled">NAKAISKEDYUL</string>
+    <string name="status_completed">TAPOS</string>
+    <string name="status_cancelled">KANSELADO</string>
+
+    <string name="add_student">Magdagdag ng Mag-aaral</string>
+    <string name="add_new_student">Magdagdag ng Bagong Mag-aaral</string>
+    <string name="student_email">Email ng Mag-aaral</string>
+    <string name="package_lessons_hint">Pakete (hal. 10 Aralin)</string>
+    <string name="add">Idagdag</string>
+    <string name="link_parent_account">I-link ang Account ng Magulang</string>
+    <string name="unlink_parent_account">Tanggalin ang Link ng Magulang</string>
+    <string name="parent_email_address">Email ng Magulang</string>
+    <string name="link">I-link</string>
+    <string name="select_student_hint">Pumili ng mag-aaral upang makita ang detalye</string>
+    <string name="package_type">Uri ng Pakete</string>
+    <string name="readiness_score">Iskor ng Kahandaan</string>
+    <string name="not_calculated">Hindi pa nakalkula</string>
+    <string name="linked_parent">Naka-link na Magulang</string>
+    <string name="no_parent_linked">Walang naka-link na magulang</string>
+    <string name="view_report_card">Tingnan ang Report Card</string>
+    <string name="view_risk_diagnostics">Tingnan ang Panganib</string>
+    <string name="financial_ledger">Talaan ng Bayad</string>
+    <string name="manage_phone_numbers">Pamahalaan ang Telepono</string>
+    <string name="deactivate_student">I-deactivate ang Mag-aaral</string>
+    <string name="reactivate_student">I-reactivate ang Mag-aaral</string>
+
+    <string name="select_instructor_hint">Pumili ng tagapagsanay para sa detalye</string>
+    <string name="instructor_details">Detalye ng Tagapagsanay</string>
+    <string name="license_no">Lisensya Numero</string>
+    <string name="sgi_certificate">SGI Sertipiko</string>
+    <string name="vehicle">Sasakyan</string>
+    <string name="bio">Talambuhay</string>
+    <string name="no_bio_provided">Walang talambuhay</string>
+
+    <string name="whatsapp">WhatsApp</string>
+    <string name="whatsapp_not_installed">Hindi naka-install ang WhatsApp</string>
+    <string name="no_primary_phone">Walang pangunahing telepono</string>
+
+    <string name="back">Bumalik</string>
+    <string name="refresh">I-refresh</string>
+    <string name="retry">Subukan muli</string>
+    <string name="dash">—</string>
+    <string name="loading">Naglo-load…</string>
+    <string name="welcome">Maligayang pagdating sa SRoadTutor</string>
+    <string name="dashboard_preparing">Inihahanda ang iyong dashboard.</string>
+</resources>

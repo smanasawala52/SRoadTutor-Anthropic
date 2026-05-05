@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">SRoadTutor</string>
+    <string name="app_tagline">精明駕駛，快速學習</string>
+
+    <string name="lang_en">English</string>
+    <string name="lang_pa">ਪੰਜਾਬੀ</string>
+    <string name="lang_hi">हिन्दी</string>
+    <string name="lang_ur">اردو</string>
+    <string name="lang_bn">বাংলা</string>
+    <string name="lang_ar">العربية</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_yue">廣東話</string>
+    <string name="lang_fil">Filipino</string>
+    <string name="language">語言</string>
+    <string name="select_language">選擇語言</string>
+
+    <string name="sign_in">登入</string>
+    <string name="sign_up">註冊</string>
+    <string name="login">登入</string>
+    <string name="logout">登出</string>
+    <string name="email">電郵地址</string>
+    <string name="password">密碼</string>
+    <string name="full_name">全名</string>
+    <string name="forgot_password">忘記密碼？</string>
+    <string name="or">或</string>
+    <string name="sign_in_with_google">用 Google 登入</string>
+    <string name="new_to_app">第一次使用 SRoadTutor？</string>
+    <string name="create_account">建立帳戶</string>
+    <string name="role_owner">學校東主</string>
+    <string name="role_instructor">教練</string>
+    <string name="role_student">學員</string>
+    <string name="role_parent">家長</string>
+
+    <string name="verify_email">驗證電郵</string>
+    <string name="verification_code">驗證碼</string>
+    <string name="resend_code">重新發送</string>
+    <string name="back_to_login">返回登入</string>
+
+    <string name="nav_home">主頁</string>
+    <string name="nav_sessions">課堂</string>
+    <string name="nav_schools">學校</string>
+    <string name="nav_team">團隊</string>
+    <string name="nav_students">學員</string>
+    <string name="nav_alerts">提醒</string>
+    <string name="nav_market">市場</string>
+    <string name="nav_auto">汽車</string>
+    <string name="nav_cover">保險</string>
+    <string name="nav_invites">邀請</string>
+    <string name="nav_billing">帳單</string>
+    <string name="nav_settings">設定</string>
+
+    <string name="session_calendar">課堂日曆</string>
+    <string name="book_session">預約課堂</string>
+    <string name="reschedule">改期</string>
+    <string name="reschedule_session">改期課堂</string>
+    <string name="cancel">取消</string>
+    <string name="complete">完成</string>
+    <string name="no_show">缺席</string>
+    <string name="log_mistakes">記錄錯誤</string>
+    <string name="view_mistakes">查看錯誤</string>
+    <string name="instructor">教練</string>
+    <string name="student">學員</string>
+    <string name="scheduled_at">時間</string>
+    <string name="duration_minutes">時長（分鐘）</string>
+    <string name="location_optional">地點（選填）</string>
+    <string name="book">預約</string>
+    <string name="save">儲存</string>
+    <string name="no_sessions_in_window">未來 7 日內無課堂。</string>
+    <string name="parent_pick_child_hint">請打開子女的個人檔案。</string>
+
+    <string name="status_scheduled">已預約</string>
+    <string name="status_completed">已完成</string>
+    <string name="status_cancelled">已取消</string>
+
+    <string name="add_student">新增學員</string>
+    <string name="add_new_student">新增學員</string>
+    <string name="student_email">學員電郵</string>
+    <string name="package_lessons_hint">套餐（例如 10 堂）</string>
+    <string name="add">新增</string>
+    <string name="link_parent_account">連結家長帳戶</string>
+    <string name="unlink_parent_account">解除家長帳戶</string>
+    <string name="parent_email_address">家長電郵</string>
+    <string name="link">連結</string>
+    <string name="select_student_hint">選擇學員查看詳情</string>
+    <string name="package_type">套餐類型</string>
+    <string name="readiness_score">準備分數</string>
+    <string name="not_calculated">未計算</string>
+    <string name="linked_parent">已連結家長</string>
+    <string name="no_parent_linked">未連結家長</string>
+    <string name="view_report_card">查看成績單</string>
+    <string name="view_risk_diagnostics">查看風險</string>
+    <string name="financial_ledger">財務記錄</string>
+    <string name="manage_phone_numbers">管理電話</string>
+    <string name="deactivate_student">停用學員</string>
+    <string name="reactivate_student">重新啟用學員</string>
+
+    <string name="select_instructor_hint">選擇教練查看詳情</string>
+    <string name="instructor_details">教練詳情</string>
+    <string name="license_no">牌照號碼</string>
+    <string name="sgi_certificate">SGI 證書</string>
+    <string name="vehicle">車輛</string>
+    <string name="bio">簡介</string>
+    <string name="no_bio_provided">未提供簡介</string>
+
+    <string name="whatsapp">WhatsApp</string>
+    <string name="whatsapp_not_installed">未安裝 WhatsApp</string>
+    <string name="no_primary_phone">無主電話</string>
+
+    <string name="back">返回</string>
+    <string name="refresh">重新整理</string>
+    <string name="retry">重試</string>
+    <string name="dash">—</string>
+    <string name="loading">載入中…</string>
+    <string name="welcome">歡迎使用 SRoadTutor</string>
+    <string name="dashboard_preparing">正在準備你的儀表板。</string>
+</resources>

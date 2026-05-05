@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">SRoadTutor</string>
+    <string name="app_tagline">스마트하게 운전, 빠르게 학습</string>
+
+    <string name="lang_en">English</string>
+    <string name="lang_pa">ਪੰਜਾਬੀ</string>
+    <string name="lang_hi">हिन्दी</string>
+    <string name="lang_ur">اردو</string>
+    <string name="lang_bn">বাংলা</string>
+    <string name="lang_ar">العربية</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_yue">廣東話</string>
+    <string name="lang_fil">Filipino</string>
+    <string name="language">언어</string>
+    <string name="select_language">언어 선택</string>
+
+    <string name="sign_in">로그인</string>
+    <string name="sign_up">회원가입</string>
+    <string name="login">로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="email">이메일 주소</string>
+    <string name="password">비밀번호</string>
+    <string name="full_name">성명</string>
+    <string name="forgot_password">비밀번호를 잊으셨나요?</string>
+    <string name="or">또는</string>
+    <string name="sign_in_with_google">Google로 로그인</string>
+    <string name="new_to_app">SRoadTutor가 처음이신가요?</string>
+    <string name="create_account">계정 만들기</string>
+    <string name="role_owner">학원 소유자</string>
+    <string name="role_instructor">강사</string>
+    <string name="role_student">학생</string>
+    <string name="role_parent">학부모</string>
+
+    <string name="verify_email">이메일 인증</string>
+    <string name="verification_code">인증 코드</string>
+    <string name="resend_code">코드 재전송</string>
+    <string name="back_to_login">로그인으로 돌아가기</string>
+
+    <string name="nav_home">홈</string>
+    <string name="nav_sessions">수업</string>
+    <string name="nav_schools">학원</string>
+    <string name="nav_team">팀</string>
+    <string name="nav_students">학생</string>
+    <string name="nav_alerts">알림</string>
+    <string name="nav_market">마켓</string>
+    <string name="nav_auto">자동차</string>
+    <string name="nav_cover">보험</string>
+    <string name="nav_invites">초대</string>
+    <string name="nav_billing">청구</string>
+    <string name="nav_settings">설정</string>
+
+    <string name="session_calendar">수업 달력</string>
+    <string name="book_session">수업 예약</string>
+    <string name="reschedule">일정 변경</string>
+    <string name="reschedule_session">수업 일정 변경</string>
+    <string name="cancel">취소</string>
+    <string name="complete">완료</string>
+    <string name="no_show">불참</string>
+    <string name="log_mistakes">실수 기록</string>
+    <string name="view_mistakes">실수 보기</string>
+    <string name="instructor">강사</string>
+    <string name="student">학생</string>
+    <string name="scheduled_at">시간</string>
+    <string name="duration_minutes">시간(분)</string>
+    <string name="location_optional">장소(선택)</string>
+    <string name="book">예약</string>
+    <string name="save">저장</string>
+    <string name="no_sessions_in_window">7일 내 예약된 수업이 없습니다.</string>
+    <string name="parent_pick_child_hint">자녀 프로필을 여세요.</string>
+
+    <string name="status_scheduled">예약됨</string>
+    <string name="status_completed">완료</string>
+    <string name="status_cancelled">취소됨</string>
+
+    <string name="add_student">학생 추가</string>
+    <string name="add_new_student">새 학생 추가</string>
+    <string name="student_email">학생 이메일</string>
+    <string name="package_lessons_hint">패키지 (예: 10회)</string>
+    <string name="add">추가</string>
+    <string name="link_parent_account">학부모 계정 연결</string>
+    <string name="unlink_parent_account">학부모 계정 해제</string>
+    <string name="parent_email_address">학부모 이메일</string>
+    <string name="link">연결</string>
+    <string name="select_student_hint">학생을 선택하여 상세보기</string>
+    <string name="package_type">패키지 유형</string>
+    <string name="readiness_score">준비도 점수</string>
+    <string name="not_calculated">계산되지 않음</string>
+    <string name="linked_parent">연결된 학부모</string>
+    <string name="no_parent_linked">연결된 학부모 없음</string>
+    <string name="view_report_card">성적표 보기</string>
+    <string name="view_risk_diagnostics">위험 진단</string>
+    <string name="financial_ledger">결제 내역</string>
+    <string name="manage_phone_numbers">전화번호 관리</string>
+    <string name="deactivate_student">학생 비활성화</string>
+    <string name="reactivate_student">학생 재활성화</string>
+
+    <string name="select_instructor_hint">강사를 선택하여 상세보기</string>
+    <string name="instructor_details">강사 상세정보</string>
+    <string name="license_no">면허 번호</string>
+    <string name="sgi_certificate">SGI 인증서</string>
+    <string name="vehicle">차량</string>
+    <string name="bio">소개</string>
+    <string name="no_bio_provided">소개 없음</string>
+
+    <string name="whatsapp">WhatsApp</string>
+    <string name="whatsapp_not_installed">WhatsApp이 설치되지 않음</string>
+    <string name="no_primary_phone">기본 전화번호 없음</string>
+
+    <string name="back">뒤로</string>
+    <string name="refresh">새로고침</string>
+    <string name="retry">다시 시도</string>
+    <string name="dash">—</string>
+    <string name="loading">로딩 중…</string>
+    <string name="welcome">SRoadTutor에 오신 것을 환영합니다</string>
+    <string name="dashboard_preparing">대시보드를 준비 중입니다.</string>
+</resources>

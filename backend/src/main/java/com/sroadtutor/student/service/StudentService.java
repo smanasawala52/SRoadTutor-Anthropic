@@ -190,7 +190,7 @@ public class StudentService {
         log.info("Student {} added to school {} by {} {} (parent linked: {})",
                 student.getId(), schoolId, role, currentUserId, !parents.isEmpty());
 
-        return StudentResponse.from(student, parents);
+        return toResponse(student, parents);
     }
 
     // ============================================================
@@ -202,7 +202,7 @@ public class StudentService {
         Student student = studentRepo.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
         requireReadScope(role, currentUserId, student);
-        return StudentResponse.from(student, loadParentLinks(student.getId()));
+        return toResponse(student);
     }
 
     @Transactional(readOnly = true)
@@ -223,7 +223,7 @@ public class StudentService {
         }
 
         return rows.stream()
-                .map(s -> StudentResponse.from(s, loadParentLinks(s.getId())))
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -231,7 +231,7 @@ public class StudentService {
     public StudentResponse getMine(UUID currentUserId) {
         Student student = studentRepo.findByUserId(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Caller has no student profile"));
-        return StudentResponse.from(student, loadParentLinks(student.getId()));
+        return toResponse(student);
     }
 
     // ============================================================
@@ -284,7 +284,7 @@ public class StudentService {
             insuranceLeadService.onStudentPassed(student.getId());
         }
 
-        return StudentResponse.from(student, loadParentLinks(student.getId()));
+        return toResponse(student);
     }
 
     // ============================================================
@@ -320,7 +320,7 @@ public class StudentService {
         log.info("Parent {} linked to student {} by {} {}",
                 pl.parentUser.getId(), student.getId(), role, currentUserId);
 
-        return StudentResponse.from(student, loadParentLinks(student.getId()));
+        return toResponse(student);
     }
 
     @Transactional
@@ -373,6 +373,20 @@ public class StudentService {
                 .build();
         parentUser = userRepo.save(parentUser);
         return new ParentLinkResult(parentUser, true);
+    }
+
+    /**
+     * Build a StudentResponse with the owning User's fullName / email / active
+     * eagerly loaded. Use everywhere instead of {@code StudentResponse.from(student, parents)}
+     * so SPA clients always see a meaningful student name in lists.
+     */
+    private StudentResponse toResponse(Student student) {
+        return toResponse(student, loadParentLinks(student.getId()));
+    }
+
+    private StudentResponse toResponse(Student student, List<StudentResponse.ParentLink> parents) {
+        User user = userRepo.findById(student.getUserId()).orElse(null);
+        return StudentResponse.from(student, user, parents);
     }
 
     private List<StudentResponse.ParentLink> loadParentLinks(UUID studentId) {

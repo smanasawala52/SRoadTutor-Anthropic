@@ -1,6 +1,8 @@
 package com.sroadtutor.session.service;
 
 import com.sroadtutor.auth.model.Role;
+import com.sroadtutor.auth.model.User;
+import com.sroadtutor.auth.repository.UserRepository;
 import com.sroadtutor.exception.BadRequestException;
 import com.sroadtutor.exception.ResourceNotFoundException;
 import com.sroadtutor.instructor.model.Instructor;
@@ -81,6 +83,7 @@ public class SessionService {
     private final InstructorRepository    instructorRepo;
     private final StudentRepository       studentRepo;
     private final ParentStudentRepository parentLinkRepo;
+    private final UserRepository          userRepo;
 
     /**
      * {@code @Lazy} breaks the SessionService → ReminderService → SessionService
@@ -96,6 +99,7 @@ public class SessionService {
                           InstructorRepository instructorRepo,
                           StudentRepository studentRepo,
                           ParentStudentRepository parentLinkRepo,
+                          UserRepository userRepo,
                           @Lazy ReminderService reminderService,
                           PaymentService paymentService) {
         this.sessionRepo = sessionRepo;
@@ -103,8 +107,27 @@ public class SessionService {
         this.instructorRepo = instructorRepo;
         this.studentRepo = studentRepo;
         this.parentLinkRepo = parentLinkRepo;
+        this.userRepo = userRepo;
         this.reminderService = reminderService;
         this.paymentService = paymentService;
+    }
+
+    /**
+     * Build a SessionResponse with instructor + student fullName eagerly resolved
+     * from the User table. Use everywhere instead of {@code SessionResponse.fromEntity(s)}
+     * so SPA clients can show meaningful names in the calendar list.
+     */
+    @Transactional(readOnly = true)
+    public com.sroadtutor.session.dto.SessionResponse toResponse(LessonSession s) {
+        String instructorName = instructorRepo.findById(s.getInstructorId())
+                .flatMap(i -> userRepo.findById(i.getUserId()))
+                .map(User::getFullName)
+                .orElse(null);
+        String studentName = studentRepo.findById(s.getStudentId())
+                .flatMap(st -> userRepo.findById(st.getUserId()))
+                .map(User::getFullName)
+                .orElse(null);
+        return com.sroadtutor.session.dto.SessionResponse.fromEntity(s, instructorName, studentName);
     }
 
     // ============================================================
